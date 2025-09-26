@@ -35,7 +35,7 @@ const EducationSection = () => {
 
 const ResumeHeader = () => {
   return (<header className={styles.header}>
-    <button onClick={() => fetch("/api/ImportPosting", { method: "POST", body: "{ 'id':10, 'PostingText': 'Hello, world!' }" })}>Import</button>
+    <button onClick={() => fetch("/api/ImportJobPosting", { method: "POST", body: "{ 'id':10, 'PostingText': 'Hello, world!' }" })}>Import</button>
     <h1>{resumeData.name}</h1>
     <h2>{resumeData.title}</h2>
     <p>{resumeData.about}</p>

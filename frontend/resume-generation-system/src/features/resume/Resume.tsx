@@ -38,7 +38,7 @@ const ResumeHeader = () => {
     <button onClick={() => fetch("/api/ImportJobPosting", {
       method: "POST",
       headers: { 'Content-Type': 'application/json' },
-      body: "{ 'id':10, 'PostingText': 'Hello, world!' }"
+      body: JSON.stringify({ id: 10, PostingText: "Hello, world!" })
     })}>Import</button>
     <h1>{resumeData.name}</h1>
     <h2>{resumeData.title}</h2>

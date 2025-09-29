@@ -25,7 +25,7 @@ public class ImportJobPosting
             Microsoft.Azure.Cosmos.CosmosClient client = new(accountEndpoint: "https://resume-generation-system.documents.azure.com:443/", tokenCredential: new DefaultAzureCredential());
             var pendingPostings = client.GetContainer("Resumes", "PendingPostings");
             var payload = await req.ReadFromJsonAsync<JobPostingPayload>();
-            await pendingPostings.UpsertItemAsync(new { Id = Guid.NewGuid().ToString(), payload.PostingText });
+            await pendingPostings.UpsertItemAsync(new { id = Guid.NewGuid().ToString(), payload.PostingText });
             return new OkResult();
         }
         catch (Exception e)

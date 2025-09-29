@@ -17,14 +17,13 @@ public class ImportJobPosting
     }
 
     [Function("ImportJobPosting")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req, [FromBody] JobPostingPayload payload)
     {
         try
         {
             _logger.LogInformation("C# HTTP trigger function processed a request.");
             Microsoft.Azure.Cosmos.CosmosClient client = new(accountEndpoint: "https://resume-generation-system.documents.azure.com:443/", tokenCredential: new DefaultAzureCredential());
             var pendingPostings = client.GetContainer("Resumes", "PendingPostings");
-            var payload = await req.ReadFromJsonAsync<JobPostingPayload>();
             await pendingPostings.UpsertItemAsync(new { id = Guid.NewGuid().ToString(), payload.PostingText });
             return new OkResult();
         }

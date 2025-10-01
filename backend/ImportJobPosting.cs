@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using RGS.Backend.Shared.Models;
 
 namespace RGS.Functions;
 
@@ -24,7 +25,7 @@ public class ImportJobPosting
             _logger.LogInformation("C# HTTP trigger function processed a request.");
             Microsoft.Azure.Cosmos.CosmosClient client = new(accountEndpoint: "https://resume-generation-system.documents.azure.com:443/", tokenCredential: new DefaultAzureCredential());
             var pendingPostings = client.GetContainer("Resumes", "PendingPostings");
-            var payload = await req.ReadFromJsonAsync<JobPostingPayload>();
+            var payload = await req.ReadFromJsonAsync<JobPostingPayload>() ?? throw new ArgumentException("Payload missing");
             await pendingPostings.UpsertItemAsync(new JobPosting(Guid.NewGuid().ToString(), payload.PostingText));
             return new OkResult();
         }

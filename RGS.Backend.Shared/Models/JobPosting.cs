@@ -1,4 +1,4 @@
-namespace RGS.Functions;
+namespace RGS.Backend.Shared.Models;
 
 public record JobPosting(string id, string PostingText);
 

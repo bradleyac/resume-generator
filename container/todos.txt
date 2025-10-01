@@ -1,0 +1,14 @@
+TODOS LOS TODOS
+
+!!!
+1. Set up continuous deployment for the container to build and publish the docker image. Can copy from Dominion for this.
+2. Implement importing and browsing job descriptions + artifacts
+3. Look into how to have an OpenAI call generate weights based on JD text
+4. Implement custom resume display based on weights vector?
+5. Integrate OpenAI call in the trigger to generate weights and pass those to the resume before saving as PDF
+6. Implement searching for imported descriptions
+
+...
+1. The page doesn't always load fully before the PDF is saved. This causes some of the icons to not display (16kb difference in the file size).
+2. Set up proper configuration instead of hard-coding URLs.
+3. Fix janky project structure.

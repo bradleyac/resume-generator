@@ -8,6 +8,7 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
+using RGS.Backend.Shared.Models;
 
 namespace RGS.Functions;
 
@@ -29,7 +30,8 @@ public class PendingPostingsTrigger
         LeaseContainerName = "leases",
         CreateLeaseContainerIfNotExists = true)] IReadOnlyList<JobPosting> input)
     {
-        CosmosClient client = new(accountEndpoint: "https://resume-generation-system.documents.azure.com:443/", tokenCredential: new DefaultAzureCredential());
+        var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
+        CosmosClient client = new(connectionString);
         var pendingPostings = client.GetContainer("Resumes", "PendingPostings");
         var completedPostings = client.GetContainer("Resumes", "CompletedPostings");
 
@@ -38,7 +40,7 @@ public class PendingPostingsTrigger
             using var stream = await GeneratePDFStreamAsync();
             var blobName = await SaveToBlobStorageAsync(stream);
             await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.PostingText, blobName));
-            await pendingPostings.DeleteItemAsync<JobPosting>(posting.id, partitionKey: PartitionKey.Null);
+            await pendingPostings.DeleteItemAsync<JobPosting>(posting.id, partitionKey: new PartitionKey(posting.id));
         }
     }
 

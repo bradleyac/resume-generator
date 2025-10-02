@@ -3,7 +3,7 @@ import styles from "./Posting.module.css";
 import { useEffect, useState } from "react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-type PostingBody = { id: string, PostingText: string, ImportedAt: string, ResumeUrl: string }
+type PostingBody = { id: string, postingText: string, importedAt: string, resumeUrl: string }
 
 export const Posting = () => {
   const { postingId } = useParams();
@@ -38,8 +38,8 @@ export const Posting = () => {
 
   return (<article className={styles.posting}>
     <h1>{posting.id}</h1>
-    <p>{posting.ImportedAt}</p>
-    <p>{posting.PostingText}</p>
-    <iframe src={posting.ResumeUrl} width="11em" height="8.5em" />
+    <p>{posting.importedAt}</p>
+    <p>{posting.postingText}</p>
+    <iframe src={posting.resumeUrl} width="850px" height="1100px" />
   </article>);
 }

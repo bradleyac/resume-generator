@@ -27,7 +27,11 @@ public class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosCl
       return posting switch
       {
         null => new NotFoundResult(),
-        var p => new JsonResult(p)
+        ItemResponse<CompletedPosting> p => p switch
+        {
+          { StatusCode: System.Net.HttpStatusCode.OK } => new JsonResult(p.Resource),
+          _ => new NotFoundResult()
+        }
       };
 
     }

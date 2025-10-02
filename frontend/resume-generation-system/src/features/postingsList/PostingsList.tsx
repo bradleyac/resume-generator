@@ -4,7 +4,7 @@ import styles from "./PostingsList.module.css";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 type PostingHeader = { id: string, importedAt: string }
-type PostingBody = { id: string, postingText: string, importedAt: string, resumeUrl: string }
+type PostingBody = { id: string, PostingText: string, ImportedAt: string, ResumeUrl: string }
 
 export const PostingsList = () => {
   const [postings, setPostings] = useState<PostingHeader[]>([]);
@@ -17,7 +17,7 @@ export const PostingsList = () => {
     const fetchItems = async () => {
       try {
         console.log(BACKEND_URL);
-        const response = await fetch(`${BACKEND_URL}/api/ListCompletedJobs`);
+        const response = await fetch(`${BACKEND_URL}/api/ListCompletedPostings`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

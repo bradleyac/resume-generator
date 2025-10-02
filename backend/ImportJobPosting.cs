@@ -2,31 +2,26 @@ using System.Threading.Tasks;
 using Azure.Identity;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using RGS.Backend.Shared.Models;
 
 namespace RGS.Functions;
 
-public class ImportJobPosting
+public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cosmosClient)
 {
-    private readonly ILogger<ImportJobPosting> _logger;
-
-    public ImportJobPosting(ILogger<ImportJobPosting> logger)
-    {
-        _logger = logger;
-    }
+    private readonly ILogger<ImportJobPosting> _logger = logger;
+    private readonly CosmosClient _cosmosClient = cosmosClient;
 
     [Function("ImportJobPosting")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
         try
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
-            Microsoft.Azure.Cosmos.CosmosClient client = new(accountEndpoint: "https://resume-generation-system.documents.azure.com:443/", tokenCredential: new DefaultAzureCredential());
-            var pendingPostings = client.GetContainer("Resumes", "PendingPostings");
+            var pendingPostings = _cosmosClient.GetContainer("Resumes", "PendingPostings");
             var payload = await req.ReadFromJsonAsync<JobPostingPayload>() ?? throw new ArgumentException("Payload missing");
-            await pendingPostings.UpsertItemAsync(new JobPosting(Guid.NewGuid().ToString(), payload.PostingText));
+            await pendingPostings.UpsertItemAsync(new JobPosting(Guid.NewGuid().ToString(), payload.PostingText, DateTime.UtcNow));
             return new OkResult();
         }
         catch (Exception e)

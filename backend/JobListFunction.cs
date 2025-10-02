@@ -1,23 +1,36 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.Cosmos;
+using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
+using RGS.Backend.Shared.Models;
+using RGS.Backend.Shared;
 
 namespace RGS.Functions;
 
-public class JobListFunction
+public class JobListFunction(ILogger<JobListFunction> logger, CosmosClient cosmosClient)
 {
-    private readonly ILogger<JobListFunction> _logger;
+    private readonly ILogger<JobListFunction> _logger = logger;
+    private readonly CosmosClient _cosmosClient = cosmosClient;
 
-    public JobListFunction(ILogger<JobListFunction> logger)
+    [Function("ListCompletedJobs")]
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        _logger = logger;
-    }
-
-    [Function("JobListFunction")]
-    public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
-    {
-        _logger.LogInformation("C# HTTP trigger function processed a request.");
-        return new OkObjectResult("Welcome to Azure Functions!");
+        try
+        {
+            var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
+            var query = completedPostingsContainer.GetItemLinqQueryable<CompletedPosting>()
+                .Select(p => new { p.Id, p.ImportedAt })
+                .OrderByDescending(p => p.ImportedAt);
+            var results = await query.ToFeedIterator().ToListAsync();
+            return new JsonResult(results);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, "Failed to list job postings");
+            throw;
+        }
     }
 }

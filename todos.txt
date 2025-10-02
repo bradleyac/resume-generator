@@ -1,7 +1,6 @@
 TODOS LOS TODOS
 
 !!!
-1. Set up continuous deployment for the container to build and publish the docker image. Can copy from Dominion for this.
 2. Implement importing and browsing job descriptions + artifacts (use react router)
 3. Look into how to have an OpenAI call generate weights based on JD text
 4. Implement custom resume display based on weights vector?

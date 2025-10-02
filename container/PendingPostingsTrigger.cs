@@ -38,9 +38,9 @@ public class PendingPostingsTrigger
         foreach (var posting in input)
         {
             using var stream = await GeneratePDFStreamAsync();
-            var blobName = await SaveToBlobStorageAsync(stream);
-            await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.PostingText, blobName));
-            await pendingPostings.DeleteItemAsync<JobPosting>(posting.id, partitionKey: new PartitionKey(posting.id));
+            var resumeUrl = await SaveToBlobStorageAsync(stream);
+            await completedPostings.UpsertItemAsync(new CompletedPosting(posting.Id, posting.PostingText, posting.ImportedAt, resumeUrl));
+            await pendingPostings.DeleteItemAsync<JobPosting>(posting.Id, partitionKey: new PartitionKey(posting.Id));
         }
     }
 

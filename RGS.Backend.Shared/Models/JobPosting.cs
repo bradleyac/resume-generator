@@ -1,5 +1,7 @@
+using System.Text.Json.Serialization;
+
 namespace RGS.Backend.Shared.Models;
 
-public record JobPosting(string id, string PostingText);
+public record JobPosting([property: JsonPropertyName("id")] string Id, string PostingText, DateTime ImportedAt);
 
-public record CompletedPosting(string id, string PostingText, string ResumeUrl);
+public record CompletedPosting([property: JsonPropertyName("id")] string Id, string PostingText, DateTime ImportedAt, string ResumeUrl);

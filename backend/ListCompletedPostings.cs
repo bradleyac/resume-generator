@@ -10,12 +10,12 @@ using RGS.Backend.Shared;
 
 namespace RGS.Functions;
 
-public class JobListFunction(ILogger<JobListFunction> logger, CosmosClient cosmosClient)
+public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient)
 {
-    private readonly ILogger<JobListFunction> _logger = logger;
+    private readonly ILogger<ListCompletedPostings> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
-    [Function("ListCompletedJobs")]
+    [Function("ListCompletedPostings")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
         try

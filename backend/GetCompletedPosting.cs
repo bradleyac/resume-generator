@@ -20,9 +20,9 @@ public class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosCl
   {
     try
     {
-      var payload = await req.ReadFromJsonAsync<GetCompletedPostingPayload>() ?? throw new ArgumentException("Payload missing");
+      var completedPostingId = req.Query["completedPostingId"].FirstOrDefault() ?? throw new ArgumentException("Payload missing");
       var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
-      var posting = await completedPostingsContainer.ReadItemAsync<CompletedPosting>(payload.id, new PartitionKey(payload.id));
+      var posting = await completedPostingsContainer.ReadItemAsync<CompletedPosting>(completedPostingId, new PartitionKey(completedPostingId));
 
       return posting switch
       {
@@ -38,5 +38,3 @@ public class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosCl
     }
   }
 }
-
-public record GetCompletedPostingPayload(string id);

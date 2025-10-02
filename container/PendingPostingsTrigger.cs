@@ -50,7 +50,7 @@ public class PendingPostingsTrigger
         await using var browser = await playwright.Chromium.LaunchAsync();
         var page = await browser.NewPageAsync();
 
-        await page.GotoAsync(PageUrl);
+        await page.GotoAsync(PageUrl, new() { WaitUntil = WaitUntilState.NetworkIdle });
         return new MemoryStream(await page.PdfAsync(new PagePdfOptions { PrintBackground = true }));
     }
 

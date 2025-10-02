@@ -40,6 +40,6 @@ export const Posting = () => {
     <h1>{posting.id}</h1>
     <p>{posting.importedAt}</p>
     <p>{posting.postingText}</p>
-    <iframe src={posting.resumeUrl} width="850px" height="1100px" />
+    <a href={posting.resumeUrl}>Download Resume</a>
   </article>);
 }

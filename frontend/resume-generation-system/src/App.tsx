@@ -6,6 +6,7 @@ import { Posting } from './features/posting/Posting';
 
 const router = createBrowserRouter([
   { path: "/", element: <PostingsList /> },
+  { path: "/index.html", element: <PostingsList /> },
   { path: "/posting/:postingId", element: <Posting /> },
   { path: "/resume", element: <Resume /> }
 ])

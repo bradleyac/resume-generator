@@ -16,13 +16,11 @@ export const PostingsList = () => {
 
     const fetchItems = async () => {
       try {
-        console.log(BACKEND_URL);
         const response = await fetch(`${BACKEND_URL}/api/ListCompletedPostings`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
-        console.log(data);
         if (!ignore) setPostings(data);
       } catch (error) {
         console.log(error);

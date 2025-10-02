@@ -14,7 +14,7 @@ namespace RGS.Functions;
 
 public class PendingPostingsTrigger
 {
-    private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net";
+    private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
     private readonly ILogger<PendingPostingsTrigger> _logger;
 
     public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger)

@@ -7,6 +7,11 @@ on:
   push:
     branches:
       - master
+    paths:
+      - backend/**
+      - container/**
+      - RGS.Backend.Shared/**
+      - .github/workflows/master_resume-generation-system-backend.yml
   workflow_dispatch:
 
 env:

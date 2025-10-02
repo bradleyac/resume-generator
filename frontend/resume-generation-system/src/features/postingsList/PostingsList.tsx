@@ -4,7 +4,6 @@ import styles from "./PostingsList.module.css";
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 type PostingHeader = { id: string, importedAt: string }
-type PostingBody = { id: string, PostingText: string, ImportedAt: string, ResumeUrl: string }
 
 export const PostingsList = () => {
   const [postings, setPostings] = useState<PostingHeader[]>([]);

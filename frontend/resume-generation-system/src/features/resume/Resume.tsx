@@ -35,11 +35,6 @@ const EducationSection = () => {
 
 const ResumeHeader = () => {
   return (<header className={styles.header}>
-    <button onClick={() => fetch("https://resume-generation-system-backend-gxfebbcedtg4hmf3.eastus2-01.azurewebsites.net/api/ImportJobPosting", {
-      method: "POST",
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: 10, PostingText: "Hello, world!" })
-    })}>Import</button>
     <h1>{resumeData.name}</h1>
     <h2>{resumeData.title}</h2>
     <p>{resumeData.about}</p>

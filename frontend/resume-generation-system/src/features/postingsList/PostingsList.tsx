@@ -42,7 +42,26 @@ export const PostingsList = () => {
     return <div>Error: {error}</div>;
   }
 
-  return (<ul className={styles.postingsList}>
-    {postings.map(posting => <li key={posting.id}><a href={`/posting/${posting.id}`}>{posting.id} at {posting.importedAt}</a></li>)}
-  </ul>);
+  return (<section>
+    <ul className={styles.postingsList}>
+      {postings.map(posting => <li key={posting.id}><a href={`/posting/${posting.id}`}>{posting.id} at {posting.importedAt}</a></li>)}
+    </ul>
+    <NewPosting />
+  </section>);
+}
+
+export const NewPosting = () => {
+  const [formKey, setFormKey] = useState(0)
+
+  const submitPosting = async (form: FormData) => {
+    await fetch(`${BACKEND_URL}/api/ImportJobPosting`, { method: "POST", body: form });
+    setFormKey(key => key + 1);
+  }
+
+  return (<form key={formKey} action={submitPosting}>
+    <h1>Submit Job Posting</h1>
+    <label htmlFor="posting-text">Posting Text: *</label>
+    <textarea id="posting-text" name="postingText"></textarea>
+    <input type="submit">Import</input>
+  </form>)
 }

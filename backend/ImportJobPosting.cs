@@ -19,9 +19,10 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
     {
         try
         {
+            // todo: CSRF
             var pendingPostings = _cosmosClient.GetContainer("Resumes", "PendingPostings");
-            var payload = await req.ReadFromJsonAsync<JobPostingPayload>() ?? throw new ArgumentException("Payload missing");
-            await pendingPostings.UpsertItemAsync(new JobPosting(Guid.NewGuid().ToString(), payload.PostingText, DateTime.UtcNow));
+            var postingText = req.Form["postingText"].FirstOrDefault() ?? throw new ArgumentException("postingText missing");
+            await pendingPostings.UpsertItemAsync(new JobPosting(Guid.NewGuid().ToString(), postingText, DateTime.UtcNow));
             return new OkResult();
         }
         catch (Exception e)
@@ -31,5 +32,3 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
         }
     }
 }
-
-public record JobPostingPayload(string PostingText);

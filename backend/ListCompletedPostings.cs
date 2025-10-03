@@ -22,7 +22,7 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
         {
             var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
             var query = completedPostingsContainer.GetItemLinqQueryable<CompletedPosting>()
-                .Select(p => new { p.id, p.ImportedAt })
+                .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt })
                 .OrderByDescending(p => p.ImportedAt);
             var results = await query.ToFeedIterator().ToListAsync();
             return new JsonResult(results);

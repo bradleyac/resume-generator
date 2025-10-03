@@ -3,7 +3,7 @@ import styles from "./Posting.module.css";
 import { useEffect, useState } from "react";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
-type PostingBody = { id: string, postingText: string, importedAt: string, resumeUrl: string }
+type PostingBody = { id: string, postingText: string, link: string, company: string, title: string, importedAt: string, resumeUrl: string }
 
 export const Posting = () => {
   const { postingId } = useParams();
@@ -39,12 +39,18 @@ export const Posting = () => {
   return (<article className={styles.posting}>
     <label htmlFor="posting-id">Posting Id: </label>
     <p id="posting-id">{posting.id}</p>
+    <label htmlFor="imported">Imported: </label>
+    <p id="imported">{new Date(posting.importedAt).toLocaleString()}</p>
+    <label htmlFor="link">Link: </label>
+    <a id="link" href={posting.link}>View</a>
+    <label htmlFor="company">Company: </label>
+    <p id="company">{posting.company}</p>
+    <label htmlFor="title">Title: </label>
+    <p id="title">{posting.title}</p>
     <label htmlFor="artifacts">Artifacts: </label>
     <div id="artifacts" className={styles.artifacts}>
       <a href={posting.resumeUrl}>Resume</a>
     </div>
-    <label htmlFor="imported">Imported: </label>
-    <p id="imported">{new Date(posting.importedAt).toLocaleString()}</p>
     <label htmlFor="job-posting">Job Posting: </label>
     <p id="job-posting" className={styles.postingText}>{posting.postingText}</p>
   </article>);

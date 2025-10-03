@@ -4,7 +4,7 @@ import { Modal } from "../modal/Modal";
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
-type PostingHeader = { id: string, importedAt: string }
+type PostingHeader = { id: string, importedAt: string, company: string, title: string, link: string }
 
 export const PostingsList = () => {
   const [postings, setPostings] = useState<PostingHeader[]>([]);
@@ -46,11 +46,11 @@ export const PostingsList = () => {
 
   return (<section>
     <ul className={styles.postingsList}>
-      {postings.map(posting => <li key={posting.id}><a href={`/posting/${posting.id}`}>{posting.id} imported at {new Date(posting.importedAt).toLocaleString()}</a></li>)}
+      {postings.map(posting => <li key={posting.id}><span>{posting.title} at {posting.company} (imported {new Date(posting.importedAt).toLocaleString()}) </span><a href={`/posting/${posting.id}`}>View Posting</a></li>)}
     </ul>
     <button onClick={() => setShowModal(true)}>Import Job Posting</button>
     <Modal showing={showModal} close={() => setShowModal(false)}>
-      <NewPosting key={showModal ? 0 : 1} closeCallback={() => setShowModal(false)} />
+      <NewPosting closeCallback={() => setShowModal(false)} />
     </Modal>
   </section>);
 }

@@ -6,11 +6,12 @@
 }
 
 .submitPosting {
-  background-color: oklch(.5 .1 250);
+  background-color: oklch(.7 .1 250);
   padding: 3em;
   width: max-content;
   place-self: center;
   border-radius: 1em;
+  box-shadow: 0 0 .5em oklch(.2 0 300);
 
   textarea {
     width: 100%;

@@ -1,0 +1,36 @@
+.postingsList {
+  width: 65vw;
+  align-self: start;
+  justify-self: start;
+  list-style: none;
+}
+
+.submitPosting {
+  background-color: oklch(.5 .1 250);
+  padding: 3em;
+  width: max-content;
+  place-self: center;
+  border-radius: 1em;
+
+  textarea {
+    width: 100%;
+    aspect-ratio: 1/1;
+  }
+
+  label {
+    vertical-align: top;
+  }
+}
+
+.formControls {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  grid-auto-rows: max-content;
+  grid-auto-flow: row;
+  row-gap: 1em;
+
+  input,
+  textarea {
+    border-radius: .5em;
+  }
+}

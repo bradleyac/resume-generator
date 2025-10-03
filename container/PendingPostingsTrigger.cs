@@ -10,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Playwright;
 using RGS.Backend.Shared.Models;
 
-namespace RGS.Functions;
+namespace RGS.Backend;
 
 public class PendingPostingsTrigger
 {
@@ -39,7 +39,7 @@ public class PendingPostingsTrigger
         {
             using var stream = await GeneratePDFStreamAsync();
             var resumeUrl = await SaveToBlobStorageAsync(stream);
-            await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.PostingText, posting.ImportedAt, resumeUrl));
+            await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.Link, posting.Company, posting.Title, posting.PostingText, posting.ImportedAt, resumeUrl));
             await pendingPostings.DeleteItemAsync<JobPosting>(posting.id, partitionKey: new PartitionKey(posting.id));
         }
     }

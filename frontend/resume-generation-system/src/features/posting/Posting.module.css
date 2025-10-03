@@ -1,0 +1,27 @@
+.postingText {
+  white-space: pre-wrap;
+}
+
+label,
+p {
+  text-align: start;
+  margin: 0;
+}
+
+label {
+  margin-right: 1em;
+}
+
+.posting {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  grid-auto-flow: row;
+
+  width: 50vw;
+  align-self: start;
+}
+
+.artifacts {
+  display: flex;
+  flex-direction: row;
+}

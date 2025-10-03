@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Azure.Identity;
 using Microsoft.AspNetCore.Http;
@@ -7,7 +8,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using RGS.Backend.Shared.Models;
 
-namespace RGS.Functions;
+namespace RGS.Backend;
 
 public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cosmosClient)
 {
@@ -21,8 +22,17 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
         {
             // todo: CSRF
             var pendingPostings = _cosmosClient.GetContainer("Resumes", "PendingPostings");
-            var postingText = req.Form["postingText"].FirstOrDefault() ?? throw new ArgumentException("postingText missing");
-            await pendingPostings.UpsertItemAsync(new JobPosting(Guid.NewGuid().ToString(), postingText, DateTime.UtcNow));
+            var form = await req.ReadFormAsync();
+            var newPosting = new JobPosting
+            (
+                Guid.NewGuid().ToString(),
+                form.Get("link"),
+                form.Get("company"),
+                form.Get("title"),
+                form.Get("postingText"),
+                DateTime.UtcNow
+            );
+            await pendingPostings.UpsertItemAsync(newPosting);
             return new OkResult();
         }
         catch (Exception e)
@@ -31,4 +41,9 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
             throw;
         }
     }
+}
+
+public static class ImportJobPostingExtensions
+{
+
 }

@@ -33,13 +33,19 @@ export const Posting = () => {
   }, [postingId]);
 
   if (!posting) {
-    return <div>Loading items...</div>;
+    return <div>Loading...</div>;
   }
 
   return (<article className={styles.posting}>
-    <h1>{posting.id}</h1>
-    <p>{posting.importedAt}</p>
-    <p>{posting.postingText}</p>
-    <a href={posting.resumeUrl}>Download Resume</a>
+    <label htmlFor="posting-id">Posting Id: </label>
+    <p id="posting-id">{posting.id}</p>
+    <label htmlFor="artifacts">Artifacts: </label>
+    <div id="artifacts" className={styles.artifacts}>
+      <a href={posting.resumeUrl}>Resume</a>
+    </div>
+    <label htmlFor="imported">Imported: </label>
+    <p id="imported">{new Date(posting.importedAt).toLocaleString()}</p>
+    <label htmlFor="job-posting">Job Posting: </label>
+    <p id="job-posting" className={styles.postingText}>{posting.postingText}</p>
   </article>);
 }

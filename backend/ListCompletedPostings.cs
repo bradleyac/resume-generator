@@ -8,7 +8,7 @@ using Microsoft.Identity.Client;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
 
-namespace RGS.Functions;
+namespace RGS.Backend;
 
 public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient)
 {

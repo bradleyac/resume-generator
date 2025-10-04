@@ -1,5 +1,5 @@
 export const resumeData = {
-  name: "Andrew Bradley",
+  "name": "Andrew Bradley",
   title: "Full Stack Developer",
   about: "Curious and collaborative generalist with 10 years of experience developing enterprise software.",
   city: "🏠 Spencer",

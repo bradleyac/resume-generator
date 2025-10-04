@@ -33,24 +33,32 @@ public class PendingPostingsTrigger
         var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
         CosmosClient client = new(connectionString);
         var pendingPostings = client.GetContainer("Resumes", "PendingPostings");
+        var resumeDataContainer = client.GetContainer("Resumes", "ResumeData");
         var completedPostings = client.GetContainer("Resumes", "CompletedPostings");
 
         foreach (var posting in input)
         {
-            using var stream = await GeneratePDFStreamAsync();
+            await GenerateResumeDataAsync(posting.id, resumeDataContainer);
+            using var stream = await GeneratePDFStreamAsync(posting.id);
             var resumeUrl = await SaveToBlobStorageAsync(stream);
             await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.Link, posting.Company, posting.Title, posting.PostingText, posting.ImportedAt, resumeUrl));
             await pendingPostings.DeleteItemAsync<JobPosting>(posting.id, partitionKey: new PartitionKey(posting.id));
         }
     }
 
-    private static async Task<Stream> GeneratePDFStreamAsync()
+    private async Task GenerateResumeDataAsync(string postingId, Container resumeDataContainer)
+    {
+        var masterResumeData = (await resumeDataContainer.ReadItemAsync<ResumeData>("master", new PartitionKey("master"))).Resource;
+        await resumeDataContainer.UpsertItemAsync(masterResumeData with { id = postingId });
+    }
+
+    private static async Task<Stream> GeneratePDFStreamAsync(string postingId)
     {
         using var playwright = await Playwright.CreateAsync();
         await using var browser = await playwright.Chromium.LaunchAsync();
         var page = await browser.NewPageAsync();
 
-        await page.GotoAsync(PageUrl, new() { WaitUntil = WaitUntilState.NetworkIdle });
+        await page.GotoAsync($"{PageUrl}/{postingId}", new() { WaitUntil = WaitUntilState.NetworkIdle });
         return new MemoryStream(await page.PdfAsync(new PagePdfOptions { PrintBackground = true }));
     }
 

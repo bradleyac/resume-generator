@@ -8,6 +8,5 @@ TODOS LOS TODOS
 6. Implement searching for imported descriptions
 
 ...
-1. The page doesn't always load fully before the PDF is saved. This causes some of the icons to not display (16kb difference in the file size).
 2. Set up proper configuration instead of hard-coding URLs.
 3. Fix janky project structure.

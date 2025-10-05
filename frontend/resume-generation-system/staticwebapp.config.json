@@ -7,7 +7,7 @@
       ]
     },
     {
-      "route": "/index.html",
+      "route": "/*",
       "allowedRoles": [
         "contributor"
       ]

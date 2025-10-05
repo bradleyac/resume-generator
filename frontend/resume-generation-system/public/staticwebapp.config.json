@@ -4,18 +4,18 @@
   },
   "routes": [
     {
+      "route": "/*",
+      "allowedRoles": [
+        "contributor"
+      ]
+    },
+    {
       "route": "/resume",
       "methods": [
         "get"
       ],
       "allowedRoles": [
         "anonymous"
-      ]
-    },
-    {
-      "route": "/*",
-      "allowedRoles": [
-        "contributor"
       ]
     }
   ]

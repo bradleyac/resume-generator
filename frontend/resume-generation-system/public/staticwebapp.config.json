@@ -8,6 +8,15 @@
       "allowedRoles": [
         "contributor"
       ]
+    },
+    {
+      "route": "/resume",
+      "methods": [
+        "get"
+      ],
+      "allowedRoles": [
+        "anonymous"
+      ]
     }
   ]
 }

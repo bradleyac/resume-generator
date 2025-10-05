@@ -1,28 +1,25 @@
 {
-  "navigationFallback": {
-    "rewrite": "/index.html"
-  },
   "routes": [
     {
-      "route": "/index.html",
-      "allowedRoles": [
-        "contributor"
-      ]
-    },
-    {
       "route": "/resume/*",
-      "methods": [
-        "get"
-      ],
       "allowedRoles": [
         "anonymous"
       ]
     },
     {
-      "route": "/posting/*",
+      "route": "/*",
       "allowedRoles": [
         "contributor"
       ]
     }
-  ]
+  ],
+  "responseOverrides": {
+    "401": {
+      "statusCode": 302,
+      "redirect": "/.auth/login/aad"
+    }
+  },
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  }
 }

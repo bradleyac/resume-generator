@@ -10,7 +10,7 @@
       ]
     },
     {
-      "route": "/resume",
+      "route": "/resume/*",
       "methods": [
         "get"
       ],

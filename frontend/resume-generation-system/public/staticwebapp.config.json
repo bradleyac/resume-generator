@@ -1,18 +1,6 @@
 {
   "routes": [
     {
-      "route": "/resume/*",
-      "allowedRoles": [
-        "anonymous"
-      ]
-    },
-    {
-      "route": "/assets/*",
-      "allowedRoles": [
-        "anonymous"
-      ]
-    },
-    {
       "route": "/api/GetResumeData",
       "allowedRoles": [
         "anonymous"
@@ -20,12 +8,6 @@
     },
     {
       "route": "/api/*",
-      "allowedRoles": [
-        "anonymous"
-      ]
-    },
-    {
-      "route": "/*",
       "allowedRoles": [
         "contributor"
       ]

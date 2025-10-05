@@ -1,0 +1,19 @@
+{
+  "routes": [
+    {
+      "route": "/resume/*",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
+      "route": "/index.html",
+      "allowedRoles": [
+        "contributor"
+      ]
+    }
+  ],
+  "navigationFallback": {
+    "rewrite": "/index.html"
+  }
+}

@@ -19,6 +19,12 @@
       ]
     },
     {
+      "route": "/api/*",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
       "route": "/*",
       "allowedRoles": [
         "contributor"

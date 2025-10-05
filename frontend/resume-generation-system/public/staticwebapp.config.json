@@ -17,6 +17,12 @@
       "allowedRoles": [
         "anonymous"
       ]
+    },
+    {
+      "route": "/posting/*",
+      "allowedRoles": [
+        "contributor"
+      ]
     }
   ]
 }

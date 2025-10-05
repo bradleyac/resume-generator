@@ -7,6 +7,12 @@
       ]
     },
     {
+      "route": "/assets/*",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
       "route": "/*",
       "allowedRoles": [
         "contributor"

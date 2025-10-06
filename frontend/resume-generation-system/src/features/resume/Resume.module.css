@@ -8,9 +8,11 @@
     "skills projects" min-content
     "skills experience" 1fr
     "skills education" min-content / 25% 75%;
-  padding: 2em;
-  gap: 1em;
-  box-shadow: 0 0 .5em black;
+  padding: 4em;
+  column-gap: .25em;
+  row-gap: .5em;
+  font-size: 12px;
+
 
   h1,
   h2,
@@ -83,17 +85,24 @@
   display: flex;
   flex-direction: column;
   gap: 0.5em;
-  font-size: 10.5px;
+  font-size: 10px;
+  line-height: 1.0;
+  margin-top: 1em;
+  margin-bottom: 1em;
 
   p {
     word-break: break-word;
+    height: 1.25em;
+  }
+
+  .gmail {
+    vertical-align: top;
   }
 }
 
 .skillsSection {
   grid-area: skills;
   place-self: start;
-  /* font-size: .9em; */
   width: 100%;
   overflow: hidden;
   display: flex;
@@ -140,13 +149,15 @@
 }
 
 .github::before,
-.gmail::before {
+.gmail::before,
+.phone::before,
+.address::before {
   content: "";
   display: inline-block;
   width: 1.25em;
   height: 1.25em;
   position: relative;
-  top: .25em;
+  margin: -.25em;
   margin-right: .25em;
   background-size: contain;
   background-repeat: no-repeat;
@@ -154,10 +165,12 @@
 
 .github::before {
   background-image: url("/github-mark.png");
+  top: .1em;
 }
 
 .gmail::before {
   background-image: url("/gmail.png");
+  top: .1em;
 }
 
 .phone::before {

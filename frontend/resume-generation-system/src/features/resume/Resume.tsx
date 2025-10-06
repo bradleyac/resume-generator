@@ -138,7 +138,9 @@ const Job = ({ job }: { job: Job }) => {
 
 const Project = ({ project }: { project: Project }) => {
   return (<section>
-    <h3 className={styles.full}><span className={styles.left}>{project.name}</span><span className={styles.right}>{project.when}</span></h3>
+    <div className={styles.full}>
+      <h3 className={styles.left}>{project.name}</h3><p className={styles.right}>{project.when}</p>
+    </div>
     <p>{project.description}</p>
     <p><strong>Technologies:</strong> {project.technologies.join(', ')}</p>
   </section>);

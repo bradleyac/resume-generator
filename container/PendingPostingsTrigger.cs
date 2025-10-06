@@ -20,8 +20,8 @@ namespace RGS.Backend;
 
 public class PendingPostingsTrigger
 {
-    private const int LineLength = 90;
-    private const int MaxLines = 24;
+    private const int LineLength = 95;
+    private const int MaxLines = 25;
     private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly CosmosClient _cosmosClient;

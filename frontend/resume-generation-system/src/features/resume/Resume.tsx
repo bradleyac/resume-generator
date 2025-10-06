@@ -119,9 +119,9 @@ const ResumeHeader = ({ resumeData }: { resumeData: ResumeData }) => {
 
 const ContactSection = ({ resumeData }: { resumeData: ResumeData }) => {
   return (<section className={styles.contactSection}>
-    <p>{resumeData.city}, {resumeData.state}</p>
+    <p className={styles.address}>{resumeData.city}, {resumeData.state}</p>
     <p className={styles.gmail}>{resumeData.contact.email}</p>
-    <p>{resumeData.contact.phone}</p>
+    <p className={styles.phone}>{resumeData.contact.phone}</p>
     <p className={styles.github}>{resumeData.contact.github}</p>
   </section>)
 }

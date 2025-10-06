@@ -160,6 +160,16 @@
   background-image: url("/gmail.png");
 }
 
+.phone::before {
+  content: "📞";
+  margin-right: .25em;
+}
+
+.address::before {
+  content: "🏠";
+  margin-right: .25em;
+}
+
 @media (prefers-color-scheme: dark) {
   .github::before {
     background-image: url("/github-mark-white.png");

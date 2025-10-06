@@ -22,10 +22,14 @@ public class PendingPostingsTrigger
 {
     private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
     private readonly ILogger<PendingPostingsTrigger> _logger;
+    private readonly CosmosClient _cosmosClient;
+    private readonly AzureOpenAIClient _aiClient;
 
-    public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger)
+    public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient)
     {
         _logger = logger;
+        _cosmosClient = cosmosClient;
+        _aiClient = aiClient;
     }
 
     [Function("PendingPostingsTrigger")]
@@ -34,15 +38,15 @@ public class PendingPostingsTrigger
         containerName: "PendingPostings",
         Connection = "CosmosDBConnectionString",
         LeaseContainerName = "leases",
-        CreateLeaseContainerIfNotExists = true)] IReadOnlyList<JobPosting> input, [FromServices] CosmosClient cosmosClient, [FromServices] AzureOpenAIClient aiClient)
+        CreateLeaseContainerIfNotExists = true)] IReadOnlyList<JobPosting> input)
     {
-        var pendingPostings = cosmosClient.GetContainer("Resumes", "PendingPostings");
-        var resumeDataContainer = cosmosClient.GetContainer("Resumes", "ResumeData");
-        var completedPostings = cosmosClient.GetContainer("Resumes", "CompletedPostings");
+        var pendingPostings = _cosmosClient.GetContainer("Resumes", "PendingPostings");
+        var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
+        var completedPostings = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
 
         foreach (var posting in input)
         {
-            await GenerateResumeDataAsync(posting, resumeDataContainer, aiClient);
+            await GenerateResumeDataAsync(posting, resumeDataContainer, _aiClient);
             using var stream = await GeneratePDFStreamAsync(posting.id);
             var resumeUrl = await SaveToBlobStorageAsync(stream);
             await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.Link, posting.Company, posting.Title, posting.PostingText, posting.ImportedAt, resumeUrl));

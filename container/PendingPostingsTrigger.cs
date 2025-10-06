@@ -20,7 +20,7 @@ namespace RGS.Backend;
 
 public class PendingPostingsTrigger
 {
-    private const int LineLength = 100;
+    private const int LineLength = 90;
     private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly CosmosClient _cosmosClient;
@@ -75,7 +75,7 @@ public class PendingPostingsTrigger
         var bullets = masterResumeData.Jobs.SelectMany((j, jobid) => j.Bullets.Select((e, i) => new Bullet(i, jobid, e)));
 
         List<ChatMessage> messages = [
-            new SystemChatMessage("You are a helpful assistant."),
+            new SystemChatMessage("You are a discerning technical recruiter helping the user construct their resume for a particular software developer position."),
             new UserChatMessage("This is the job description: " + posting.PostingText),
             new UserChatMessage("These are my resume bullets: " + JsonSerializer.Serialize(bullets)),
             new UserChatMessage("Read the job description and assign a score between 0 and 10 to each bullet according to how appropriate it would be to appear on a resume for the job description. Return the scores associated by id."),
@@ -98,9 +98,9 @@ public class PendingPostingsTrigger
         var newResumeData = masterResumeData with
         {
             id = posting.id,
-            Jobs = masterResumeData.Jobs.Select((j, jobid) => j with
+            Jobs = masterResumeData.Jobs.Select((job, jobid) => job with
             {
-                Bullets = j.Bullets.Where((b, i) => toInclude.Select(b => (b.id, b.jobid)).Contains((i, jobid))).ToArray()
+                Bullets = job.Bullets.Where((text, id) => toInclude.Select(b => (b.id, b.jobid)).Contains((id, jobid))).ToArray()
             }).ToArray()
         };
 
@@ -121,7 +121,7 @@ public class PendingPostingsTrigger
     {
         var connectionString = Environment.GetEnvironmentVariable("RESUME_BLOB_CONTAINER_CONNECTION_STRING");
         var client = new BlobContainerClient(connectionString, "resumes");
-        var blobName = $"resume-{Guid.NewGuid()}";
+        var blobName = $"resume-{Guid.NewGuid()}.pdf";
         _ = await client.UploadBlobAsync(blobName, pdfStream);
         return $"https://resumeartifacts.blob.core.windows.net/resumes/{blobName}";
     }

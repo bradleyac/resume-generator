@@ -76,7 +76,7 @@ public class PendingPostingsTrigger
         List<ChatMessage> messages = [
             new SystemChatMessage("You are a helpful assistant."),
             new UserChatMessage("This is the job description: " + posting.PostingText),
-            new UserChatMessage("These are my resume bullets: " + System.Text.Json.JsonSerializer.Serialize(bullets)),
+            new UserChatMessage("These are my resume bullets: " + JsonSerializer.Serialize(bullets)),
             new UserChatMessage("Read the job description and assign a score between 0 and 10 to each bullet according to how appropriate it would be to appear on a resume for the job description. Return the scores associated by id."),
         ];
         ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");

@@ -25,6 +25,7 @@ public static class ServiceCollectionExtensions
         @this.AddSingleton(new CosmosClient(connectionString));
 
         var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
-        return @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential()));
+        var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey");
+        return @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new System.ClientModel.ApiKeyCredential(openAIKey)));
     }
 }

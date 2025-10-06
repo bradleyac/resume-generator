@@ -83,10 +83,16 @@ public class PendingPostingsTrigger
         var response = chatClient.CompleteChat(messages, requestOptions);
 
         var rankings = JsonSerializer.Deserialize<Rankings>(response.Value.Content[0].Text);
+        var idToLengthWeightMap = bullets.ToDictionary(b => b.id, b => b.bulletText.Length / 80 + 1);
 
         var bestOfEach = rankings.wts.GroupBy(wt => wt.jobid).SelectMany(g => g.OrderByDescending(wt => wt.wt).Take(4));
 
-        Ranking[] toInclude = [.. bestOfEach, .. rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt).Take(8)];
+        Ranking[] toInclude = [.. bestOfEach, .. rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt).Take(10)];
+
+        while (toInclude.Sum(r => idToLengthWeightMap[r.id]) > 23)
+        {
+            toInclude = toInclude.SkipLast(1).ToArray();
+        }
 
         var newResumeData = masterResumeData with
         {

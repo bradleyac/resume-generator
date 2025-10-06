@@ -1,3 +1,5 @@
+using Azure.AI.OpenAI;
+using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -20,6 +22,9 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection ConfigureServices(this IServiceCollection @this)
     {
         var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
-        return @this.AddSingleton(new CosmosClient(connectionString));
+        @this.AddSingleton(new CosmosClient(connectionString));
+
+        var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
+        return @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new DefaultAzureCredential()));
     }
 }

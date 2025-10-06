@@ -1,3 +1,4 @@
+using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
@@ -26,6 +27,6 @@ public static class ServiceCollectionExtensions
 
         var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
         var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey");
-        return @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new System.ClientModel.ApiKeyCredential(openAIKey)));
+        return @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
     }
 }

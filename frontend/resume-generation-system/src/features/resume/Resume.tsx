@@ -131,7 +131,7 @@ const Job = ({ job }: { job: Job }) => {
     <h3 className={styles.full}><span className={styles.left}>{job.title}</span><span className={styles.right}>{job.company}</span></h3>
     <p className={styles.full}><span className={styles.left}>{job.start} - {job.end}</span><span className={styles.right}>{job.location}</span></p>
     <ul>
-      {job.bullets.slice(0, 10).map((bullet, index) => (<li key={index}>{bullet}</li>))}
+      {job.bullets.map((bullet, index) => (<li key={index}>{bullet}</li>))}
     </ul>
   </section>);
 }

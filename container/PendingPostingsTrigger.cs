@@ -20,6 +20,7 @@ namespace RGS.Backend;
 
 public class PendingPostingsTrigger
 {
+    private const int LineLength = 100;
     private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly CosmosClient _cosmosClient;
@@ -83,7 +84,7 @@ public class PendingPostingsTrigger
         var response = chatClient.CompleteChat(messages, requestOptions);
 
         var rankings = JsonSerializer.Deserialize<Rankings>(response.Value.Content[0].Text);
-        var idToLengthWeightMap = bullets.ToDictionary(b => (b.id, b.jobid), b => b.bulletText.Length / 80 + 1);
+        var idToLengthWeightMap = bullets.ToDictionary(b => (b.id, b.jobid), b => b.bulletText.Length / LineLength + 1);
 
         var bestOfEach = rankings.wts.GroupBy(wt => wt.jobid).SelectMany(g => g.OrderByDescending(wt => wt.wt).Take(4));
 

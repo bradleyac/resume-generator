@@ -21,6 +21,7 @@ namespace RGS.Backend;
 public class PendingPostingsTrigger
 {
     private const int LineLength = 90;
+    private const int MaxLines = 24;
     private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly CosmosClient _cosmosClient;
@@ -88,19 +89,25 @@ public class PendingPostingsTrigger
 
         var bestOfEach = rankings.wts.GroupBy(wt => wt.jobid).SelectMany(g => g.OrderByDescending(wt => wt.wt).Take(4));
 
-        Ranking[] toInclude = [.. bestOfEach, .. rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt).Take(10)];
+        Ranking[] toInclude = [.. bestOfEach, .. rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt)];
 
-        while (toInclude.Sum(r => idToLengthWeightMap[(r.id, r.jobid)]) > 23)
-        {
-            toInclude = toInclude.SkipLast(1).ToArray();
-        }
+        var pruned = toInclude
+            .Zip(
+                toInclude.Select(
+                    (bullet, index) => toInclude.Take(index + 1)
+                        .Sum(r => idToLengthWeightMap[(r.id, r.jobid)])
+                )
+            )
+            .TakeWhile(rankingAndLines => rankingAndLines.Second <= MaxLines)
+            .Select(rankingAndLines => rankingAndLines.First)
+            .ToArray();
 
         var newResumeData = masterResumeData with
         {
             id = posting.id,
             Jobs = masterResumeData.Jobs.Select((job, jobid) => job with
             {
-                Bullets = job.Bullets.Where((text, id) => toInclude.Select(b => (b.id, b.jobid)).Contains((id, jobid))).ToArray()
+                Bullets = job.Bullets.Where((text, id) => pruned.Select(b => (b.id, b.jobid)).Contains((id, jobid))).ToArray()
             }).ToArray()
         };
 

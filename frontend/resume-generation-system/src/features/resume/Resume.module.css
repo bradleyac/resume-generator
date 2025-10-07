@@ -95,7 +95,7 @@
   flex-direction: column;
   gap: 0.5em;
   font-size: 10px;
-  padding-left: .25em;
+  padding: 0 0 .25em .25em;
 
   p {
     word-break: break-word;

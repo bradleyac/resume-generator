@@ -116,6 +116,7 @@
   flex-direction: column;
   flex-wrap: wrap;
   gap: .5em;
+  font-size: 10px;
 
   section {
     height: min-content;
@@ -144,6 +145,7 @@
 .bookshelfSection {
   grid-area: bookshelf;
   place-self: start;
+  font-size: 10px;
 
   ul {
     padding: 0;

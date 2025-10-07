@@ -148,7 +148,7 @@ const Project = ({ project }: { project: Project }) => {
     <div className={styles.full}>
       <h3 className={styles.left}>{project.name}</h3><p className={styles.right}>{project.when}</p>
     </div>
-    <p>{project.description}</p>
+    <p className={styles.indented}>{project.description}</p>
     <p><strong>Technologies:</strong> {project.technologies.join(', ')}</p>
   </section>);
 }

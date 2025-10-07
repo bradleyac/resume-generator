@@ -171,6 +171,11 @@
   text-align: left;
 }
 
+.indented {
+  position: relative;
+  left: 2em;
+}
+
 .github::before,
 .gmail::before,
 .phone::before,

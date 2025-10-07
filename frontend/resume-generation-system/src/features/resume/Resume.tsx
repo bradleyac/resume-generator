@@ -147,9 +147,9 @@ const Project = ({ project }: { project: Project }) => {
 }
 
 const Education = ({ education }: { education: Education }) => {
-  return (<div>
-    <h3>{education.degree} - {education.school}</h3>
-    <p>{education.location} | {education.graduation}</p>
+  return (<div className={styles.full}>
+    <h3 className={styles.left}>{education.degree} - {education.school}</h3>
+    <p className={styles.right}>{education.location} | {education.graduation}</p>
   </div>);
 }
 

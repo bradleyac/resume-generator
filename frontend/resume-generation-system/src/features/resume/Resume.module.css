@@ -20,13 +20,13 @@
   }
 
   h1 {
-    /* background-color: oklch(.75 .05 180); */
-    /* padding: .125em; */
+    background-color: oklch(.75 .1 160);
+    padding: .125em;
   }
 
   h2 {
-    /* background-color: oklch(.85 .05 180); */
-    /* padding: .125em; */
+    background-color: oklch(.85 .1 160);
+    padding: .125em;
   }
 
   h3 {
@@ -36,13 +36,16 @@
 
 .header {
   grid-area: header;
-  width: calc(100% - 1em);
+  place-content: center;
+  position: relative;
+  /* background-color: oklch(.85 .1 160); */
+  /* padding-top: 1em; */
 }
 
 .experienceSection,
 .educationSection,
 .projectsSection {
-  width: calc(100% - 1em);
+  width: calc(100%);
 }
 
 .experienceSection,
@@ -92,8 +95,7 @@
   flex-direction: column;
   gap: 0.5em;
   font-size: 10px;
-  margin-top: 1em;
-  margin-bottom: 1em;
+  padding-left: .25em;
 
   p {
     word-break: break-word;

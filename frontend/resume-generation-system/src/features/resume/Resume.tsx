@@ -176,11 +176,12 @@ const SkillsSection = ({ resumeData }: { resumeData: ResumeData }) => {
 
 const BookshelfSection = ({ resumeData }: { resumeData: ResumeData }) => {
   return (<section className={styles.bookshelfSection}>
-    <h2>My Bookshelf</h2>
+    <h2>Books</h2>
     <ul>
       {resumeData.bookshelf.map((book, index) => (
-        <li key={index}>{book.title} | {book.author}</li>
-      ))}
-    </ul>
-  </section>);
+        <li key={index} className={styles.book}><p><strong>{book.title}</strong></p><p>{book.author}</p></li>
+      ))
+      }
+    </ul >
+  </section >);
 }

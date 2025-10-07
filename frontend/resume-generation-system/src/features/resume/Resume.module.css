@@ -5,10 +5,10 @@
   display: grid;
   grid-template: "header header" max-content
     "contact projects" min-content
-    "skills projects" min-content
-    "skills experience" 1fr
-    "bookshelf experience" min-content
-    "bookshelf education" min-content / 25% 75%;
+    "skills projects" auto
+    "skills experience" min-content
+    "bookshelf experience" 1fr
+    ". education" min-content / 25% 75%;
   padding: 4em;
   column-gap: .25em;
   row-gap: .5em;
@@ -51,7 +51,8 @@
 .educationSection,
 .projectsSection,
 .contactSection,
-.skillsSection {
+.skillsSection,
+.bookshelfSection {
   position: relative;
 
   p {
@@ -72,7 +73,7 @@
 
   ul {
     text-align: start;
-    padding: 0;
+    padding: 0 0 0 1.25em;
   }
 }
 
@@ -142,6 +143,14 @@
 
 .bookshelfSection {
   grid-area: bookshelf;
+  place-self: start;
+
+  ul {
+    padding: 0 0 0 1.25em;
+    list-style: "📚";
+    /* list-style-type: none; */
+    text-align: start;
+  }
 }
 
 .full {

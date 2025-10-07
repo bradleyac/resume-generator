@@ -8,7 +8,7 @@
     "skills projects" auto
     "skills experience" min-content
     "bookshelf experience" 1fr
-    ". education" min-content / 25% 75%;
+    ". education" min-content / 26% 74%;
   padding: 4em;
   column-gap: .25em;
   row-gap: .5em;
@@ -73,7 +73,8 @@
 
   ul {
     text-align: start;
-    padding: 0 0 0 1.25em;
+    padding: 0 0 0 1em;
+    list-style-position: inside;
   }
 }
 
@@ -146,6 +147,8 @@
   grid-area: bookshelf;
   place-self: start;
   font-size: 10px;
+  width: 100%;
+  gap: .5em;
 
   ul {
     padding: 0;

@@ -7,7 +7,8 @@
     "contact projects" min-content
     "skills projects" min-content
     "skills experience" 1fr
-    "skills education" min-content / 25% 75%;
+    "bookshelf experience" min-content
+    "bookshelf education" min-content / 25% 75%;
   padding: 4em;
   column-gap: .25em;
   row-gap: .5em;
@@ -38,8 +39,6 @@
   grid-area: header;
   place-content: center;
   position: relative;
-  /* background-color: oklch(.85 .1 160); */
-  /* padding-top: 1em; */
 }
 
 .experienceSection,
@@ -139,6 +138,10 @@
       content: "";
     }
   }
+}
+
+.bookshelfSection {
+  grid-area: bookshelf;
 }
 
 .full {

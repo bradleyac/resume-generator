@@ -10,6 +10,8 @@ public record Contact(string Email, string Phone, string Github);
 
 public record SkillCategory(string Label, string[] Items);
 
+public record Book(string Title, string Author);
+
 public record ResumeData(string id,
                          string Name,
                          string Title,
@@ -20,4 +22,5 @@ public record ResumeData(string id,
                          Job[] Jobs,
                          Project[] Projects,
                          Education[] Education,
-                         SkillCategory[] Skills);
+                         SkillCategory[] Skills,
+                         Book[] Bookshelf);

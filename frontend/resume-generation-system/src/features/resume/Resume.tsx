@@ -25,6 +25,11 @@ type Education = {
   graduation: string;
 };
 
+type Book = {
+  title: string;
+  author: string;
+}
+
 type ResumeData = {
   name: string;
   title: string;
@@ -43,6 +48,7 @@ type ResumeData = {
     label: string;
     items: string[];
   }[];
+  bookshelf: Book[];
 }
 
 const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
@@ -85,6 +91,7 @@ export const Resume = () => {
     <EducationSection resumeData={resumeData} />
     <ContactSection resumeData={resumeData} />
     <SkillsSection resumeData={resumeData} />
+    <BookshelfSection resumeData={resumeData} />
   </article>);
 }
 
@@ -164,5 +171,16 @@ const SkillsSection = ({ resumeData }: { resumeData: ResumeData }) => {
         ))}
         </ul>
       </section>))}
+  </section>);
+}
+
+const BookshelfSection = ({ resumeData }: { resumeData: ResumeData }) => {
+  return (<section className={styles.bookshelfSection}>
+    <h2>My Bookshelf</h2>
+    <ul>
+      {resumeData.bookshelf.map((book, index) => (
+        <li key={index}>{book.title} | {book.author}</li>
+      ))}
+    </ul>
   </section>);
 }

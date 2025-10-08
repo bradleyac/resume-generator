@@ -7,6 +7,11 @@ on:
   push:
     branches:
       - dev
+    paths:
+      - backend/**
+      - container/**
+      - RGS.Backend.Shared/**
+      - .github/workflows/dev_resume-generation-system-backend-dev.yml
   workflow_dispatch:
 
 env:
@@ -42,6 +47,9 @@ jobs:
           client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_E6D7B62EB429474296297B0DA5B7F954 }}
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_A2BB146B7A7E4477BA876B1A58C0B080 }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_2C62F242CFEE4E3FAB700F25A87E9BCB }}
+
+      - name: Logout Azure
+        uses: azure/logout@v1
 
       - name: 'Run Azure Functions Action'
         uses: Azure/functions-action@v1

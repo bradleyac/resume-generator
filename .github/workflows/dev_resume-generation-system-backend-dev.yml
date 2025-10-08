@@ -50,4 +50,19 @@ jobs:
           app-name: 'resume-generation-system-backend-dev'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
+
+      - name: Build and push container image to registry
+        uses: azure/container-apps-deploy-action@v2
+        with:
+          appSourcePath: ${{ github.workspace }}/
+          dockerFilePath: ./container/Dockerfile
+          _targetLabelKey_: _targetLabel_
+          acrName: dominion
+          acrUsername: ${{ secrets.DOMINIONSERVER_REGISTRY_USERNAME }}
+          acrPassword: ${{ secrets.DOMINIONSERVER_REGISTRY_PASSWORD }}
+          containerAppName: rgs-container-funcs-dev
+          resourceGroup: rgs-dev
+          imageToBuild: dominion.azurecr.io/rgs-container-funcs-dev:${{ github.sha }}
+          _buildArgumentsKey_: |
+            _buildArgumentsValues_
           

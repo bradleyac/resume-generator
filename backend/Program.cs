@@ -20,6 +20,7 @@ public static class BuilderExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection @this)
     {
-        return @this.AddSingleton(new CosmosClient(accountEndpoint: "https://resume-generation-system.documents.azure.com:443/", tokenCredential: new DefaultAzureCredential()));
+        var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
+        return @this.AddSingleton(new CosmosClient(connectionString));
     }
 }

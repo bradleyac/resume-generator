@@ -23,6 +23,7 @@ public class PendingPostingsTrigger
     private const int LineLength = 85;
     private const int MaxLines = 25;
     private static readonly string PageUrl;
+    private static readonly string ResumeBlobContainerUrl;
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly CosmosClient _cosmosClient;
     private readonly AzureOpenAIClient _aiClient;
@@ -31,6 +32,7 @@ public class PendingPostingsTrigger
     {
         var swaHostUrl = Environment.GetEnvironmentVariable("SWA_HOST");
         PageUrl = $"{swaHostUrl}/resume" ?? throw new ArgumentException("SWA_HOST not configured");
+        ResumeBlobContainerUrl = Environment.GetEnvironmentVariable("RESUME_BLOB_CONTAINER_URL") ?? throw new ArgumentException("RESUME_BLOB_CONTAINER_URL not configured");
     }
 
     public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient)
@@ -136,6 +138,6 @@ public class PendingPostingsTrigger
         var client = new BlobContainerClient(connectionString, "resumes");
         var blobName = $"resume-{Guid.NewGuid()}.pdf";
         _ = await client.UploadBlobAsync(blobName, pdfStream);
-        return $"https://resumeartifacts.blob.core.windows.net/resumes/{blobName}";
+        return $"{ResumeBlobContainerUrl}/{blobName}";
     }
 }

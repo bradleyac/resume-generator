@@ -22,10 +22,16 @@ public class PendingPostingsTrigger
 {
     private const int LineLength = 85;
     private const int MaxLines = 25;
-    private const string PageUrl = "https://happy-mushroom-0344c0c0f.2.azurestaticapps.net/resume";
+    private static readonly string PageUrl;
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly CosmosClient _cosmosClient;
     private readonly AzureOpenAIClient _aiClient;
+
+    static PendingPostingsTrigger()
+    {
+        var swaHostUrl = Environment.GetEnvironmentVariable("SWA_HOST");
+        PageUrl = $"{swaHostUrl}/resume" ?? throw new ArgumentException("SWA_HOST not configured");
+    }
 
     public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient)
     {

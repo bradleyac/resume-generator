@@ -23,6 +23,4 @@ public record ResumeData(string id,
                          Project[] Projects,
                          Education[] Education,
                          SkillCategory[] Skills,
-                         Book[] Bookshelf,
-                         ExtractedPosting? Extracted,
-                         Rankings? Rankings);
+                         Book[] Bookshelf);

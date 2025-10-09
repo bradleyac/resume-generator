@@ -109,7 +109,7 @@ public class PendingPostingsTrigger
                 )
             )
             .TakeWhile(rankingAndLines => rankingAndLines.Second <= MaxLines)
-            .Select(rankingAndLines => rankingAndLines.First) d
+            .Select(rankingAndLines => rankingAndLines.First)
             .ToArray();
 
         var newResumeData = masterResumeData with

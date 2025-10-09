@@ -64,17 +64,19 @@ public class PendingPostingsTrigger
         }
     }
 
+    public record PageExtract(ExtractedPosting Posting, Rankings Rankings);
+
     private async Task GenerateResumeDataAsync(JobPosting posting, Container resumeDataContainer, AzureOpenAIClient aiClient)
     {
         var masterResumeData = (await resumeDataContainer.ReadItemAsync<ResumeData>("master", new PartitionKey("master"))).Resource;
 
         JSchemaGenerator generator = new JSchemaGenerator();
-        var jsonSchema = generator.Generate(typeof(Rankings)).ToString();
+        var jsonSchema = generator.Generate(typeof(PageExtract)).ToString();
 
         var requestOptions = new ChatCompletionOptions()
         {
             MaxOutputTokenCount = 10000,
-            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat("rankings", BinaryData.FromString(jsonSchema))
+            ResponseFormat = ChatResponseFormat.CreateJsonSchemaFormat("extract", BinaryData.FromString(jsonSchema))
         };
 
 #pragma warning disable AOAI001
@@ -85,19 +87,19 @@ public class PendingPostingsTrigger
 
         List<ChatMessage> messages = [
             new SystemChatMessage("You are a discerning technical recruiter helping the user construct their resume for a particular software developer position."),
-            new UserChatMessage("This is the job description: " + posting.PostingText),
+            new UserChatMessage("This is the link to the job description: " + posting.Link),
             new UserChatMessage("These are my resume bullets: " + JsonSerializer.Serialize(bullets)),
-            new UserChatMessage("Read the job description and assign a score between 0 and 10 to each bullet according to how appropriate it would be to appear on a resume for the job description. Return the scores associated by id."),
+            new UserChatMessage("Read the job description and assign a score between 0 and 10 to each bullet according to how appropriate it would be to appear on a resume for the job description. Return the scores associated by id as well as general information about the job (title, company, verbatim description)."),
         ];
         ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
         var response = chatClient.CompleteChat(messages, requestOptions);
 
-        var rankings = JsonSerializer.Deserialize<Rankings>(response.Value.Content[0].Text);
+        var extract = JsonSerializer.Deserialize<PageExtract>(response.Value.Content[0].Text);
         var idToLengthWeightMap = bullets.ToDictionary(b => (b.id, b.jobid), b => b.bulletText.Length / LineLength + 1);
 
-        var bestOfEach = rankings.wts.GroupBy(wt => wt.jobid).SelectMany(g => g.OrderByDescending(wt => wt.wt).Take(4));
+        var bestOfEach = extract.Rankings.wts.GroupBy(wt => wt.jobid).SelectMany(g => g.OrderByDescending(wt => wt.wt).Take(4));
 
-        Ranking[] toInclude = [.. bestOfEach, .. rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt)];
+        Ranking[] toInclude = [.. bestOfEach, .. extract.Rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt)];
 
         var pruned = toInclude
             .Zip(
@@ -107,7 +109,7 @@ public class PendingPostingsTrigger
                 )
             )
             .TakeWhile(rankingAndLines => rankingAndLines.Second <= MaxLines)
-            .Select(rankingAndLines => rankingAndLines.First)
+            .Select(rankingAndLines => rankingAndLines.First) d
             .ToArray();
 
         var newResumeData = masterResumeData with
@@ -116,7 +118,9 @@ public class PendingPostingsTrigger
             Jobs = masterResumeData.Jobs.Select((job, jobid) => job with
             {
                 Bullets = job.Bullets.Where((text, id) => pruned.Select(b => (b.id, b.jobid)).Contains((id, jobid))).ToArray()
-            }).ToArray()
+            }).ToArray(),
+            Extracted = extract.Posting,
+            Rankings = extract.Rankings,
         };
 
         await resumeDataContainer.UpsertItemAsync(newResumeData);

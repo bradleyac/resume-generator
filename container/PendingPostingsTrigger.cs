@@ -94,6 +94,8 @@ public class PendingPostingsTrigger
         ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
         var response = chatClient.CompleteChat(messages, requestOptions);
 
+        _logger.LogInformation(response.Value.Content[0].Text);
+
         var extract = JsonSerializer.Deserialize<PageExtract>(response.Value.Content[0].Text);
         var idToLengthWeightMap = bullets.ToDictionary(b => (b.id, b.jobid), b => b.bulletText.Length / LineLength + 1);
 

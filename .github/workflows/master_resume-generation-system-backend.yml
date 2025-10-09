@@ -12,6 +12,7 @@ on:
       - container/**
       - RGS.Backend.Shared/**
       - .github/workflows/master_resume-generation-system-backend.yml
+  workflow_dispatch:
 
 env:
   AZURE_FUNCTIONAPP_PACKAGE_PATH: './backend' # set this to the path to your web app project, defaults to the repository root

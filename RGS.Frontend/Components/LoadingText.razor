@@ -1,0 +1,12 @@
+﻿@if (TextObject is null)
+{
+  <p aria-hidden="true" class="placeholder col-4"></p>
+}
+else
+{
+  <p>@TextObject.ToString()</p>
+}
+
+@code {
+  [Parameter] public object TextObject { get; set; } = null!;
+}

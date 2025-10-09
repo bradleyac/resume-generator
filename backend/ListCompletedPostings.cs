@@ -15,22 +15,41 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
     private readonly ILogger<ListCompletedPostings> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
+    private const int MaxPostingsToReturn = 10;
+
     [Function("ListCompletedPostings")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        try
+        DateTime? lastImportedAt = null;
+        string? lastId = null;
+        string? status = null;
+
+        if (req.Query.TryGetValue("lastImportedAt", out var lastImportedAtValues))
         {
-            var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
-            var query = completedPostingsContainer.GetItemLinqQueryable<CompletedPosting>()
-                .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt })
-                .OrderByDescending(p => p.ImportedAt);
-            var results = await query.ToFeedIterator().ToListAsync();
-            return new JsonResult(results);
+            lastImportedAt = DateTime.Parse(lastImportedAtValues.First()).ToUniversalTime();
+            _logger.LogInformation(lastImportedAt.ToString());
         }
-        catch (Exception e)
+
+        if (req.Query.TryGetValue("lastId", out var lastIdValues))
         {
-            _logger.LogError(e, "Failed to list job postings");
-            throw;
+            lastId = lastIdValues.First();
         }
+
+        if (req.Query.TryGetValue("status", out var statusValues))
+        {
+            status = statusValues.First();
+        }
+
+        var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
+        var query = completedPostingsContainer.GetItemLinqQueryable<CompletedPosting>()
+            .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt, p.Status })
+            .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
+            .Where(p => status == null || p.Status == status)
+            .OrderByDescending(p => p.ImportedAt)
+            .ThenBy(p => p.id)
+            .Take(MaxPostingsToReturn);
+
+        var list = await query.ToFeedIterator().ToListAsync();
+        return new JsonResult(list.Select(item => new PostingSummary(item.id, item.Link, item.Company, item.Title, item.ImportedAt, item.Status)).ToList());
     }
 }

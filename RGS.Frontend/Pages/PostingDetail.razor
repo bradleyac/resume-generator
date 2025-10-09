@@ -1,0 +1,45 @@
+﻿@page "/posting/{PostingId}"
+@using RGS.Frontend.Components
+
+<div class="@ContainerClass card m-3 p-3">
+  <label>Posting Id: </label>
+  <LoadingText TextObject=@posting?.id />
+  <label>Imported: </label>
+  <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />
+  <label for="link">Link: </label>
+  <a id="link" href=@posting?.Link>View</a>
+  <label>Company: </label>
+  <LoadingText TextObject=@posting?.Company />
+  <label>Title: </label>
+  <LoadingText TextObject=@posting?.Title />
+  <label for="artifacts">Artifacts: </label>
+  <div id="artifacts" class="flex flex-row">
+    <a href=@posting?.ResumeUrl>Resume</a>
+  </div>
+  <label>Job Posting: </label>
+  <LoadingText TextObject=@posting?.PostingText />
+</div>
+
+
+@code {
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  [Parameter] public string PostingId { get; set; } = string.Empty;
+
+  private CompletedPosting? posting;
+  private bool isLoading = true;
+  private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
+  {
+    "Pending" => "border border-warning",
+    "Applied" => "border border-success",
+    "Archived" => "border border-secondary",
+    _ => string.Empty,
+  };
+
+  protected override async Task OnInitializedAsync()
+  {
+    // Load posting details using PostingId
+    await Task.Delay(500);
+    posting = await PostingsService.GetPostingAsync(PostingId);
+    isLoading = false;
+  }
+}

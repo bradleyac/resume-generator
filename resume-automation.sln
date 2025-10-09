@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGS.Backend.Shared", "RGS.B
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "container", "container\container.csproj", "{F406713B-9731-46E5-8BBB-F3B19940D439}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RGS.Frontend", "RGS.Frontend\RGS.Frontend.csproj", "{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +57,18 @@ Global
 		{F406713B-9731-46E5-8BBB-F3B19940D439}.Release|x64.Build.0 = Release|Any CPU
 		{F406713B-9731-46E5-8BBB-F3B19940D439}.Release|x86.ActiveCfg = Release|Any CPU
 		{F406713B-9731-46E5-8BBB-F3B19940D439}.Release|x86.Build.0 = Release|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Debug|x64.Build.0 = Debug|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Debug|x86.Build.0 = Debug|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Release|x64.ActiveCfg = Release|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Release|x64.Build.0 = Release|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Release|x86.ActiveCfg = Release|Any CPU
+		{564C11F2-F358-402D-8DDB-6E17AAE6DDBD}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

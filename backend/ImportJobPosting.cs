@@ -20,16 +20,18 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
     {
         try
         {
-            // todo: CSRF
+            // TODO: CSRF protection
+            // Currently using cookie-based authentication built into Azure Functions, and thus vulnerable to CSRF.
+            // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.
             var pendingPostings = _cosmosClient.GetContainer("Resumes", "PendingPostings");
-            var form = await req.ReadFormAsync();
+            var payload = await req.ReadFromJsonAsync<NewPostingModel>() ?? throw new ArgumentException("Invalid payload");
             var newPosting = new JobPosting
             (
                 Guid.NewGuid().ToString(),
-                form.Get("link"),
-                form.Get("company"),
-                form.Get("title"),
-                form.Get("postingText"),
+                payload.Link,
+                payload.Company,
+                payload.Title,
+                payload.PostingText,
                 DateTime.UtcNow
             );
             await pendingPostings.UpsertItemAsync(newPosting);
@@ -41,9 +43,4 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
             throw;
         }
     }
-}
-
-public static class ImportJobPostingExtensions
-{
-
 }

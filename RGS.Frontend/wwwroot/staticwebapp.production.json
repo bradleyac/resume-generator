@@ -24,5 +24,8 @@
     "exclude": [
       "/api/*"
     ]
+  },
+  "globalHeaders": {
+    "Blazor-Environment": "Production"
   }
 }

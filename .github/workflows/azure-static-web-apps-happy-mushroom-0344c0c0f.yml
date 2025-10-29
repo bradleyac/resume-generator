@@ -16,11 +16,15 @@ jobs:
     if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
     runs-on: ubuntu-latest
     name: Build and Deploy Job
+    env:
+      ENVRIRONMENT: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
+      - name: CopyConfig
+        run : cp ./RGS.Frontend/wwwroot/staticwebapp.$ENVIRONMENT.json ./RGS.Frontend/wwwroot/staticwebapp.config.json
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

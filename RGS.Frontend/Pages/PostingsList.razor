@@ -100,12 +100,12 @@
   private async Task OnPostingApplied(string postingId)
   {
     await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Applied));
-    postings = postings.Select(p => p.id == postingId ? p with { Status = PostingStatus.Applied } : p).ToList();
+    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Applied } : p).ToList();
   }
 
   private async Task OnPostingArchived(string postingId)
   {
     await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Archived));
-    postings = postings.Select(p => p.id == postingId ? p with { Status = PostingStatus.Archived } : p).ToList();
+    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Archived } : p).ToList();
   }
 }

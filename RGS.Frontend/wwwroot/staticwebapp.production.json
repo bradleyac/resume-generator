@@ -7,6 +7,12 @@
       ]
     },
     {
+      "route": "/api/ImportJobPosting",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
       "route": "/api/*",
       "allowedRoles": [
         "contributor"

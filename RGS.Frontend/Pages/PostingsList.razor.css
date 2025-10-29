@@ -1,0 +1,7 @@
+.postings-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  grid-auto-rows: auto;
+  grid-auto-flow: row;
+  gap: 1rem;
+}

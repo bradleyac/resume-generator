@@ -40,10 +40,10 @@
     @foreach (var postingDay in postings.GroupBy(p => p.ImportedAt.Date))
     {
       <h1>@postingDay.Key.ToString("D")</h1>
-      <ul class="d-flex flex-wrap p-0 list-unstyled">
+      <ul class="p-0 list-unstyled postings-list">
         @foreach (var posting in postingDay)
         {
-          <li class="col-sm-12 col-lg-4">
+          <li>
             <Posting @key=@posting.id OnApplied="async (id) => await OnPostingApplied(id)" OnArchived="async (id) => await OnPostingArchived(id)" PostingSummary=@posting />
           </li>
         }

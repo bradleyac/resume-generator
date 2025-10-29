@@ -5,6 +5,7 @@ using RGS.Frontend;
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
+builder.Configuration.AddEnvironmentVariables("RGS_");
 
 string apiBaseAddress = builder.Configuration["Api:BaseAddress"] ?? throw new RGSException("ApiBaseAddress not configured");
 

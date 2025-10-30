@@ -1,0 +1,8 @@
+.resume-layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+  display: grid;
+  place-items: center;
+  width: fit-content;
+}

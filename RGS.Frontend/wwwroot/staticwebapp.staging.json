@@ -32,7 +32,6 @@
     ]
   },
   "globalHeaders": {
-    "Blazor-Environment": "Staging",
-    "Access-Control-Allow-Origin": "*"
+    "Blazor-Environment": "Staging"
   }
 }

@@ -32,6 +32,7 @@
     ]
   },
   "globalHeaders": {
-    "Blazor-Environment": "Production"
+    "Blazor-Environment": "Production",
+    "Access-Control-Allow-Origin": "*"
   }
 }

@@ -22,13 +22,13 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
     {
         try
         {
-            var key = _config["Api:Key"];
-            var providedKey = req.Headers["x-api-key"].ToString();
+            // var key = _config["Api:Key"];
+            // var providedKey = req.Headers["x-api-key"].ToString();
 
-            if (string.IsNullOrEmpty(key) || key != providedKey)
-            {
-                return new UnauthorizedResult();
-            }
+            // if (string.IsNullOrEmpty(key) || key != providedKey)
+            // {
+            //     return new UnauthorizedResult();
+            // }
             // TODO: CSRF protection
             // Currently using cookie-based authentication built into Azure Functions, and thus vulnerable to CSRF.
             // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.

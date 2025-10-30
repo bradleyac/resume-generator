@@ -11,6 +11,18 @@
       "allowedRoles": [
         "contributor"
       ]
+    },
+    {
+      "route": "/api/ImportJobPosting",
+      "methods": [
+        "post"
+      ],
+      "allowedRoles": [
+        "anonymous"
+      ],
+      "headers": {
+        "Access-Control-Allow-Origin": "*"
+      }
     }
   ],
   "responseOverrides": {

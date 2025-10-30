@@ -127,8 +127,8 @@ public class PendingPostingsTrigger
         using var playwright = await Playwright.CreateAsync();
         await using var browser = await playwright.Chromium.LaunchAsync();
         var page = await browser.NewPageAsync();
-
         await page.GotoAsync($"{PageUrl}/{postingId}", new() { WaitUntil = WaitUntilState.NetworkIdle });
+        await page.WaitForSelectorAsync(".resume", new() { State = WaitForSelectorState.Visible });
         return new MemoryStream(await page.PdfAsync(new PagePdfOptions { PrintBackground = true }));
     }
 

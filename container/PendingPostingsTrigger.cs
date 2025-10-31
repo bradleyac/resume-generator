@@ -15,6 +15,7 @@ using Microsoft.Playwright;
 using Newtonsoft.Json.Schema.Generation;
 using OpenAI.Chat;
 using RGS.Backend.Shared.Models;
+using RGS.Backend.Shared;
 
 namespace RGS.Backend;
 
@@ -101,10 +102,9 @@ public class PendingPostingsTrigger
 
         var pruned = toInclude
             .Zip(
-                toInclude.Select(
-                    (bullet, index) => toInclude.Take(index + 1)
-                        .Sum(r => idToLengthWeightMap[(r.id, r.jobid)])
-                )
+                toInclude
+                    .Select(bullet => idToLengthWeightMap[(bullet.id, bullet.jobid)])
+                    .Scan((a, b) => a + b)
             )
             .TakeWhile(rankingAndLines => rankingAndLines.Second <= MaxLines)
             .Select(rankingAndLines => rankingAndLines.First)

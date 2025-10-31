@@ -101,11 +101,8 @@ public class PendingPostingsTrigger
         Ranking[] toInclude = [.. bestOfEach, .. rankings.wts.Except(bestOfEach).OrderByDescending(wt => wt.wt)];
 
         var pruned = toInclude
-            .Zip(
-                toInclude
-                    .Select(bullet => idToLengthWeightMap[(bullet.id, bullet.jobid)])
-                    .Scan((a, b) => a + b)
-            )
+            .Zip(toInclude.Select(bullet => idToLengthWeightMap[(bullet.id, bullet.jobid)])
+                .Scan((a, b) => a + b))
             .TakeWhile(rankingAndLines => rankingAndLines.Second <= MaxLines)
             .Select(rankingAndLines => rankingAndLines.First)
             .ToArray();
@@ -116,7 +113,8 @@ public class PendingPostingsTrigger
             Jobs = masterResumeData.Jobs.Select((job, jobid) => job with
             {
                 Bullets = job.Bullets.Where((text, id) => pruned.Select(b => (b.id, b.jobid)).Contains((id, jobid))).ToArray()
-            }).ToArray()
+            }).ToArray(),
+            GeneratedRankings = rankings
         };
 
         await resumeDataContainer.UpsertItemAsync(newResumeData);

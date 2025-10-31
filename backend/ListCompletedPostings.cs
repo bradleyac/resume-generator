@@ -40,7 +40,7 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
             status = statusValues.First();
         }
 
-        var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
+        var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
         var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()
             .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt, p.Status })
             .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)

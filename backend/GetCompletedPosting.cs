@@ -21,7 +21,7 @@ public class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosCl
     try
     {
       var completedPostingId = req.Query["completedPostingId"].FirstOrDefault() ?? throw new ArgumentException("Payload missing");
-      var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
+      var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
       var posting = await completedPostingsContainer.ReadItemAsync<JobPosting>(completedPostingId, new PartitionKey(completedPostingId));
 
       return posting switch

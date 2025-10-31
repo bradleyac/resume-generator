@@ -11,7 +11,7 @@
     <p class="card-text"><a href="@PostingSummary.Link" target="_blank">@PostingSummary.Link</a></p>
     <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToString("g")</small></p>
     <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>
-    @if (PostingSummary.Status == PostingStatus.Pending)
+    @if (PostingSummary.Status == PostingStatus.Ready)
     {
       <button class="btn btn-secondary ms-2" @onclick="async () => await OnApplied.InvokeAsync(PostingSummary.id)">Mark Applied</button>
     }
@@ -31,17 +31,17 @@
 
   private string CardClass => PostingSummary.Status switch
   {
-    "Pending" => "border-2 border-warning",
-    "Applied" => "border-2 border-success",
-    "Archived" => "border-2 border-secondary",
+    PostingStatus.Ready => "border-2 border-warning",
+    PostingStatus.Applied => "border-2 border-success",
+    PostingStatus.Archived => "border-2 border-secondary",
     _ => string.Empty,
   };
 
   private string BadgeClass => PostingSummary.Status switch
   {
-    "Pending" => "bg-warning",
-    "Applied" => "bg-success",
-    "Archived" => "bg-secondary",
+    PostingStatus.Ready => "bg-warning",
+    PostingStatus.Applied => "bg-success",
+    PostingStatus.Archived => "bg-secondary",
     _ => "",
   };
 

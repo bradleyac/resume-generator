@@ -29,9 +29,9 @@
   private bool isLoading = true;
   private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
   {
-    "Pending" => "border border-warning",
-    "Applied" => "border border-success",
-    "Archived" => "border border-secondary",
+    PostingStatus.Ready => "border border-warning",
+    PostingStatus.Applied => "border border-success",
+    PostingStatus.Archived => "border border-secondary",
     _ => string.Empty,
   };
 

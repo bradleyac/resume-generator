@@ -1,6 +1,7 @@
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
+using container.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
@@ -28,6 +29,10 @@ public static class ServiceCollectionExtensions
 
         var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
         var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey");
-        return @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
+        @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
+
+        @this.AddSingleton<PostingProcessor>();
+
+        return @this;
     }
 }

@@ -32,8 +32,8 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
                 return new BadRequestObjectResult("Invalid status");
             }
 
-            var pendingPostings = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
-            var postingResponse = await pendingPostings.ReadItemAsync<CompletedPosting>(payload.PostingId, new PartitionKey(payload.PostingId));
+            var postings = _cosmosClient.GetContainer("Resumes", "Postings");
+            var postingResponse = await postings.ReadItemAsync<JobPosting>(payload.PostingId, new PartitionKey(payload.PostingId));
 
             if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK)
             {
@@ -45,7 +45,7 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
             if (posting is not null && posting.Status != payload.NewStatus)
             {
                 posting = posting with { Status = payload.NewStatus };
-                await pendingPostings.UpsertItemAsync(posting);
+                await postings.UpsertItemAsync(posting);
             }
 
             return new OkResult();

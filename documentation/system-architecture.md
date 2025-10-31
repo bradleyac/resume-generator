@@ -18,7 +18,7 @@ Paring down the master resume data to a 1-page resume tailored to the job, and a
 
 ### Lifecycle of a Job Posting
 
-When a job posting is imported, it is initially stored in the PendingPostings NoSQL container in Azure CosmosDB. The Azure CosmosDB change feed will notify Azure Functions that a document was added and trigger artifact generation for the job posting. When the artifacts (resume, cover letter) are complete, the posting is moved to the CompletedPostings NoSQL container and the artifacts can be downloaded from the frontend.
+When a job posting is imported, it is stored in the Postings NoSQL container in Azure CosmosDB with a status of Pending. The Azure CosmosDB change feed will notify Azure Functions that a document was added and trigger artifact generation for the job posting. When the artifacts (resume, cover letter) are complete, the posting is updated to a status of Ready and the artifacts can be downloaded from the frontend. Job postings can be marked Applied and Archived in the frontend once they are in the Ready status.
 
 ### Anatomy of a Resume
 

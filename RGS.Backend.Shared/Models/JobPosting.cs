@@ -18,14 +18,14 @@ public class NewPostingModel
   public string PostingText { get; set; } = string.Empty;
 }
 
-public record JobPosting(string id, string Link, string Company, string Title, string PostingText, DateTime ImportedAt);
+public record JobPosting(string id, string Link, string Company, string Title, string PostingText, DateTime ImportedAt, string? ResumeUrl = null, string Status = PostingStatus.Pending);
 
-public record CompletedPosting(string id, string Link, string Company, string Title, string PostingText, DateTime ImportedAt, string ResumeUrl, string Status = PostingStatus.Pending);
 public record PostingSummary(string id, string Link, string Company, string Title, DateTime ImportedAt, string Status);
 
 public static class PostingStatus
 {
   public const string Pending = "Pending";
+  public const string Ready = "Ready";
   public const string Applied = "Applied";
   public const string Archived = "Archived";
 }

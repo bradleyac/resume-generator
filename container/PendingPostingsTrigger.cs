@@ -16,6 +16,7 @@ using Newtonsoft.Json.Schema.Generation;
 using OpenAI.Chat;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
+using Grpc.Core;
 
 namespace RGS.Backend;
 
@@ -46,22 +47,20 @@ public class PendingPostingsTrigger
     [Function("PendingPostingsTrigger")]
     public async Task Run([CosmosDBTrigger(
         databaseName: "Resumes",
-        containerName: "PendingPostings",
+        containerName: "Postings",
         Connection = "CosmosDBConnectionString",
         LeaseContainerName = "leases",
         CreateLeaseContainerIfNotExists = true)] IReadOnlyList<JobPosting> input)
     {
-        var pendingPostings = _cosmosClient.GetContainer("Resumes", "PendingPostings");
+        var postings = _cosmosClient.GetContainer("Resumes", "Postings");
         var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
-        var completedPostings = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
 
-        foreach (var posting in input)
+        foreach (var posting in input.Where(p => p.Status == PostingStatus.Pending))
         {
             await GenerateResumeDataAsync(posting, resumeDataContainer, _aiClient);
             using var stream = await GeneratePDFStreamAsync(posting.id);
             var resumeUrl = await SaveToBlobStorageAsync(stream);
-            await completedPostings.UpsertItemAsync(new CompletedPosting(posting.id, posting.Link, posting.Company, posting.Title, posting.PostingText, posting.ImportedAt, resumeUrl));
-            await pendingPostings.DeleteItemAsync<JobPosting>(posting.id, partitionKey: new PartitionKey(posting.id));
+            await postings.UpsertItemAsync(posting with { ResumeUrl = resumeUrl, Status = PostingStatus.Ready });
         }
     }
 

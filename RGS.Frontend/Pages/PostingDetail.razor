@@ -25,7 +25,7 @@
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
 
-  private CompletedPosting? posting;
+  private JobPosting? posting;
   private bool isLoading = true;
   private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
   {

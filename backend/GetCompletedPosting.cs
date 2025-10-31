@@ -22,12 +22,12 @@ public class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosCl
     {
       var completedPostingId = req.Query["completedPostingId"].FirstOrDefault() ?? throw new ArgumentException("Payload missing");
       var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "CompletedPostings");
-      var posting = await completedPostingsContainer.ReadItemAsync<CompletedPosting>(completedPostingId, new PartitionKey(completedPostingId));
+      var posting = await completedPostingsContainer.ReadItemAsync<JobPosting>(completedPostingId, new PartitionKey(completedPostingId));
 
       return posting switch
       {
         null => new NotFoundResult(),
-        ItemResponse<CompletedPosting> p => p switch
+        ItemResponse<JobPosting> p => p switch
         {
           { StatusCode: System.Net.HttpStatusCode.OK } => new JsonResult(p.Resource),
           _ => new NotFoundResult()

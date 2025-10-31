@@ -4,7 +4,7 @@ using RGS.Frontend;
 
 internal interface IPostingsService
 {
-  Task<CompletedPosting> GetPostingAsync(string postingId);
+  Task<JobPosting> GetPostingAsync(string postingId);
   Task<List<PostingSummary>> GetPostingsAsync();
   IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string? status = null);
   Task<ResumeData> GetResumeDataAsync(string postingId);
@@ -17,9 +17,9 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
   private readonly HttpClient _httpClient = httpClient;
   private readonly ILogger<PostingsService> _logger = logger;
 
-  public async Task<CompletedPosting> GetPostingAsync(string postingId)
+  public async Task<JobPosting> GetPostingAsync(string postingId)
   {
-    return await _httpClient.GetFromJsonAsync<CompletedPosting>($"/api/GetCompletedPosting?completedPostingId={postingId}") ?? throw new RGSException("Failed to retrieve posting");
+    return await _httpClient.GetFromJsonAsync<JobPosting>($"/api/GetCompletedPosting?completedPostingId={postingId}") ?? throw new RGSException("Failed to retrieve posting");
   }
 
   public async Task<List<PostingSummary>> GetPostingsAsync()

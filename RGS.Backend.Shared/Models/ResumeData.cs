@@ -24,4 +24,5 @@ public record ResumeData(string id,
                          Education[] Education,
                          SkillCategory[] Skills,
                          Book[] Bookshelf,
-                         Rankings? GeneratedRankings = null);
+                         Rankings? GeneratedRankings = null,
+                         string? CoverLetter = null);

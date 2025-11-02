@@ -59,13 +59,16 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
   {
     var postings = _cosmosClient.GetContainer("Resumes", "Postings");
     var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
-    await GenerateResumeDataAsync(posting, resumeDataContainer, _aiClient);
+    var resumeData = await GenerateResumeDataAsync(posting, resumeDataContainer, _aiClient);
+    var coverLetter = await GenerateCoverLetterAsync(posting, resumeData, _aiClient);
+    resumeData = resumeData with { CoverLetter = coverLetter };
+    await resumeDataContainer.UpsertItemAsync(resumeData);
     using var stream = await GeneratePDFStreamAsync(posting.id);
     var resumeUrl = await SaveToBlobStorageAsync(stream);
     await postings.UpsertItemAsync(posting with { ResumeUrl = resumeUrl, Status = PostingStatus.Ready });
   }
 
-  private async Task GenerateResumeDataAsync(JobPosting posting, Container resumeDataContainer, AzureOpenAIClient aiClient)
+  private async Task<ResumeData> GenerateResumeDataAsync(JobPosting posting, Container resumeDataContainer, AzureOpenAIClient aiClient)
   {
     var masterResumeData = (await resumeDataContainer.ReadItemAsync<ResumeData>("master", new PartitionKey("master"))).Resource;
 
@@ -107,7 +110,7 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
         .Select(rankingAndLines => rankingAndLines.First)
         .ToArray();
 
-    var newResumeData = masterResumeData with
+    return masterResumeData with
     {
       id = posting.id,
       Jobs = masterResumeData.Jobs.Select((job, jobid) => job with
@@ -116,8 +119,29 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
       }).ToArray(),
       GeneratedRankings = rankings
     };
+  }
 
-    await resumeDataContainer.UpsertItemAsync(newResumeData);
+  private async Task<string> GenerateCoverLetterAsync(JobPosting posting, ResumeData resumeData, AzureOpenAIClient aiClient)
+  {
+    var requestOptions = new ChatCompletionOptions()
+    {
+      MaxOutputTokenCount = 10000,
+    };
+
+#pragma warning disable AOAI001
+    requestOptions.SetNewMaxCompletionTokensPropertyEnabled(true);
+#pragma warning restore AOAI001
+
+    List<ChatMessage> messages = [
+        new SystemChatMessage("You are a discerning technical recruiter helping the user construct write a cover letter for a particular software developer position."),
+            new UserChatMessage("This is the information from my resume: " + JsonSerializer.Serialize(resumeData)),
+            new UserChatMessage("This is the job description: " + posting.PostingText),
+            new UserChatMessage("Write a one page cover letter for the position, emphasizing why I am excited to take on the role and how my background makes me a good fit."),
+        ];
+    ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
+    var response = chatClient.CompleteChat(messages, requestOptions);
+
+    return response.Value.Content[0].Text;
   }
 
   private static async Task<Stream> GeneratePDFStreamAsync(string postingId)

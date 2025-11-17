@@ -13,7 +13,7 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
     private readonly ILogger<SetPostingStatus> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
-    private static List<string> ValidStatuses = [PostingStatus.Pending, PostingStatus.Ready, PostingStatus.Applied, PostingStatus.Archived];
+    private static List<string> ValidStatuses = [PostingStatus.AwaitingAddress, PostingStatus.Pending, PostingStatus.Ready, PostingStatus.Applied, PostingStatus.Archived];
 
 
     [Function("SetPostingStatus")]

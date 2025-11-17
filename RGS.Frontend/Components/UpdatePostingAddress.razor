@@ -35,7 +35,6 @@
   private UpdatePostingAddressModel model = null!;
   private async Task HandleValidSubmit()
   {
-    model.PostingId = PostingId;
     await PostingsService.UpdatePostingAddressAsync(model);
     await OnPostingSubmitted.InvokeAsync();
   }

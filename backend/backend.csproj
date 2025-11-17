@@ -11,7 +11,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="SetPostingAddress.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <None Include="SetPostingAddress.cs" />
     <PackageReference Include="Azure.Identity" Version="1.16.0" />
     <PackageReference Include="Azure.Storage.Blobs" Version="12.25.1" />
     <PackageReference Include="Microsoft.ApplicationInsights.WorkerService" Version="2.23.0" />

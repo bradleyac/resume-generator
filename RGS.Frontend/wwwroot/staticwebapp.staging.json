@@ -7,6 +7,12 @@
       ]
     },
     {
+      "route": "/api/GetCompletedPosting",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
       "route": "/api/ImportJobPosting",
       "allowedRoles": [
         "anonymous"

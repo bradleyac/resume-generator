@@ -1,9 +1,13 @@
 ﻿@page "/posting/{PostingId}"
+@using BlazorBootstrap
 @using RGS.Frontend.Components
 
 <div class="@ContainerClass card m-3 p-3">
   <label>Posting Id: </label>
   <LoadingText TextObject=@posting?.id />
+  <div class="btn-group" role="group" aria-label="Actions">
+    <button class="btn btn-primary" @onclick="OnUpdatePostingAddressClicked"><i class="bi bi-plus-lg" /></button>
+  </div>
   <label>Imported: </label>
   <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />
   <label for="link">Link: </label>
@@ -21,12 +25,18 @@
   <LoadingText TextObject=@posting?.PostingText />
 </div>
 
+<Modal @ref="modal" Title="Update Posting Address" IsVerticallyCentered="true">
+  <BodyTemplate>
+    <NewPosting OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
+  </BodyTemplate>
+</Modal>
 
 @code {
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
 
   private JobPosting? posting;
+  private Modal modal = null!;
   private bool isLoading = true;
   private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
   {
@@ -42,4 +52,6 @@
     posting = await PostingsService.GetPostingAsync(PostingId);
     isLoading = false;
   }
+
+    private Task OnUpdatePostingAddressClicked() => modal.ShowAsync();
 }

@@ -8,6 +8,7 @@ internal interface IPostingsService
   Task<List<PostingSummary>> GetPostingsAsync();
   IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string? status = null);
   Task<ResumeData> GetResumeDataAsync(string postingId);
+  Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate);
   Task SubmitNewPostingAsync(NewPostingModel model);
   Task SetPostingStatusAsync(PostingStatusUpdate statusUpdate);
 }
@@ -71,5 +72,10 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
       Console.WriteLine(url);
       return _httpClient.GetFromJsonAsync<List<PostingSummary>>(url);
     }
+  }
+
+  public async Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate)
+  {
+    await _httpClient.PostAsync("/api/SetPostingAddress", JsonContent.Create(addressUpdate));
   }
 }

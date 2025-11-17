@@ -7,7 +7,7 @@
 }
 else
 {
-  <article class="resume">
+  <article class="resume loaded">
     @ResumeHeaderSection(resumeData)
     @ExperienceSection(resumeData)
     @ProjectsSection(resumeData)
@@ -28,7 +28,6 @@ else
   protected override async Task OnInitializedAsync()
   {
     // Load posting details using PostingId
-    await Task.Delay(500);
     resumeData = await PostingsService.GetResumeDataAsync(PostingId);
     isLoading = false;
   }

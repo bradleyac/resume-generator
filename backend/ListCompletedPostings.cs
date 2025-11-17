@@ -23,6 +23,7 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
         DateTime? lastImportedAt = null;
         string? lastId = null;
         string? status = null;
+        string? searchText = null;
 
         if (req.Query.TryGetValue("lastImportedAt", out var lastImportedAtValues))
         {
@@ -39,6 +40,11 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
         {
             status = statusValues.First();
         }
+
+        if (req.Query.TryGetValue("searchText", out var searchTextValues))
+        {
+            searchText = searchTextValues.First();
+        }   
 
         var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
         var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()

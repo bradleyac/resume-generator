@@ -32,8 +32,7 @@
   [Parameter] public EventCallback OnCancel { get; set; }
   [Parameter] public string PostingId { get; set; } = null!;
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
-  private UpdatePostingAddressModel model = new();
-
+  private UpdatePostingAddressModel model = null!;
   private async Task HandleValidSubmit()
   {
     model.PostingId = PostingId;
@@ -45,4 +44,10 @@
   {
     await OnCancel.InvokeAsync();
   }
+
+    protected override Task OnInitializedAsync() 
+    {
+      model = new UpdatePostingAddressModel{ PostingId = PostingId };
+      return Task.CompletedTask;
+    }
 }

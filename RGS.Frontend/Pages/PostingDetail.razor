@@ -39,7 +39,6 @@
   protected override async Task OnInitializedAsync()
   {
     // Load posting details using PostingId
-    await Task.Delay(500);
     posting = await PostingsService.GetPostingAsync(PostingId);
     isLoading = false;
   }

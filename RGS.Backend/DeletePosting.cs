@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Client;
 using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
@@ -23,6 +24,9 @@ public class DeletePosting(ILogger<DeletePosting> logger, CosmosClient cosmosCli
 
             var postings = _cosmosClient.GetContainer("Resumes", "Postings");
             await postings.DeleteItemAsync<JobPosting>(postingId, new PartitionKey(postingId));
+
+            var resumes = _cosmosClient.GetContainer("Resumes", "ResumeData");
+            await resumes.DeleteItemAsync<ResumeData>(postingId, new PartitionKey(postingId));
 
             return new OkResult();
         }

@@ -3,7 +3,7 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using RGS.Backend.Shared.Models;
-using container.Services;
+using RGS.Backend.Services;
 
 namespace RGS.Backend;
 

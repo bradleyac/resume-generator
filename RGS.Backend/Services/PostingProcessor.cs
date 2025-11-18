@@ -13,13 +13,13 @@ using OpenAI.Chat;
 using RGS.Backend.Shared;
 using RGS.Backend.Shared.Models;
 
-namespace container.Services;
+namespace RGS.Backend.Services;
 
 public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient)
 {
   private const int LineLength = 85;
   private const int MaxLines = 25;
-  
+
   private readonly ILogger<PostingProcessor> _logger = logger;
   private readonly CosmosClient _cosmosClient = cosmosClient;
   private readonly AzureOpenAIClient _aiClient = aiClient;

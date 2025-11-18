@@ -7,6 +7,7 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using RGS.Backend.Services;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -31,6 +32,8 @@ public static class BuilderExtensions
         var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
         var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey");
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
+
+        @this.AddTransient<PostingProcessor>();
 
         return @this;
     }

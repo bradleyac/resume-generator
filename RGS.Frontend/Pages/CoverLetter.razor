@@ -7,6 +7,7 @@
 }
 else
 {
+  <PageTitle>@PageTitle</PageTitle>
   <article class="cover-letter loaded">
     @HeaderSection(resumeData)
     @BodySection(resumeData, posting)
@@ -16,6 +17,7 @@ else
 @code {
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
+  public string PageTitle => $"abradley-cover-letter-{resumeData.id}";
 
   private ResumeData resumeData = null!;
   private JobPosting posting = null!;

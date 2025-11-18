@@ -7,6 +7,7 @@
 }
 else
 {
+  <PageTitle>@PageTitle</PageTitle>
   <article class="resume loaded">
     @ResumeHeaderSection(resumeData)
     @ExperienceSection(resumeData)
@@ -21,6 +22,7 @@ else
 @code {
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
+  public string PageTitle => $"abradley-resume-{resumeData.id}";
 
   private ResumeData resumeData = null!;
   private bool isLoading = true;

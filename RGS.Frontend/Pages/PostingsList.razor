@@ -44,7 +44,11 @@
         @foreach (var posting in postingDay)
         {
           <li>
-            <Posting @key=@posting.id OnApplied="async (id) => await OnPostingApplied(id)" OnArchived="async (id) => await OnPostingArchived(id)" PostingSummary=@posting />
+            <Posting @key=@posting.id 
+              OnApplied="async (id) => await OnPostingApplied(id)" 
+              OnArchived="async (id) => await OnPostingArchived(id)" 
+              OnResubmit="async (id) => await OnResubmitPosting(id)" 
+              PostingSummary=@posting />
           </li>
         }
       </ul>
@@ -107,5 +111,11 @@
   {
     await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Archived));
     postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Archived } : p).ToList();
+  }
+
+  private async Task OnResubmitPosting(string postingId)
+  {
+    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Pending));
+    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Pending } : p).ToList();
   }
 }

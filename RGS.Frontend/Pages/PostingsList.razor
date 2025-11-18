@@ -47,7 +47,8 @@
             <Posting @key=@posting.id 
               OnApplied="async (id) => await OnPostingApplied(id)" 
               OnArchived="async (id) => await OnPostingArchived(id)" 
-              OnResubmit="async (id) => await OnResubmitPosting(id)" 
+              OnResubmit="async (id) => await OnResubmitPosting(id)"
+              OnDeletePosting="async (id) => await OnDeletePosting(id)"
               PostingSummary=@posting />
           </li>
         }
@@ -117,5 +118,11 @@
   {
     await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Pending));
     postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Pending } : p).ToList();
+  }
+
+  private async Task OnDeletePosting(string postingId)
+  {
+    await PostingsService.DeletePostingAsync(postingId);
+    postings = postings?.Where(p => p.id != postingId).ToList();
   }
 }

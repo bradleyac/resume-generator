@@ -11,6 +11,7 @@ internal interface IPostingsService
   Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate);
   Task SubmitNewPostingAsync(NewPostingModel model);
   Task SetPostingStatusAsync(PostingStatusUpdate statusUpdate);
+  Task DeletePostingAsync(string postingId);
 }
 
 internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> logger) : IPostingsService
@@ -77,5 +78,10 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
   public async Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate)
   {
     await _httpClient.PostAsync("/api/SetPostingAddress", JsonContent.Create(addressUpdate));
+  }
+
+  public async Task DeletePostingAsync(string postingId)
+  {
+    await _httpClient.PostAsync($"/api/DeletePosting/{postingId}", null);
   }
 }

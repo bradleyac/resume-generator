@@ -12,7 +12,10 @@
     <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToString("g")</small></p>
     <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>
     <button class="btn btn-secondary ms-2" @onclick="async () => await OnResubmit.InvokeAsync(PostingSummary.id)">Resubmit Posting</button>
-    <button class="btn btn-danger ms-2" @onclick="async () => await OnDeletePosting.InvokeAsync(PostingSummary.id)">Delete Posting</button>
+    @if (PostingSummary.Status == PostingStatus.Archived)
+    {
+      <button class="btn btn-danger ms-2" @onclick="async () => await OnDeletePosting.InvokeAsync(PostingSummary.id)">Delete Posting</button>
+    }
     @if (PostingSummary.Status == PostingStatus.Ready)
     {
       <button class="btn btn-secondary ms-2" @onclick="async () => await OnApplied.InvokeAsync(PostingSummary.id)">Mark Applied</button>

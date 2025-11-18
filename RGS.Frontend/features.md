@@ -2,8 +2,9 @@
 
 * ~~Posting lifecycle statuses (applied, archived)~~
 * ~~UI for setting statuses~~
-* Port resume page to Blazor
-* Cover letter generation
+* ~~Port resume page to Blazor~~
+* ~~Cover letter generation~~
+* Reliably generate artifacts the first time.
 * Search across postings
 * Automate job posting submission/ingestion somehow (crawling with hosted headless browser, browser extension when on page, jobs API)
   long-term: automate searching and ingesting

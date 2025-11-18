@@ -1,15 +1,8 @@
-using System.Text.Json;
 using Azure.AI.OpenAI;
-using Azure.AI.OpenAI.Chat;
-using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
-using Microsoft.Playwright;
-using Newtonsoft.Json.Schema.Generation;
-using OpenAI.Chat;
 using RGS.Backend.Shared.Models;
-using RGS.Backend.Shared;
 using container.Services;
 
 namespace RGS.Backend;

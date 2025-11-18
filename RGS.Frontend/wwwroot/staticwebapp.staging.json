@@ -1,25 +1,13 @@
 {
   "routes": [
     {
-      "route": "/api/GetResumeData",
-      "allowedRoles": [
-        "anonymous"
-      ]
-    },
-    {
-      "route": "/api/GetCompletedPosting",
-      "allowedRoles": [
-        "anonymous"
-      ]
-    },
-    {
       "route": "/api/ImportJobPosting",
       "allowedRoles": [
         "anonymous"
       ]
     },
     {
-      "route": "/api/*",
+      "route": "/*",
       "allowedRoles": [
         "contributor"
       ]

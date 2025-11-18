@@ -16,22 +16,20 @@
   <LoadingText TextObject=@posting?.Company />
   <label>Title: </label>
   <LoadingText TextObject=@posting?.Title />
-  <label for="artifacts">Artifacts: </label>
-  <div id="artifacts" class="flex flex-row">
-    <a href=@posting?.ResumeUrl>Resume</a>
-    <a href=@posting?.CoverLetterUrl>Cover Letter</a>
-  </div>
   <label>Job Posting: </label>
   <LoadingText TextObject=@posting?.PostingText />
+  <button class="btn btn-primary" @onclick="() => NavigateToResume(PostingId)">View Resume</button>
+  <button class="btn btn-primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</button>
 </div>
 
 <Modal @ref="modal" Title="Update Posting Address" IsVerticallyCentered="true">
   <BodyTemplate>
-    <UpdatePostingAddress PostingId=@posting.id OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
+    <UpdatePostingAddress PostingId=@PostingId OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
   </BodyTemplate>
 </Modal>
 
 @code {
+  [Inject] private NavigationManager NavigationManager { get; set; } = null!;
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
 
@@ -53,5 +51,15 @@
     isLoading = false;
   }
 
-    private Task OnUpdatePostingAddressClicked() => modal.ShowAsync();
+  private Task OnUpdatePostingAddressClicked() => modal.ShowAsync();
+
+  private void NavigateToResume(string postingId)
+  {
+    NavigationManager.NavigateTo($"/resume/{postingId}");
+  }
+
+  private void NavigateToCoverLetter(string postingId)
+  {
+    NavigationManager.NavigateTo($"/cover/{postingId}");
+  }
 }

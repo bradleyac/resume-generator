@@ -1,11 +1,10 @@
 using Azure;
 using Azure.AI.OpenAI;
 using Azure.Identity;
-using container.Services;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;
-using Microsoft.Azure.Functions.Worker.Extensions.Abstractions;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -16,13 +15,15 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
-    .ConfigureServices();
+    .AddApplicationServices();
+
+builder.Configuration.AddEnvironmentVariables();
 
 builder.Build().Run();
 
-public static class ServiceCollectionExtensions
+public static class BuilderExtensions
 {
-    public static IServiceCollection ConfigureServices(this IServiceCollection @this)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection @this)
     {
         var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
         @this.AddSingleton(new CosmosClient(connectionString));
@@ -30,8 +31,6 @@ public static class ServiceCollectionExtensions
         var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
         var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey");
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
-
-        @this.AddSingleton<PostingProcessor>();
 
         return @this;
     }

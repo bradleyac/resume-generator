@@ -19,20 +19,10 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
 {
   private const int LineLength = 85;
   private const int MaxLines = 25;
-  private static readonly string PageUrl;
-  private static readonly string ResumeDatabaseUrl;
+  
   private readonly ILogger<PostingProcessor> _logger = logger;
   private readonly CosmosClient _cosmosClient = cosmosClient;
   private readonly AzureOpenAIClient _aiClient = aiClient;
-
-  static PostingProcessor()
-  {
-    // TODO: Do this at startup and inject config instead of using static constructor.
-    //       Also find any other places this happens and fix those. 
-    var swaHostUrl = Environment.GetEnvironmentVariable("SWA_HOST");
-    PageUrl = $"{swaHostUrl}" ?? throw new ArgumentException("SWA_HOST not configured");
-    ResumeDatabaseUrl = Environment.GetEnvironmentVariable("RESUME_BLOB_CONTAINER_URL") ?? throw new ArgumentException("RESUME_BLOB_CONTAINER_URL not configured");
-  }
 
   public async Task CatchUp()
   {
@@ -63,11 +53,7 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
     var coverLetter = await GenerateCoverLetterAsync(posting, resumeData, _aiClient);
     resumeData = resumeData with { CoverLetter = coverLetter };
     await resumeDataContainer.UpsertItemAsync(resumeData);
-    using var resumeStream = await GeneratePDFStreamAsync(GetResumeUrl(posting.id));
-    var resumeUrl = await SaveToBlobStorageAsync(resumeStream, "resumes", $"{posting.id}.pdf");
-    using var coverLetterStream = await GeneratePDFStreamAsync(GetCoverLetterUrl(posting.id));
-    var coverLetterUrl = await SaveToBlobStorageAsync(coverLetterStream, "coverletters", $"{posting.id}.pdf");
-    await postings.UpsertItemAsync(posting with { ResumeUrl = resumeUrl, CoverLetterUrl = coverLetterUrl, Status = PostingStatus.Ready });
+    await postings.UpsertItemAsync(posting with { Status = PostingStatus.Ready });
   }
 
   private async Task<ResumeData> GenerateResumeDataAsync(JobPosting posting, Container resumeDataContainer, AzureOpenAIClient aiClient)
@@ -144,26 +130,5 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
     var response = chatClient.CompleteChat(messages, requestOptions);
 
     return response.Value.Content[0].Text;
-  }
-
-  private static string GetResumeUrl(string postingId) => $"{PageUrl}/resume/{postingId}";
-  private static string GetCoverLetterUrl(string postingId) => $"{PageUrl}/cover/{postingId}";
-
-  private static async Task<Stream> GeneratePDFStreamAsync(string fullUrl)
-  {
-    using var playwright = await Playwright.CreateAsync();
-    await using var browser = await playwright.Chromium.LaunchAsync();
-    var page = await browser.NewPageAsync();
-    await page.GotoAsync(fullUrl, new() { WaitUntil = WaitUntilState.NetworkIdle });
-    await page.WaitForSelectorAsync(".loaded", new() { State = WaitForSelectorState.Visible });
-    return new MemoryStream(await page.PdfAsync(new PagePdfOptions { PrintBackground = true }));
-  }
-
-  private static async Task<string> SaveToBlobStorageAsync(Stream pdfStream, string containerName, string blobName)
-  {
-    var connectionString = Environment.GetEnvironmentVariable("RESUME_BLOB_CONTAINER_CONNECTION_STRING");
-    var client = new BlobContainerClient(connectionString, containerName);
-    _ = await client.UploadBlobAsync(blobName, pdfStream);
-    return $"{ResumeDatabaseUrl}/{containerName}/{blobName}";
   }
 }

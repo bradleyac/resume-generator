@@ -37,13 +37,13 @@ public class UpdatePostingAddressModel
   public string Zip { get; set; } = string.Empty;
 }
 
-public record JobPosting(string id, string Link, string Company, string Title, string PostingText, DateTime ImportedAt, string? StreetAddress = null, string? City = null, string? State = null, string? Zip = null, string Status = PostingStatus.AwaitingAddress);
+public record JobPosting(string id, string Link, string Company, string Title, string PostingText, DateTime ImportedAt, string? StreetAddress = null, string? City = null, string? State = null, string? Zip = null, string Status = PostingStatus.Pending);
 
 public record PostingSummary(string id, string Link, string Company, string Title, DateTime ImportedAt, string Status);
 
 public static class PostingStatus
 {
-  public const string AwaitingAddress = "AwaitingAddress";
+  public static string[] ValidStatuses = new[] { Pending, Ready, Applied, Archived };
   public const string Pending = "Pending";
   public const string Ready = "Ready";
   public const string Applied = "Applied";

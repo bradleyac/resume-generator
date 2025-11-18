@@ -1,8 +1,8 @@
 ﻿<div class="btn-group" role="group" aria-label="Status Selector">
-  @foreach (var status in new[] { (string?)null, PostingStatus.Ready, PostingStatus.Applied, PostingStatus.Archived })
+  @foreach (var status in (string[])["All", .. PostingStatus.ValidStatuses])
   {
     <button type="button" class="@(Status == status ? "active" : "") btn btn-primary" @onclick="async () => await SelectStatus(status?.ToString())">
-      @(status?.ToString() ?? "All")
+      @status
     </button>
   }
 </div>

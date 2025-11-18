@@ -9,7 +9,7 @@
     <h2 class="card-title">@PostingSummary.Title</h2>
     <h3 class="card-subtitle mb-2 text-muted">@PostingSummary.Company</h3>
     <p class="card-text"><a href="@PostingSummary.Link" target="_blank">@PostingSummary.Link</a></p>
-    <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToString("g")</small></p>
+    <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToLocalTime()</small></p>
     <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>
     <button class="btn btn-secondary ms-2" @onclick="async () => await OnResubmit.InvokeAsync(PostingSummary.id)">Resubmit Posting</button>
     @if (PostingSummary.Status == PostingStatus.Archived)
@@ -38,14 +38,16 @@
 
   private string CardClass => PostingSummary.Status switch
   {
+    PostingStatus.Pending => "border-2 border-light",
     PostingStatus.Ready => "border-2 border-warning",
     PostingStatus.Applied => "border-2 border-success",
     PostingStatus.Archived => "border-2 border-secondary",
-    _ => string.Empty,
+    _ => "",
   };
 
   private string BadgeClass => PostingSummary.Status switch
   {
+    PostingStatus.Pending => "bg-light",
     PostingStatus.Ready => "bg-warning",
     PostingStatus.Applied => "bg-success",
     PostingStatus.Archived => "bg-secondary",

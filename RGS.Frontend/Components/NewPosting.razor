@@ -1,0 +1,46 @@
+﻿<section class="m-3">
+  <h1>Submit Job Posting</h1>
+
+  <EditForm Model="@model" @key="@model" method="post" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+      <label for="link" class="form-label">Link</label>
+      <InputText type="url" id="link" class="form-control" @bind-Value="model.Link" />
+    </div>
+    <div class="mb-3">
+      <label for="company" class="form-label">Company</label>
+      <InputText id="company" class="form-control" @bind-Value="model.Company" />
+    </div>
+    <div class="mb-3">
+      <label for="title" class="form-label">Title</label>
+      <InputText id="title" class="form-control" @bind-Value="model.Title" />
+    </div>
+    <div class="mb-3">
+      <label for="description" class="form-label">Posting Text</label>
+      <InputTextArea id="description" class="form-control" rows="5" @bind-Value="model.PostingText" />
+    </div>
+    <div class="mb-3">
+      <button type="button" class="btn btn-secondary me-2" @onclick="HandleCancel">Cancel</button>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </EditForm>
+</section>
+
+@code {
+  [Parameter] public EventCallback OnPostingSubmitted { get; set; }
+  [Parameter] public EventCallback OnCancel { get; set; }
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  private NewPostingModel model = new();
+
+  private async Task HandleValidSubmit()
+  {
+    await PostingsService.SubmitNewPostingAsync(model);
+    await OnPostingSubmitted.InvokeAsync();
+  }
+
+  private async Task HandleCancel()
+  {
+    await OnCancel.InvokeAsync();
+  }
+}

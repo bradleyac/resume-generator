@@ -1,0 +1,127 @@
+﻿@page "/resume/{PostingId}"
+@layout ResumeLayout
+
+@if (isLoading)
+{
+  <p>Loading resume...</p>
+}
+else
+{
+  <PageTitle>@PageTitle</PageTitle>
+  <article class="resume loaded">
+    @ResumeHeaderSection(resumeData)
+    @ExperienceSection(resumeData)
+    @ProjectsSection(resumeData)
+    @EducationSection(resumeData)
+    @ContactSection(resumeData)
+    @SkillsSection(resumeData)
+    @BookshelfSection(resumeData)
+  </article>
+}
+
+@code {
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  [Parameter] public string PostingId { get; set; } = string.Empty;
+  public string PageTitle => $"abradley-resume-{resumeData.id}";
+
+  private ResumeData resumeData = null!;
+  private bool isLoading = true;
+
+  protected override async Task OnInitializedAsync()
+  {
+    // Load posting details using PostingId
+    resumeData = await PostingsService.GetResumeDataAsync(PostingId);
+    isLoading = false;
+  }
+
+  private RenderFragment ExperienceSection(ResumeData resumeData) => @<section class="experience">
+    <h2>Experience</h2>
+    @foreach (var job in resumeData.Jobs)
+    {
+      @JobComponent(job)
+    }
+  </section>;
+
+private RenderFragment JobComponent(Job job) => @<section>
+  <h3 class="full"><span class="left">@job.Title</span><span class="right">@job.Company</span></h3>
+  <p class="full"><span class="left">@job.Start - @job.End</span><span class="right">@job.Location</span></p>
+  <ul>
+    @foreach (var bullet in job.Bullets)
+    {
+      <li>@bullet</li>
+    }
+  </ul>
+</section>;
+
+private RenderFragment ResumeHeaderSection(ResumeData resumeData) => @<header class="header">
+  <h1>@resumeData.Name</h1>
+  <h2>@resumeData.Title</h2>
+  <p>@resumeData.About</p>
+</header>;
+
+  private RenderFragment ContactSection(ResumeData resumeData) => @<section class="contact">
+    <p class="address">@resumeData.City, @resumeData.State</p>
+    <p class="gmail">@resumeData.Contact.Email</p>
+    <p class="phone">@resumeData.Contact.Phone</p>
+    <p class="github">@resumeData.Contact.Github</p>
+  </section>;
+
+  private RenderFragment ProjectsSection(ResumeData resumeData) => @<section class="projects">
+    <h2>Projects</h2>
+    @foreach (var project in resumeData.Projects)
+    {
+      @ProjectComponent(project)
+    }
+  </section>;
+
+  private RenderFragment ProjectComponent(Project project) => @<section>
+    <div class="full">
+      <h3 class="left">@project.Name</h3>
+      <p class="right">@project.When</p>
+    </div>
+    <p class="indented">@project.Description</p>
+    <p><strong>Technologies:</strong> @string.Join(", ", project.Technologies)</p>
+  </section>;
+
+  private RenderFragment EducationSection(ResumeData resumeData) => @<section class="education">
+    <h2>Education</h2>
+    @foreach (var edu in resumeData.Education)
+    {
+      @EducationComponent(edu)
+    }
+  </section>;
+
+  private RenderFragment EducationComponent(Education education) => @<div class="full">
+    <h3 class="left">@education.Degree - @education.School</h3>
+    <p class="right">@education.Location | @education.Graduation</p>
+  </div>;
+
+  private RenderFragment SkillsSection(ResumeData resumeData) => @<section class="skills">
+    <h2>Skills</h2>
+    @foreach (var area in resumeData.Skills)
+    {
+    <section>
+      <h3>@area.Label</h3>
+      <ul>
+        @foreach (var item in area.Items)
+        {
+          <li>@item</li>
+        }
+      </ul>
+    </section>
+    }
+  </section>;
+
+  private RenderFragment BookshelfSection(ResumeData resumeData) => @<section class="bookshelf">
+    <h2>Books</h2>
+    <ul>
+      @foreach (var book in resumeData.Bookshelf)
+      {
+        <li class="book">
+          <p><strong>@book.Title</strong></p>
+          <p>@book.Author</p>
+        </li>
+      }
+    </ul>
+  </section>;
+}

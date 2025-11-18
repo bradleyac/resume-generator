@@ -1,0 +1,7 @@
+.resume-layout {
+  margin: 0 auto;
+  text-align: center;
+  display: grid;
+  place-items: center;
+  width: fit-content;
+}

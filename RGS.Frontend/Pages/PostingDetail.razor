@@ -1,0 +1,65 @@
+﻿@page "/posting/{PostingId}"
+@using BlazorBootstrap
+@using RGS.Frontend.Components
+
+<div class="@ContainerClass card m-3 p-3">
+  <label>Posting Id: </label>
+  <LoadingText TextObject=@posting?.id />
+  <div class="btn-group" role="group" aria-label="Actions">
+    <button class="btn btn-primary" @onclick="OnUpdatePostingAddressClicked"><i class="bi bi-plus-lg" /></button>
+  </div>
+  <label>Imported: </label>
+  <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />
+  <label for="link">Link: </label>
+  <a id="link" href=@posting?.Link>View</a>
+  <label>Company: </label>
+  <LoadingText TextObject=@posting?.Company />
+  <label>Title: </label>
+  <LoadingText TextObject=@posting?.Title />
+  <label>Job Posting: </label>
+  <LoadingText TextObject=@posting?.PostingText />
+  <button class="btn btn-primary" @onclick="() => NavigateToResume(PostingId)">View Resume</button>
+  <button class="btn btn-primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</button>
+</div>
+
+<Modal @ref="modal" Title="Update Posting Address" IsVerticallyCentered="true">
+  <BodyTemplate>
+    <UpdatePostingAddress PostingId=@PostingId OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
+  </BodyTemplate>
+</Modal>
+
+@code {
+  [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  [Parameter] public string PostingId { get; set; } = string.Empty;
+
+  private JobPosting? posting;
+  private Modal modal = null!;
+  private bool isLoading = true;
+  private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
+  {
+    PostingStatus.Ready => "border border-warning",
+    PostingStatus.Applied => "border border-success",
+    PostingStatus.Archived => "border border-secondary",
+    _ => string.Empty,
+  };
+
+  protected override async Task OnInitializedAsync()
+  {
+    // Load posting details using PostingId
+    posting = await PostingsService.GetPostingAsync(PostingId);
+    isLoading = false;
+  }
+
+  private Task OnUpdatePostingAddressClicked() => modal.ShowAsync();
+
+  private void NavigateToResume(string postingId)
+  {
+    NavigationManager.NavigateTo($"/resume/{postingId}");
+  }
+
+  private void NavigateToCoverLetter(string postingId)
+  {
+    NavigationManager.NavigateTo($"/cover/{postingId}");
+  }
+}

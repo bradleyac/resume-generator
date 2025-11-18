@@ -1,0 +1,128 @@
+@page "/"
+@using BlazorBootstrap
+@using RGS.Frontend.Components
+
+<PageTitle>Job Postings</PageTitle>
+
+<h1 class="text-center p-3 bg-primary text-light">Job Postings</h1>
+<div class="container mt-4">
+  <div class="d-flex align-items-center mb-3 gap-3">
+    <StatusSelector OnStatusSelected=@OnStatusSelected />
+    <div class="btn-group" role="group" aria-label="Actions">
+      <button class="btn btn-primary" @onclick="OnAddPostingClicked"><i class="bi bi-plus-lg" /></button>
+    </div>
+  </div>
+
+  @if (postings is null)
+  {
+    <ul class="list-unstyled p-0">
+      <li aria-hidden="true" class="card mb-3 placeholder-glow">
+        <div class="card-body">
+          <div>
+            <h1 class="card-title placeholder col-4"></h1>
+          </div>
+          <div>
+            <h2 class="card-subtitle placeholder col-3"></h2>
+          </div>
+          <div>
+            <p class="card-text placeholder col-6"></p>
+          </div>
+          <div>
+            <p class="card-text placeholder col-6"></p>
+          </div>
+          <div><button disabled class="btn btn-primary placeholder col-1"></button></div>
+        </div>
+      </li>
+    </ul>
+  }
+  else
+  {
+    @foreach (var postingDay in postings.GroupBy(p => p.ImportedAt.Date))
+    {
+      <h1>@postingDay.Key.ToString("D")</h1>
+      <ul class="p-0 list-unstyled postings-list">
+        @foreach (var posting in postingDay)
+        {
+          <li>
+            <Posting @key=@posting.id 
+              OnApplied="async (id) => await OnPostingApplied(id)" 
+              OnArchived="async (id) => await OnPostingArchived(id)" 
+              OnResubmit="async (id) => await OnResubmitPosting(id)"
+              OnDeletePosting="async (id) => await OnDeletePosting(id)"
+              PostingSummary=@posting />
+          </li>
+        }
+      </ul>
+    }
+
+    <button class="btn btn-secondary mb-3" @onclick="OnShowMoreClicked">Show More</button>
+  }
+</div>
+
+<Modal @ref="modal" Title="Add New Posting" IsVerticallyCentered="true">
+  <BodyTemplate>
+    <NewPosting OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
+  </BodyTemplate>
+</Modal>
+
+@code {
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+
+  private List<PostingSummary>? postings = null;
+  private Modal modal = null!;
+  private Func<Task>? loadMorePostings = null;
+
+  private void NavigateToPosting(string postingId)
+  {
+    NavigationManager.NavigateTo($"/posting/{postingId}");
+  }
+
+  private Task OnAddPostingClicked() => modal.ShowAsync();
+
+  private Task OnShowMoreClicked() => loadMorePostings?.Invoke() ?? Task.CompletedTask;
+
+  protected override Task OnInitializedAsync() => OnStatusSelected(null);
+
+  private async Task OnStatusSelected(string? status)
+  {
+    postings = [];
+
+    var postingsStream = PostingsService.GetPostingsStreamAsync(status);
+    var enumerator = postingsStream.GetAsyncEnumerator();
+
+    loadMorePostings = async () =>
+    {
+      if (await enumerator.MoveNextAsync())
+      {
+        postings.AddRange(enumerator.Current);
+      }
+    };
+
+    await loadMorePostings();
+  }
+
+  private async Task OnPostingApplied(string postingId)
+  {
+    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Applied));
+    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Applied } : p).ToList();
+  }
+
+  private async Task OnPostingArchived(string postingId)
+  {
+    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Archived));
+    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Archived } : p).ToList();
+  }
+
+  private async Task OnResubmitPosting(string postingId)
+  {
+    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Pending));
+    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Pending } : p).ToList();
+  }
+
+  private async Task OnDeletePosting(string postingId)
+  {
+    await PostingsService.DeletePostingAsync(postingId);
+    postings = postings?.Where(p => p.id != postingId).ToList();
+  }
+}

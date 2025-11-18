@@ -8,14 +8,13 @@ on:
     branches:
       - dev
     paths:
-      - backend/**
-      - container/**
+      - RGS.Backend/**
       - RGS.Backend.Shared/**
       - .github/workflows/dev_resume-generation-system-backend-dev.yml
   workflow_dispatch:
 
 env:
-  AZURE_FUNCTIONAPP_PACKAGE_PATH: './backend' # set this to the path to your web app project, defaults to the repository root
+  AZURE_FUNCTIONAPP_PACKAGE_PATH: './RGS.Backend' # set this to the path to your web app project, defaults to the repository root
   DOTNET_VERSION: '9.0.x' # set this to the dotnet version to use
 
 jobs:
@@ -55,19 +54,4 @@ jobs:
           app-name: 'resume-generation-system-backend-dev'
           slot-name: 'Production'
           package: '${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/output'
-
-      - name: Build and push container image to registry
-        uses: azure/container-apps-deploy-action@v2
-        with:
-          appSourcePath: ${{ github.workspace }}/
-          dockerFilePath: ./container/Dockerfile
-          _targetLabelKey_: _targetLabel_
-          acrName: dominion
-          acrUsername: ${{ secrets.DOMINIONSERVER_REGISTRY_USERNAME }}
-          acrPassword: ${{ secrets.DOMINIONSERVER_REGISTRY_PASSWORD }}
-          containerAppName: rgs-container-funcs-dev
-          resourceGroup: rgs-dev
-          imageToBuild: dominion.azurecr.io/rgs-container-funcs-dev:${{ github.sha }}
-          _buildArgumentsKey_: |
-            _buildArgumentsValues_
           

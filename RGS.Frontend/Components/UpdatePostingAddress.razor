@@ -1,0 +1,52 @@
+<section class="m-3">
+  <h1>Submit Job Posting Address</h1>
+
+  <EditForm Model="@model" @key="@model" method="post" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+      <label for="street-address" class="form-label">Street Address</label>
+      <InputText id="street-address" class="form-control" @bind-Value="model.StreetAddress" />
+    </div>
+    <div class="mb-3">
+      <label for="city" class="form-label">City</label>
+      <InputText id="city" class="form-control" @bind-Value="model.City" />
+    </div>
+    <div class="mb-3">
+      <label for="state" class="form-label">State</label>
+      <InputText id="state" class="form-control" @bind-Value="model.State" />
+    </div>
+    <div class="mb-3">
+      <label for="zip" class="form-label">Zip</label>
+      <InputTextArea id="zip" class="form-control" rows="5" @bind-Value="model.Zip" />
+    </div>
+    <div class="mb-3">
+      <button type="button" class="btn btn-secondary me-2" @onclick="HandleCancel">Cancel</button>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </EditForm>
+</section>
+
+@code {
+  [Parameter] public EventCallback OnPostingSubmitted { get; set; }
+  [Parameter] public EventCallback OnCancel { get; set; }
+  [Parameter] public string PostingId { get; set; } = null!;
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  private UpdatePostingAddressModel model = null!;
+  private async Task HandleValidSubmit()
+  {
+    await PostingsService.UpdatePostingAddressAsync(model);
+    await OnPostingSubmitted.InvokeAsync();
+  }
+
+  private async Task HandleCancel()
+  {
+    await OnCancel.InvokeAsync();
+  }
+
+    protected override Task OnInitializedAsync() 
+    {
+      model = new UpdatePostingAddressModel{ PostingId = PostingId };
+      return Task.CompletedTask;
+    }
+}

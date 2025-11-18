@@ -1,0 +1,56 @@
+@using BlazorBootstrap
+@using RGS.Frontend.Components
+
+<div class="@CardClass card">
+  <div class="card-body">
+    <div class="d-flex w-100">
+      <span class="@BadgeClass ms-auto badge">@PostingSummary.Status</span>
+    </div>
+    <h2 class="card-title">@PostingSummary.Title</h2>
+    <h3 class="card-subtitle mb-2 text-muted">@PostingSummary.Company</h3>
+    <p class="card-text"><a href="@PostingSummary.Link" target="_blank">@PostingSummary.Link</a></p>
+    <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToString("g")</small></p>
+    <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>
+    <button class="btn btn-secondary ms-2" @onclick="async () => await OnResubmit.InvokeAsync(PostingSummary.id)">Resubmit Posting</button>
+    <button class="btn btn-danger ms-2" @onclick="async () => await OnDeletePosting.InvokeAsync(PostingSummary.id)">Delete Posting</button>
+    @if (PostingSummary.Status == PostingStatus.Ready)
+    {
+      <button class="btn btn-secondary ms-2" @onclick="async () => await OnApplied.InvokeAsync(PostingSummary.id)">Mark Applied</button>
+    }
+    @if (PostingSummary.Status != PostingStatus.Archived)
+    {
+      <button class="btn btn-danger ms-2" @onclick="async () => await OnArchived.InvokeAsync(PostingSummary.id)">Archive Posting</button>
+    }
+  </div>
+</div>
+
+@code {
+  [Parameter] public PostingSummary PostingSummary { get; set; } = null!;
+
+  [Inject] private NavigationManager NavigationManager { get; set; } = null!;
+  [Parameter] public EventCallback<string> OnApplied { get; set; }
+  [Parameter] public EventCallback<string> OnArchived { get; set; }
+  [Parameter] public EventCallback<string> OnResubmit { get; set; }
+  [Parameter] public EventCallback<string> OnDeletePosting { get; set; }
+
+  private string CardClass => PostingSummary.Status switch
+  {
+    PostingStatus.Ready => "border-2 border-warning",
+    PostingStatus.Applied => "border-2 border-success",
+    PostingStatus.Archived => "border-2 border-secondary",
+    _ => string.Empty,
+  };
+
+  private string BadgeClass => PostingSummary.Status switch
+  {
+    PostingStatus.Ready => "bg-warning",
+    PostingStatus.Applied => "bg-success",
+    PostingStatus.Archived => "bg-secondary",
+    _ => "",
+  };
+
+  private void NavigateToPosting(string postingId)
+  {
+    NavigationManager.NavigateTo($"/posting/{postingId}");
+  }
+}

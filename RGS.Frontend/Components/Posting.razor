@@ -10,20 +10,21 @@
     <h3 class="card-subtitle mb-2 text-muted">@PostingSummary.Company</h3>
     <p class="card-text"><a href="@PostingSummary.Link" target="_blank">@PostingSummary.Link</a></p>
     <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToLocalTime()</small></p>
-    <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>
-    <button class="btn btn-secondary ms-2" @onclick="async () => await OnResubmit.InvokeAsync(PostingSummary.id)">Resubmit Posting</button>
-    @if (PostingSummary.Status == PostingStatus.Archived)
-    {
-      <button class="btn btn-danger ms-2" @onclick="async () => await OnDeletePosting.InvokeAsync(PostingSummary.id)">Delete Posting</button>
-    }
-    @if (PostingSummary.Status == PostingStatus.Ready)
-    {
-      <button class="btn btn-secondary ms-2" @onclick="async () => await OnApplied.InvokeAsync(PostingSummary.id)">Mark Applied</button>
-    }
-    @if (PostingSummary.Status != PostingStatus.Archived)
-    {
-      <button class="btn btn-danger ms-2" @onclick="async () => await OnArchived.InvokeAsync(PostingSummary.id)">Archive Posting</button>
-    }
+    <div class="d-flex gap-2" role="group" aria-label="Posting Actions">
+      <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>
+      <button class="btn btn-secondary" @onclick="async () => await OnResubmit.InvokeAsync(PostingSummary.id)">Resubmit Posting</button>
+      @if (PostingSummary.Status == PostingStatus.Ready)
+      {
+        <button class="btn btn-success" @onclick="async () => await OnApplied.InvokeAsync(PostingSummary.id)">Mark Applied</button>
+      }
+      @if (PostingSummary.Status != PostingStatus.Archived)
+      {
+        <button class="btn btn-danger" @onclick="async () => await OnArchived.InvokeAsync(PostingSummary.id)">Archive Posting</button>
+      }
+      else {
+        <button class="btn btn-danger" @onclick="async () => await OnDeletePosting.InvokeAsync(PostingSummary.id)">Delete Posting</button>
+      }
+    </div>
   </div>
 </div>
 

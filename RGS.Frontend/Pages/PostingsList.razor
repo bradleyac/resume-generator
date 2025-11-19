@@ -1,5 +1,6 @@
 @page "/"
 @using BlazorBootstrap
+@using R3
 @using RGS.Frontend.Components
 
 <PageTitle>Job Postings</PageTitle>
@@ -11,6 +12,9 @@
     <div class="btn-group" role="group" aria-label="Actions">
       <button class="btn btn-primary" @onclick="OnAddPostingClicked"><i class="bi bi-plus-lg" /></button>
     </div>
+  </div>
+  <div class="mb-3">
+    <input @key=@Status class="form-control" placeholder="Search postings..." @oninput="(e) => searchTermSubject.OnNext(e.Value?.ToString() ?? string.Empty)" />
   </div>
 
   @if (postings is null)
@@ -72,30 +76,46 @@
   private List<PostingSummary>? postings = null;
   private Modal modal = null!;
   private Func<Task>? loadMorePostings = null;
-  private string Status { get; set; } = "All";
+  private Subject<string> searchTermSubject = new();
+  private IDisposable? searchTermSubscription;
+
+  [Parameter]
+  [SupplyParameterFromQuery]
+  public string? Status { get; set; }
 
   private void NavigateToPosting(string postingId)
   {
-    NavigationManager.NavigateTo($"/posting/{postingId}");
+      NavigationManager.NavigateTo($"/posting/{postingId}");
   }
 
   private Task OnAddPostingClicked() => modal.ShowAsync();
 
   private Task OnShowMoreClicked() => loadMorePostings?.Invoke() ?? Task.CompletedTask;
 
-  protected override Task OnInitializedAsync() => LoadPostingsByStatus();
-
-  private async Task OnStatusSelected(string status)
+  protected override async Task OnParametersSetAsync() 
   {
-    Status = status;
+    searchTermSubscription?.Dispose();
+    searchTermSubscription = searchTermSubject
+      .Debounce(TimeSpan.FromMilliseconds(300))
+      .DistinctUntilChanged()
+      .Subscribe(async searchTerm =>
+      {
+        await LoadPostingsByStatus(searchTerm);
+        StateHasChanged();
+      });
     await LoadPostingsByStatus();
   }
 
-  private async Task LoadPostingsByStatus()
+  private void OnStatusSelected(string status)
+  {
+    NavigationManager.NavigateTo($"/?Status={status}");
+  }
+
+  private async Task LoadPostingsByStatus(string searchText = "")
   {
     postings = [];
 
-    var postingsStream = PostingsService.GetPostingsStreamAsync(Status);
+    var postingsStream = PostingsService.GetPostingsStreamAsync(Status ?? "All", searchText);
     var enumerator = postingsStream.GetAsyncEnumerator();
 
     loadMorePostings = async () =>

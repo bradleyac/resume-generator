@@ -6,9 +6,10 @@ internal interface IPostingsService
 {
   Task<JobPosting> GetPostingAsync(string postingId);
   Task<List<PostingSummary>> GetPostingsAsync();
-  IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status);
+  IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status, string searchText);
   Task<ResumeData> GetResumeDataAsync(string postingId);
   Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate);
+  Task RegenerateCoverLetterAsync(RegenerateCoverLetterModel regenerateModel);
   Task SubmitNewPostingAsync(NewPostingModel model);
   Task SetPostingStatusAsync(PostingStatusUpdate statusUpdate);
   Task DeletePostingAsync(string postingId);
@@ -44,7 +45,7 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
     await _httpClient.PostAsync("/api/SetPostingStatus", JsonContent.Create(statusUpdate));
   }
 
-  public async IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status)
+  public async IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status, string searchText)
   {
     DateTime? lastImportedAt = null;
     string? lastId = null;
@@ -66,7 +67,8 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
       {
         { "status", status == "All" ? null : status },
         { "lastImportedAt", lastImportedAt?.ToString("o") },
-        { "lastId", lastId?.ToString() }
+        { "lastId", lastId?.ToString() },
+        { "searchText", string.IsNullOrWhiteSpace(searchText) ? null : searchText }
       };
       string queryParams = string.Join("&", queryParamList.Where(param => param.Value != null).Select(param => $"{param.Key}={param.Value}"));
       var url = $"/api/ListCompletedPostings?{queryParams}";
@@ -83,5 +85,10 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
   public async Task DeletePostingAsync(string postingId)
   {
     await _httpClient.PostAsync($"/api/DeletePosting/{postingId}", null);
+  }
+
+  public async Task RegenerateCoverLetterAsync(RegenerateCoverLetterModel regenerateModel)
+  {
+    await _httpClient.PostAsync("/api/RegenerateCoverLetter", JsonContent.Create(regenerateModel));
   }
 }

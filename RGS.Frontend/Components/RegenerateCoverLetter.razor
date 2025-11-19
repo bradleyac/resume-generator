@@ -1,0 +1,38 @@
+﻿<section class="m-3">
+  <EditForm Model="@model" @key="@model" method="post" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+      <label for="additional-context" class="form-label">Additional Context</label>
+      <InputTextArea id="additional-context" class="form-control" @bind-Value="model.AdditionalContext" />
+    </div>
+    <div class="mb-3">
+      <button type="button" class="btn btn-secondary me-2" @onclick="HandleCancel">Cancel</button>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+  </EditForm>
+</section>
+
+@code {
+  [Parameter] public EventCallback OnClose { get; set; }
+  [Parameter] public EventCallback OnCancel { get; set; }
+  [Parameter] public string PostingId { get; set; } = null!;
+  [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  private RegenerateCoverLetterModel model = null!;
+  private async Task HandleValidSubmit()
+  {
+    await PostingsService.RegenerateCoverLetterAsync(model);
+    await OnClose.InvokeAsync();
+  }
+
+  private async Task HandleCancel()
+  {
+    await OnCancel.InvokeAsync();
+  }
+
+    protected override Task OnInitializedAsync() 
+    {
+      model = new RegenerateCoverLetterModel{ PostingId = PostingId };
+      return Task.CompletedTask;
+    }
+}

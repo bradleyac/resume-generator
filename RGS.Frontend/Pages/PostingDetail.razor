@@ -7,6 +7,7 @@
   <LoadingText TextObject=@posting?.id />
   <div class="btn-group" role="group" aria-label="Actions">
     <button class="btn btn-primary" @onclick="OnUpdatePostingAddressClicked"><i class="bi bi-plus-lg" /></button>
+    <button class="btn btn-primary" @onclick="OnRegenerateCoverLetterClicked"><i class="bi bi-arrow-clockwise" /></button>
   </div>
   <label>Imported: </label>
   <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />
@@ -22,9 +23,15 @@
   <button class="btn btn-primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</button>
 </div>
 
-<Modal @ref="modal" Title="Update Posting Address" IsVerticallyCentered="true">
+<Modal @ref="updateAddressModal" Title="Update Posting Address" IsVerticallyCentered="true">
   <BodyTemplate>
-    <UpdatePostingAddress PostingId=@PostingId OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
+    <UpdatePostingAddress PostingId=@PostingId OnCancel="() => updateAddressModal.HideAsync()" OnPostingSubmitted="() => updateAddressModal.HideAsync()" />
+  </BodyTemplate>
+</Modal>
+
+<Modal @ref="resubmitModal" Title="Re-generate Cover Letter" IsVerticallyCentered="true">
+  <BodyTemplate>
+    <RegenerateCoverLetter PostingId=@PostingId OnCancel="() => resubmitModal.HideAsync()" OnClose="() => resubmitModal.HideAsync()" />
   </BodyTemplate>
 </Modal>
 
@@ -34,7 +41,8 @@
   [Parameter] public string PostingId { get; set; } = string.Empty;
 
   private JobPosting? posting;
-  private Modal modal = null!;
+  private Modal updateAddressModal = null!;
+  private Modal resubmitModal = null!;
   private bool isLoading = true;
   private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
   {
@@ -51,7 +59,8 @@
     isLoading = false;
   }
 
-  private Task OnUpdatePostingAddressClicked() => modal.ShowAsync();
+  private Task OnUpdatePostingAddressClicked() => updateAddressModal.ShowAsync();
+  private Task OnRegenerateCoverLetterClicked() => resubmitModal.ShowAsync();
 
   private void NavigateToResume(string postingId)
   {

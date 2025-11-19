@@ -56,6 +56,34 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
     await postings.UpsertItemAsync(posting with { Status = PostingStatus.Ready });
   }
 
+  public async Task RegenerateCoverLetterAsync(RegenerateCoverLetterModel model)
+  {
+    var postings = _cosmosClient.GetContainer("Resumes", "Postings");
+    var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
+
+    var postingResponse = await postings.ReadItemAsync<JobPosting>(model.PostingId, new PartitionKey(model.PostingId));
+
+    if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK || postingResponse.Resource is null)
+    {
+      throw new ArgumentException("Posting not found");
+    }
+
+    var posting = postingResponse.Resource;
+
+    var resumeDataResponse = await resumeDataContainer.ReadItemAsync<ResumeData>(posting.id, new PartitionKey(posting.id));
+
+    if (resumeDataResponse.StatusCode != System.Net.HttpStatusCode.OK || resumeDataResponse.Resource is null)
+    {
+      throw new ArgumentException("Resume data not found");
+    }
+
+    var resumeData = resumeDataResponse.Resource;
+
+    var coverLetter = await GenerateCoverLetterAsync(posting, resumeData, _aiClient, model.AdditionalContext);
+    resumeData = resumeData with { CoverLetter = coverLetter };
+    await resumeDataContainer.UpsertItemAsync(resumeData);
+  }
+
   private async Task<ResumeData> GenerateResumeDataAsync(JobPosting posting, Container resumeDataContainer, AzureOpenAIClient aiClient)
   {
     var masterResumeData = (await resumeDataContainer.ReadItemAsync<ResumeData>("master", new PartitionKey("master"))).Resource;
@@ -109,7 +137,7 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
     };
   }
 
-  private async Task<string> GenerateCoverLetterAsync(JobPosting posting, ResumeData resumeData, AzureOpenAIClient aiClient)
+  private async Task<string> GenerateCoverLetterAsync(JobPosting posting, ResumeData resumeData, AzureOpenAIClient aiClient, string? additionalContext = null)
   {
     var requestOptions = new ChatCompletionOptions()
     {
@@ -124,8 +152,14 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
         new SystemChatMessage("You are a discerning technical recruiter helping the user construct write a cover letter for a particular software developer position."),
             new UserChatMessage("This is the information from my resume: " + JsonSerializer.Serialize(resumeData)),
             new UserChatMessage("This is the job description: " + posting.PostingText),
-            new UserChatMessage("Write a one page cover letter for the position, emphasizing why I am excited to take on the role and how my background makes me a good fit. Start with 'Dear Hiring Manager,' and end after the final paragraph without a signature. Instead of newline characters, separate paragraphs with a single '|' character."),
+            new UserChatMessage("Write a one page cover letter for the position, emphasizing why I am excited to take on the role and how my background makes me a good fit. Start with 'Dear Hiring Manager,' and end after the final paragraph without a signature. Instead of newline characters, separate paragraphs with a single pipe character: |."),
         ];
+
+    if (additionalContext is not null)
+    {
+      messages.Add(new UserChatMessage("Here is some additional context to consider: " + additionalContext));
+    }
+
     ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
     var response = chatClient.CompleteChat(messages, requestOptions);
 

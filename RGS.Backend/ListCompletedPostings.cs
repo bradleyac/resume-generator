@@ -48,9 +48,10 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
 
         var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
         var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()
-            .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt, p.Status })
             .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
             .Where(p => status == null || p.Status == status)
+            .Where(p => string.IsNullOrWhiteSpace(searchText) || p.Company.FullTextContains(searchText) || p.Title.FullTextContains(searchText) || p.PostingText.FullTextContains(searchText))
+            .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt, p.Status })
             .OrderByDescending(p => p.ImportedAt)
             .ThenBy(p => p.id)
             .Take(MaxPostingsToReturn);

@@ -37,6 +37,14 @@ public class UpdatePostingAddressModel
   public string Zip { get; set; } = string.Empty;
 }
 
+public class RegenerateCoverLetterModel
+{
+  [Required]
+  public string PostingId { get; set; } = string.Empty;
+
+  public string? AdditionalContext { get; set; }
+}
+
 public record JobPosting(string id, string Link, string Company, string Title, string PostingText, DateTime ImportedAt, string? StreetAddress = null, string? City = null, string? State = null, string? Zip = null, string Status = PostingStatus.Pending);
 
 public record PostingSummary(string id, string Link, string Company, string Title, DateTime ImportedAt, string Status);

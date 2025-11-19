@@ -13,8 +13,6 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
     private readonly ILogger<SetPostingStatus> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
-    private static List<string> ValidStatuses = [PostingStatus.AwaitingAddress, PostingStatus.Pending, PostingStatus.Ready, PostingStatus.Applied, PostingStatus.Archived];
-
 
     [Function("SetPostingStatus")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
@@ -27,7 +25,7 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
 
             var payload = await req.ReadFromJsonAsync<PostingStatusUpdate>() ?? throw new ArgumentException("Invalid payload");
 
-            if (!ValidStatuses.Contains(payload.NewStatus))
+            if (!PostingStatus.ValidStatuses.Contains(payload.NewStatus))
             {
                 return new BadRequestObjectResult("Invalid status");
             }

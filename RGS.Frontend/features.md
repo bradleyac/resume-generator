@@ -10,4 +10,3 @@
   long-term: automate searching and ingesting
   short-term: Manually trigger automatic scraping of current page via JS
     Should be able to include submission in the script to be run.
-    TODO: Script can't POST to backend API? Do I need a different endpoint for it?

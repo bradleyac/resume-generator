@@ -6,7 +6,7 @@ internal interface IPostingsService
 {
   Task<JobPosting> GetPostingAsync(string postingId);
   Task<List<PostingSummary>> GetPostingsAsync();
-  IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string? status = null);
+  IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status);
   Task<ResumeData> GetResumeDataAsync(string postingId);
   Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate);
   Task SubmitNewPostingAsync(NewPostingModel model);
@@ -44,7 +44,7 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
     await _httpClient.PostAsync("/api/SetPostingStatus", JsonContent.Create(statusUpdate));
   }
 
-  public async IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string? status = null)
+  public async IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status)
   {
     DateTime? lastImportedAt = null;
     string? lastId = null;
@@ -64,7 +64,7 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
       _logger.LogInformation(lastImportedAt.ToString());
       Dictionary<string, string?> queryParamList = new()
       {
-        { "status", status },
+        { "status", status == "All" ? null : status },
         { "lastImportedAt", lastImportedAt?.ToString("o") },
         { "lastId", lastId?.ToString() }
       };

@@ -1,24 +1,23 @@
 ﻿<div class="btn-group" role="group" aria-label="Status Selector">
   @foreach (var status in (string[])["All", .. PostingStatus.ValidStatuses])
   {
-    <button type="button" class="@(Status == status ? "active" : "") btn btn-primary" @onclick="async () => await SelectStatus(status?.ToString())">
+    <button type="button" class="@(SelectedStatus == status ? "active" : "") btn btn-primary" @onclick="async () => await SelectStatus(status)">
       @status
     </button>
   }
 </div>
 
 @code {
-  [Parameter] public EventCallback<string?> OnStatusSelected { get; set; }
-  private string? Status { get; set; } = null;
+  [Parameter] public EventCallback<string> OnStatusSelected { get; set; }
+  [Parameter] public string SelectedStatus { get; set; } = "All";
 
-  private async Task SelectStatus(string? status)
+  private async Task SelectStatus(string status)
   {
-    if (Status == status)
+    if (SelectedStatus == status)
     {
       return;
     }
 
-    Status = status;
     await OnStatusSelected.InvokeAsync(status);
   }
 }

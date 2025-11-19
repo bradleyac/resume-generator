@@ -7,7 +7,7 @@
 <h1 class="text-center p-3 bg-primary text-light">Job Postings</h1>
 <div class="container mt-4">
   <div class="d-flex align-items-center mb-3 gap-3">
-    <StatusSelector OnStatusSelected=@OnStatusSelected />
+    <StatusSelector SelectedStatus=@Status OnStatusSelected=@OnStatusSelected />
     <div class="btn-group" role="group" aria-label="Actions">
       <button class="btn btn-primary" @onclick="OnAddPostingClicked"><i class="bi bi-plus-lg" /></button>
     </div>
@@ -72,6 +72,7 @@
   private List<PostingSummary>? postings = null;
   private Modal modal = null!;
   private Func<Task>? loadMorePostings = null;
+  private string Status { get; set; } = "All";
 
   private void NavigateToPosting(string postingId)
   {
@@ -82,13 +83,19 @@
 
   private Task OnShowMoreClicked() => loadMorePostings?.Invoke() ?? Task.CompletedTask;
 
-  protected override Task OnInitializedAsync() => OnStatusSelected(null);
+  protected override Task OnInitializedAsync() => LoadPostingsByStatus();
 
-  private async Task OnStatusSelected(string? status)
+  private async Task OnStatusSelected(string status)
+  {
+    Status = status;
+    await LoadPostingsByStatus();
+  }
+
+  private async Task LoadPostingsByStatus()
   {
     postings = [];
 
-    var postingsStream = PostingsService.GetPostingsStreamAsync(status);
+    var postingsStream = PostingsService.GetPostingsStreamAsync(Status);
     var enumerator = postingsStream.GetAsyncEnumerator();
 
     loadMorePostings = async () =>

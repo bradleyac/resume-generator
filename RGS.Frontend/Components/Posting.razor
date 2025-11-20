@@ -8,7 +8,6 @@
     </div>
     <h2 class="card-title">@PostingSummary.Title</h2>
     <h3 class="card-subtitle mb-2 text-muted">@PostingSummary.Company</h3>
-    <p class="card-text"><a href="@PostingSummary.Link" target="_blank">@PostingSummary.Link</a></p>
     <p class="card-text"><small class="text-muted">Imported at: @PostingSummary.ImportedAt.ToLocalTime()</small></p>
     <div class="d-flex gap-2" role="group" aria-label="Posting Actions">
       <button class="btn btn-primary" @onclick="() => NavigateToPosting(PostingSummary.id)">View Details</button>

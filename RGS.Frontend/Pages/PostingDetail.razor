@@ -5,8 +5,10 @@
 <div class="@ContainerClass card m-3 p-3">
   <label>Posting Id: </label>
   <LoadingText TextObject=@posting?.id />
-  <div class="btn-group" role="group" aria-label="Actions">
-    <button class="btn btn-primary" @onclick="OnUpdatePostingAddressClicked"><i class="bi bi-plus-lg" /></button>
+  <div class="d-flex gap-2" role="group" aria-label="Actions">
+    <button class="btn btn-primary" @onclick="() => NavigateToResume(PostingId)">View Resume</button>
+    <button class="btn btn-primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</button>
+    <button class="btn btn-primary" @onclick="OnUpdatePostingAddressClicked"><i class="bi bi-geo-fill" /></button>
     <button class="btn btn-primary" @onclick="OnRegenerateCoverLetterClicked"><i class="bi bi-arrow-clockwise" /></button>
   </div>
   <label>Imported: </label>
@@ -18,9 +20,7 @@
   <label>Title: </label>
   <LoadingText TextObject=@posting?.Title />
   <label>Job Posting: </label>
-  <LoadingText TextObject=@posting?.PostingText />
-  <button class="btn btn-primary" @onclick="() => NavigateToResume(PostingId)">View Resume</button>
-  <button class="btn btn-primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</button>
+  <pre style="white-space: pre-wrap;">@posting?.PostingText</pre>
 </div>
 
 <Modal @ref="updateAddressModal" Title="Update Posting Address" IsVerticallyCentered="true">
@@ -54,7 +54,6 @@
 
   protected override async Task OnInitializedAsync()
   {
-    // Load posting details using PostingId
     posting = await PostingsService.GetPostingAsync(PostingId);
     isLoading = false;
   }

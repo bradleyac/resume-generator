@@ -150,7 +150,7 @@ public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cos
 
     List<ChatMessage> messages = [
         new SystemChatMessage("You are a discerning technical recruiter helping the user construct write a cover letter for a particular software developer position."),
-            new UserChatMessage("This is the information from my resume: " + JsonSerializer.Serialize(resumeData)),
+            new UserChatMessage("This is the information from my resume: " + JsonSerializer.Serialize(resumeData with { CoverLetter = null })),
             new UserChatMessage("This is the job description: " + posting.PostingText),
             new UserChatMessage("Write a one page cover letter for the position, emphasizing why I am excited to take on the role and how my background makes me a good fit. Start with 'Dear Hiring Manager,' and end after the final paragraph without a signature. Instead of newline characters, separate paragraphs with a single pipe character: |."),
         ];

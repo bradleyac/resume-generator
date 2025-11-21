@@ -26,6 +26,6 @@
     ]
   },
   "globalHeaders": {
-    "Blazor-Environment": "Staging"
+    "blazor-environment": "Staging"
   }
 }

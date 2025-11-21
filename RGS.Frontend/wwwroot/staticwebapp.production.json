@@ -26,6 +26,6 @@
     ]
   },
   "globalHeaders": {
-    "Blazor-Environment": "Production"
+    "blazor-environment": "Production"
   }
 }

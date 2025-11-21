@@ -39,8 +39,6 @@ jobs:
           pushd './${{ env.AZURE_SWA_PACKAGE_PATH }}'
           dotnet publish --configuration Release -p:WasmApplicationEnvironmentName=$WasmApplicationEnvironmentName --output ./output
           popd
-      - name: CopyConfig
-        run : cp ./RGS.Frontend/wwwroot/staticwebapp.$ENVIRONMENT.json ./RGS.Frontend/output/wwwroot/staticwebapp.config.json && ls -la ./RGS.Frontend/output/wwwroot/
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1

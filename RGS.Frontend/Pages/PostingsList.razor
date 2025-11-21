@@ -8,7 +8,7 @@
 <h1 class="text-center p-3 bg-primary text-light">Job Postings</h1>
 <div class="container mt-4">
   <div class="d-flex align-items-center mb-3 gap-3">
-    <StatusSelector SelectedStatus=@Status OnStatusSelected=@OnStatusSelected />
+    <StatusSelector @bind-SelectedStatus=@Status @bind-SelectedStatus:after="OnStatusSelected"/>
     <div class="btn-group" role="group" aria-label="Actions">
       <button class="btn btn-primary" @onclick="OnAddPostingClicked"><i class="bi bi-plus-lg" /></button>
     </div>
@@ -106,9 +106,9 @@
     await LoadPostingsByStatus();
   }
 
-  private void OnStatusSelected(string status)
+  private void OnStatusSelected()
   {
-    NavigationManager.NavigateTo($"/?Status={status}");
+    NavigationManager.NavigateTo($"/?Status={Status}");
   }
 
   private async Task LoadPostingsByStatus(string searchText = "")

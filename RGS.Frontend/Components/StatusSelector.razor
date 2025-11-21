@@ -8,7 +8,7 @@
 </div>
 
 @code {
-  [Parameter] public EventCallback<string> OnStatusSelected { get; set; }
+  [Parameter] public EventCallback<string> SelectedStatusChanged { get; set; }
   [Parameter] public string? SelectedStatus { get; set; } = null;
 
   private async Task SelectStatus(string status)
@@ -18,6 +18,6 @@
       return;
     }
 
-    await OnStatusSelected.InvokeAsync(status);
+    await SelectedStatusChanged.InvokeAsync(status);
   }
 }

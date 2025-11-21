@@ -28,3 +28,21 @@ public record ResumeData(string id,
                          Book[] Bookshelf,
                          Rankings? GeneratedRankings = null,
                          string? CoverLetter = null);
+
+public class ResumeDataModel
+{
+  public required string id { get; set; }
+  public required string Name { get; set; }
+  public required string Title { get; set; }
+  public required string About { get; set; }
+  public required string StreetAddress { get; set; }
+  public required string City { get; set; }
+  public required string State { get; set; }
+  public required string Zip { get; set; }
+  public required Contact Contact { get; set; }
+  public required Job[] Jobs { get; set; }
+  public required Project[] Projects { get; set; }
+  public required Education[] Education { get; set; }
+  public required SkillCategory[] Skills { get; set; }
+  public required Book[] Bookshelf { get; set; }
+}

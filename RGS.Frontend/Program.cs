@@ -10,6 +10,7 @@ string apiBaseAddress = builder.Configuration["Api:BaseAddress"] ?? throw new RG
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
 builder.Services.AddScoped<IPostingsService, PostingsService>();
+builder.Services.AddScoped<IResumeDataService, ResumeDataService>();
 builder.Services.AddBlazorBootstrap();
 
 await builder.Build().RunAsync();

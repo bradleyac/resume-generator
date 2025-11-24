@@ -9,9 +9,9 @@ namespace RGS.Backend;
 public class AuthDebug
 {
     private readonly ILogger<AuthDebug> _logger;
-    private readonly HttpContextAccessor _httpContextAccessor;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthDebug(ILogger<AuthDebug> logger, HttpContextAccessor httpContextAccessor)
+    public AuthDebug(ILogger<AuthDebug> logger, IHttpContextAccessor httpContextAccessor)
     {
         _logger = logger;
         _httpContextAccessor = httpContextAccessor;

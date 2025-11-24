@@ -32,7 +32,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
       var decoded = Convert.FromBase64String(principalHeader);
       var json = Encoding.UTF8.GetString(decoded);
       var principal = JsonSerializer.Deserialize<EasyAuthUser>(json);
-      _logger.LogInformation("Easy Auth Principal JSON: {PrincipalJson}", json);
+      _logger.LogInformation("Easy Auth Principal JSON: {PrincipalJson}", principal);
 
       context.Items["User"] = principal;
     }

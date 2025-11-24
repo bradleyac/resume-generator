@@ -19,8 +19,9 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
   public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
   {
     // Extract user information from Easy Auth headers
-    var httpContext = context.GetHttpContext();
-    var principalHeader = httpContext.Request.Headers["X-MS-CLIENT-PRINCIPAL"].ToString();
+    var req = await context.GetHttpRequestDataAsync();
+
+    var principalHeader = req.Headers.Single(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").ToString();
     if (!string.IsNullOrEmpty(principalHeader))
     {
       var decoded = Convert.FromBase64String(principalHeader);
@@ -36,7 +37,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
       }
 
       var identity = new ClaimsIdentity(claims, "EasyAuth");
-      httpContext.User = new ClaimsPrincipal(identity);
+      context.Items["User"] = new ClaimsPrincipal(identity);
     }
 
     // Call the next middleware in the pipeline

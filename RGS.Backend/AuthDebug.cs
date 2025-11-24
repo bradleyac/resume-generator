@@ -18,11 +18,14 @@ public class AuthDebug
     [Function("AuthDebug")]
     public IActionResult Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        var result = new
+        var headers = new Dictionary<string, string>
         {
-            IsAuthenticated = req.HttpContext?.User?.Identity?.IsAuthenticated ?? false,
-            Name = req.HttpContext?.User?.Identity?.Name ?? "N/A",
+            { "X-MS-CLIENT-PRINCIPAL", req.Headers["X-MS-CLIENT-PRINCIPAL"].ToString() },
+            { "X-MS-CLIENT-PRINCIPAL-ID", req.Headers["X-MS-CLIENT-PRINCIPAL-ID"].ToString() },
+            { "X-MS-CLIENT-PRINCIPAL-IDP", req.Headers["X-MS-CLIENT-PRINCIPAL-IDP"].ToString() },
+            { "X-MS-CLIENT-PRINCIPAL-NAME", req.Headers["X-MS-CLIENT-PRINCIPAL-NAME"].ToString() },
         };
-        return new OkObjectResult(result);
+
+        return new OkObjectResult(headers);
     }
 }

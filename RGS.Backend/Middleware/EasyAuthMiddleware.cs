@@ -31,6 +31,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
       var decoded = Convert.FromBase64String(principalHeader);
       var json = Encoding.UTF8.GetString(decoded);
       var principal = JsonDocument.Parse(json);
+      _logger.LogInformation("Easy Auth Principal JSON: {PrincipalJson}", json);
 
       var claims = new List<Claim>();
       foreach (var claim in principal.RootElement.GetProperty("claims").EnumerateArray())

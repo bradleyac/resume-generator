@@ -9,12 +9,10 @@ namespace RGS.Backend;
 public class AuthDebug
 {
     private readonly ILogger<AuthDebug> _logger;
-    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public AuthDebug(ILogger<AuthDebug> logger, IHttpContextAccessor httpContextAccessor)
+    public AuthDebug(ILogger<AuthDebug> logger)
     {
         _logger = logger;
-        _httpContextAccessor = httpContextAccessor;
     }
 
     [Function("AuthDebug")]
@@ -22,8 +20,8 @@ public class AuthDebug
     {
         var result = new
         {
-            IsAuthenticated = _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false,
-            Name = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "N/A",
+            IsAuthenticated = req.HttpContext?.User?.Identity?.IsAuthenticated ?? false,
+            Name = req.HttpContext?.User?.Identity?.Name ?? "N/A",
         };
         return new OkObjectResult(result);
     }

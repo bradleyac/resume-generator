@@ -17,6 +17,8 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
     private readonly CosmosClient _cosmosClient = cosmosClient;
     private readonly IConfiguration _config = config;
 
+    // Allow anonymous access but require API key in header
+    // TODO: Associate each API key with a user.
     [Function("ImportJobPosting")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
@@ -29,9 +31,7 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
             {
                 return new UnauthorizedResult();
             }
-            // TODO: CSRF protection
-            // Currently using cookie-based authentication built into Azure Functions, and thus vulnerable to CSRF.
-            // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.
+
             var postings = _cosmosClient.GetContainer("Resumes", "Postings");
             var payload = await req.ReadFromJsonAsync<NewPostingModel>() ?? throw new ArgumentException("Invalid payload");
             var newPosting = new JobPosting

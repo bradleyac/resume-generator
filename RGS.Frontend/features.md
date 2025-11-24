@@ -6,14 +6,16 @@
 * ~~Cover letter generation~~
 * ~~Allow re-generating just the cover letter with additional feedback for the model.~~
 * ~~Search across postings~~
+* Goal setting
+* More than one user
+  Everything must be owned by a user
+  Forbid actions on another user's resources
 * Master resume data management interface
   Allow CRUD operations on:
     bullets
     books
     projects
     skills
-* Goal setting
-* More than one user
 * Make ingestion script work on sites other than Indeed
   ~~LinkedIn~~
   Dice

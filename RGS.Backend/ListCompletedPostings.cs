@@ -18,7 +18,7 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
     private const int MaxPostingsToReturn = 10;
 
     [Function("ListCompletedPostings")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "get")] HttpRequest req)
     {
         DateTime? lastImportedAt = null;
         string? lastId = null;
@@ -44,7 +44,7 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
         if (req.Query.TryGetValue("searchText", out var searchTextValues))
         {
             searchText = searchTextValues.First();
-        }   
+        }
 
         var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
         var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()

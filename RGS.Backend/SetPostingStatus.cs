@@ -15,7 +15,7 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
 
 
     [Function("SetPostingStatus")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "post")] HttpRequest req)
     {
         try
         {

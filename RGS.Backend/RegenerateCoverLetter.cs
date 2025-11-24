@@ -14,7 +14,7 @@ public class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, Postin
     private readonly PostingProcessor _postingProcessor = postingProcessor;
 
     [Function("RegenerateCoverLetter")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "post")] HttpRequest req)
     {
         _logger.LogInformation("Re-generating cover letter.");
         var payload = await req.ReadFromJsonAsync<RegenerateCoverLetterModel>() ?? throw new ArgumentException("Invalid payload");

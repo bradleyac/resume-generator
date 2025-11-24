@@ -14,7 +14,7 @@ public class SetPostingAddress(ILogger<SetPostingStatus> logger, CosmosClient co
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
     [Function("SetPostingAddress")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "post")] HttpRequest req)
     {
         try
         {

@@ -24,7 +24,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
     // Extract user information from Easy Auth headers
     var req = await context.GetHttpRequestDataAsync();
 
-    var principalHeader = req.Headers.Single(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").ToString();
+    var principalHeader = req.Headers.Single(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value.Single();
     _logger.LogInformation("Easy Auth Principal Header: {PrincipalHeader}", principalHeader);
     if (!string.IsNullOrEmpty(principalHeader))
     {

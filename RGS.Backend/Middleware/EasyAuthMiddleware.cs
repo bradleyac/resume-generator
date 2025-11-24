@@ -1,8 +1,6 @@
-using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
@@ -11,12 +9,10 @@ namespace RGS.Backend.Middleware;
 
 internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
 {
-  private readonly FunctionExecutionDelegate _next;
   private readonly ILogger<EasyAuthMiddleware> _logger;
 
-  public EasyAuthMiddleware(FunctionExecutionDelegate next, ILogger<EasyAuthMiddleware> logger)
+  public EasyAuthMiddleware(ILogger<EasyAuthMiddleware> logger)
   {
-    _next = next;
     _logger = logger;
   }
 
@@ -38,7 +34,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
     }
 
     // Call the next middleware in the pipeline
-    await _next(context);
+    await next(context);
   }
 }
 
@@ -54,5 +50,5 @@ internal class EasyAuthUser
   public string IdentityProvider { get; set; } = string.Empty;
 
   [JsonPropertyName("userRoles")]
-  public string[] UserRoles { get; set; } = Array.Empty<string>();
+  public string[] UserRoles { get; set; } = [];
 }

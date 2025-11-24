@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RGS.Backend.Services;
+using RGS.Backend.Middleware;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
     .AddApplicationServices();
+
+builder.UseMiddleware<EasyAuthMiddleware>();
 
 builder.Configuration.AddEnvironmentVariables();
 

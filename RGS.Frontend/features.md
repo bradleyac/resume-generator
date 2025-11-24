@@ -12,6 +12,8 @@
     books
     projects
     skills
+* Goal setting
+* More than one user
 * Make ingestion script work on sites other than Indeed
   ~~LinkedIn~~
   Dice

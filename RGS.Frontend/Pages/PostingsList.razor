@@ -8,16 +8,16 @@
 <h1 class="text-center p-3 bg-primary text-light">Job Postings</h1>
 <div class="container mt-4">
   <div class="d-flex align-items-center mb-3 gap-3">
-    <StatusSelector @bind-SelectedStatus=@Status @bind-SelectedStatus:after="OnStatusSelected"/>
+    <StatusSelector @bind-SelectedStatus=@Status @bind-SelectedStatus:after="OnStatusSelected" />
     <div class="btn-group" role="group" aria-label="Actions">
       <button class="btn btn-primary" @onclick="OnAddPostingClicked"><i class="bi bi-plus-lg" /></button>
     </div>
   </div>
   <div class="mb-3">
-    <input @key=@Status class="form-control" placeholder="Search postings..." @oninput="(e) => searchTermSubject.OnNext(e.Value?.ToString() ?? string.Empty)" />
+    <input @key=@Status class="form-control" placeholder="Search postings..." @oninput="(e) => SearchTermSubject.OnNext(e.Value?.ToString() ?? string.Empty)" />
   </div>
 
-  @if (postings is null)
+  @if (Postings is null)
   {
     <ul class="list-unstyled p-0">
       <li aria-hidden="true" class="card mb-3 placeholder-glow">
@@ -41,19 +41,14 @@
   }
   else
   {
-    @foreach (var postingDay in postings.GroupBy(p => p.ImportedAt.Date))
+    @foreach (var postingDay in Postings.GroupBy(p => p.ImportedAt.Date))
     {
       <h1>@postingDay.Key.ToString("D")</h1>
       <ul class="p-0 list-unstyled postings-list">
         @foreach (var posting in postingDay)
         {
           <li>
-            <Posting @key=@posting.id 
-              OnApplied="async (id) => await OnPostingApplied(id)" 
-              OnArchived="async (id) => await OnPostingArchived(id)" 
-              OnResubmit="async (id) => await OnResubmitPosting(id)"
-              OnDeletePosting="async (id) => await OnDeletePosting(id)"
-              PostingSummary=@posting />
+            <Posting @key=@posting.id OnApplied="OnPostingApplied" OnArchived="OnPostingArchived" OnResubmit="OnResubmitPosting" OnDeletePosting="OnDeletePosting" PostingSummary=@posting />
           </li>
         }
       </ul>
@@ -63,93 +58,8 @@
   }
 </div>
 
-<Modal @ref="modal" Title="Add New Posting" IsVerticallyCentered="true">
+<Modal @ref="Modal" Title="Add New Posting" IsVerticallyCentered="true">
   <BodyTemplate>
-    <NewPosting OnCancel="() => modal.HideAsync()" OnPostingSubmitted="() => modal.HideAsync()" />
+    <NewPosting OnCancel="() => Modal.HideAsync()" OnPostingSubmitted="() => Modal.HideAsync()" />
   </BodyTemplate>
 </Modal>
-
-@code {
-  [Inject] private IPostingsService PostingsService { get; set; } = null!;
-  [Inject] private NavigationManager NavigationManager { get; set; } = null!;
-
-  private List<PostingSummary>? postings = null;
-  private Modal modal = null!;
-  private Func<Task>? loadMorePostings = null;
-  private Subject<string> searchTermSubject = new();
-  private IDisposable? searchTermSubscription;
-
-  [Parameter]
-  [SupplyParameterFromQuery]
-  public string? Status { get; set; }
-
-  private void NavigateToPosting(string postingId)
-  {
-      NavigationManager.NavigateTo($"/posting/{postingId}");
-  }
-
-  private Task OnAddPostingClicked() => modal.ShowAsync();
-
-  private Task OnShowMoreClicked() => loadMorePostings?.Invoke() ?? Task.CompletedTask;
-
-  protected override async Task OnParametersSetAsync() 
-  {
-    searchTermSubscription?.Dispose();
-    searchTermSubscription = searchTermSubject
-      .Debounce(TimeSpan.FromMilliseconds(300))
-      .DistinctUntilChanged()
-      .Subscribe(async searchTerm =>
-      {
-        await LoadPostingsByStatus(searchTerm);
-        StateHasChanged();
-      });
-    await LoadPostingsByStatus();
-  }
-
-  private void OnStatusSelected()
-  {
-    NavigationManager.NavigateTo($"/?Status={Status}");
-  }
-
-  private async Task LoadPostingsByStatus(string searchText = "")
-  {
-    postings = [];
-
-    var postingsStream = PostingsService.GetPostingsStreamAsync(Status ?? "All", searchText);
-    var enumerator = postingsStream.GetAsyncEnumerator();
-
-    loadMorePostings = async () =>
-    {
-      if (await enumerator.MoveNextAsync())
-      {
-        postings.AddRange(enumerator.Current);
-      }
-    };
-
-    await loadMorePostings();
-  }
-
-  private async Task OnPostingApplied(string postingId)
-  {
-    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Applied));
-    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Applied } : p).ToList();
-  }
-
-  private async Task OnPostingArchived(string postingId)
-  {
-    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Archived));
-    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Archived } : p).ToList();
-  }
-
-  private async Task OnResubmitPosting(string postingId)
-  {
-    await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Pending));
-    postings = postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Pending } : p).ToList();
-  }
-
-  private async Task OnDeletePosting(string postingId)
-  {
-    await PostingsService.DeletePostingAsync(postingId);
-    postings = postings?.Where(p => p.id != postingId).ToList();
-  }
-}

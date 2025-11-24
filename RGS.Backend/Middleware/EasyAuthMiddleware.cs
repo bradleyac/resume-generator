@@ -42,4 +42,17 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
   }
 }
 
-internal record EasyAuthUser(string IdentityProvider, string UserId, string UserDetails, string[] UserRoles);
+internal class EasyAuthUser
+{
+  [JsonPropertyName("userId")]
+  public string UserId { get; set; } = string.Empty;
+
+  [JsonPropertyName("userDetails")]
+  public string UserDetails { get; set; } = string.Empty;
+
+  [JsonPropertyName("identityProvider")]
+  public string IdentityProvider { get; set; } = string.Empty;
+
+  [JsonPropertyName("userRoles")]
+  public string[] UserRoles { get; set; } = Array.Empty<string>();
+}

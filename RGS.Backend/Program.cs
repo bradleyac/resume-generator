@@ -34,6 +34,7 @@ public static class BuilderExtensions
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
 
         @this.AddTransient<PostingProcessor>();
+        @this.AddHttpContextAccessor();
 
         return @this;
     }

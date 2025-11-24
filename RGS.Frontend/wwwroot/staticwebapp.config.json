@@ -22,7 +22,7 @@
   "navigationFallback": {
     "rewrite": "/index.html",
     "exclude": [
-      "/api/ImportJobPosting",
+      "/api/*",
       "/.auth/*"
     ]
   }

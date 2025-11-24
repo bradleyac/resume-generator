@@ -22,8 +22,8 @@ public class AuthDebug
     {
         var result = new
         {
-            IsAuthenticated = _httpContextAccessor.HttpContext.User?.Identity?.IsAuthenticated ?? false,
-            Name = _httpContextAccessor.HttpContext.User?.Identity?.Name ?? "N/A",
+            IsAuthenticated = _httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false,
+            Name = _httpContextAccessor.HttpContext?.User?.Identity?.Name ?? "N/A",
         };
         return new OkObjectResult(result);
     }

@@ -16,7 +16,7 @@ public class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosCl
   private readonly CosmosClient _cosmosClient = cosmosClient;
 
   [Function("GetCompletedPosting")]
-  public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "get")] HttpRequest req)
+  public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
   {
     try
     {

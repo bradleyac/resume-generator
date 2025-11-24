@@ -16,7 +16,7 @@ public class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosCli
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
     [Function("SetResumeData")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "post")] HttpRequest req)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
         try
         {

@@ -14,7 +14,7 @@ public class DeletePosting(ILogger<DeletePosting> logger, CosmosClient cosmosCli
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
     [Function("DeletePosting")]
-    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.User, "post", Route = "DeletePosting/{postingId}")] HttpRequest req, string postingId)
+    public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "DeletePosting/{postingId}")] HttpRequest req, string postingId)
     {
         try
         {

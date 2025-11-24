@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -30,22 +31,15 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
     {
       var decoded = Convert.FromBase64String(principalHeader);
       var json = Encoding.UTF8.GetString(decoded);
-      var principal = JsonDocument.Parse(json);
+      var principal = JsonSerializer.Deserialize<EasyAuthUser>(json);
       _logger.LogInformation("Easy Auth Principal JSON: {PrincipalJson}", json);
 
-      var claims = new List<Claim>();
-      foreach (var claim in principal.RootElement.GetProperty("claims").EnumerateArray())
-      {
-        var type = claim.GetProperty("typ").GetString() ?? string.Empty;
-        var value = claim.GetProperty("val").GetString() ?? string.Empty;
-        claims.Add(new Claim(type, value));
-      }
-
-      var identity = new ClaimsIdentity(claims, "EasyAuth");
-      context.Items["User"] = new ClaimsPrincipal(identity);
+      context.Items["User"] = principal;
     }
 
     // Call the next middleware in the pipeline
     await _next(context);
   }
 }
+
+internal record EasyAuthUser(string IdentityProvider, string UserId, string UserDetails, string[] UserRoles);

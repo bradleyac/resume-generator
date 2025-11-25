@@ -40,6 +40,7 @@ public static class BuilderExtensions
         @this.AddTransient<PostingProcessor>();
         @this.AddScoped<UserService>();
         @this.AddScoped<FunctionContextAccessor>();
+        @this.AddScoped<FunctionContextAccessorMiddleware>();
 
         return @this;
     }

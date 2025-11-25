@@ -1,16 +1,16 @@
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.DependencyInjection;
 using RGS.Backend.Services;
 
 namespace RGS.Backend.Middleware;
 
-internal class FunctionContextAccessorMiddleware(FunctionContextAccessor functionContextAccessor) : IFunctionsWorkerMiddleware
+internal class FunctionContextAccessorMiddleware : IFunctionsWorkerMiddleware
 {
-  private readonly FunctionContextAccessor _functionContextAccessor = functionContextAccessor;
-
   public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
   {
-    _functionContextAccessor.Current = context;
+    var scopedContextAccessor = context.InstanceServices.GetRequiredService<FunctionContextAccessor>();
+    scopedContextAccessor.Current = context;
     await next(context);
   }
 }

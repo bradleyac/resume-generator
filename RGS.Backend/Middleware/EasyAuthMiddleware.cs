@@ -20,7 +20,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
   public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
   {
     // Extract user information from Easy Auth headers
-    var req = await (context?.GetHttpRequestDataAsync() ?? ValueTask.FromResult<HttpRequestData?>(null));
+    var req = await (context?.GetHttpRequestDataAsync() ?? default);
 
     if (req is not null)
     {

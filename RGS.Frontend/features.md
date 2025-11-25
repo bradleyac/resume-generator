@@ -5,6 +5,7 @@
 * ~~Port resume page to Blazor~~
 * ~~Cover letter generation~~
 * ~~Allow re-generating just the cover letter with additional feedback for the model.~~
+  Keep a history of feedback given for a particular posting.
 * ~~Search across postings~~
 * Goal setting?
 * More than one user

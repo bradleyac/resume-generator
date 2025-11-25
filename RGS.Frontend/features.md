@@ -6,10 +6,11 @@
 * ~~Cover letter generation~~
 * ~~Allow re-generating just the cover letter with additional feedback for the model.~~
 * ~~Search across postings~~
-* Goal setting
+* Goal setting?
 * More than one user
-  Everything must be owned by a user
-  Forbid actions on another user's resources
+  ~~Everything must be owned by a user~~
+  ~~Forbid actions on another user's resources~~
+  Each user gets an API key and can view it
 * Master resume data management interface
   Allow CRUD operations on:
     bullets

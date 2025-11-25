@@ -20,6 +20,7 @@ builder.Services
     .AddApplicationServices();
 
 builder.UseMiddleware<EasyAuthMiddleware>();
+builder.UseMiddleware<FunctionContextAccessorMiddleware>();
 
 builder.Configuration.AddEnvironmentVariables();
 
@@ -37,6 +38,8 @@ public static class BuilderExtensions
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
 
         @this.AddTransient<PostingProcessor>();
+        @this.AddScoped<UserService>();
+        @this.AddScoped<FunctionContextAccessor>();
 
         return @this;
     }

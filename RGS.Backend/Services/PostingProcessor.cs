@@ -7,7 +7,6 @@ using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.Playwright;
 using Newtonsoft.Json.Schema.Generation;
 using OpenAI.Chat;
 using RGS.Backend.Shared;
@@ -15,7 +14,7 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend.Services;
 
-public class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient)
+internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient)
 {
   private const int LineLength = 85;
   private const int MaxLines = 25;

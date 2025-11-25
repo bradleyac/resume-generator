@@ -7,19 +7,27 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Identity.Client;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
+using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient)
+internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient, UserService userService)
 {
     private readonly ILogger<ListCompletedPostings> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
+    private readonly UserService _userService = userService;
 
     private const int MaxPostingsToReturn = 10;
 
     [Function("ListCompletedPostings")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
+        var currentUser = _userService.GetCurrentUser();
+        if (currentUser is null)
+        {
+            return new UnauthorizedResult();
+        }
+
         DateTime? lastImportedAt = null;
         string? lastId = null;
         string? status = null;
@@ -48,6 +56,7 @@ public class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosmos
 
         var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
         var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()
+            .Where(p => p.UserId == currentUser.UserId)
             .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
             .Where(p => status == null || p.Status == status)
             .Where(p => string.IsNullOrWhiteSpace(searchText) || p.Company.FullTextContains(searchText) || p.Title.FullTextContains(searchText) || p.PostingText.FullTextContains(searchText))

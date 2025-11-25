@@ -13,6 +13,7 @@ public record SkillCategory(string Label, string[] Items);
 public record Book(string Title, string Author);
 
 public record ResumeData(string id,
+                         string UserId,
                          string Name,
                          string Title,
                          string About,

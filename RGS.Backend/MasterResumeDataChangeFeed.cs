@@ -7,12 +7,12 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-public class MasterResumeDataChangeFeed(ILogger<MasterResumeDataChangeFeed> logger, CosmosClient cosmosClient)
+internal class MasterResumeDataChangeFeed(ILogger<MasterResumeDataChangeFeed> logger, CosmosClient cosmosClient)
 {
     private readonly ILogger<MasterResumeDataChangeFeed> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
 
-  [Function("MasterResumeDataChangeFeed")]
+    [Function("MasterResumeDataChangeFeed")]
     public void Run([CosmosDBTrigger(
         databaseName: "Resumes",
         containerName: "ResumeData",

@@ -7,7 +7,7 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-public class PendingPostingsTrigger
+internal class PendingPostingsTrigger
 {
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly PostingProcessor _postingProcessor;

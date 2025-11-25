@@ -4,14 +4,16 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
+using RGS.Backend.Services;
 using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cosmosClient)
+internal class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cosmosClient, UserService userService)
 {
     private readonly ILogger<SetPostingStatus> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
+    private readonly UserService _userService = userService;
 
 
     [Function("SetPostingStatus")]
@@ -32,8 +34,9 @@ public class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cos
 
             var postings = _cosmosClient.GetContainer("Resumes", "Postings");
             var postingResponse = await postings.ReadItemAsync<JobPosting>(payload.PostingId, new PartitionKey(payload.PostingId));
+            var currentUser = _userService.GetCurrentUser();
 
-            if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK)
+            if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK || postingResponse.Resource.UserId != currentUser?.UserId)
             {
                 return new NotFoundResult();
             }

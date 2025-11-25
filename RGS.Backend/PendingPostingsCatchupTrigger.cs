@@ -3,13 +3,13 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-public class PendingPostingsCatchupTrigger(PostingProcessor postingProcessor)
+internal class PendingPostingsCatchupTrigger(PostingProcessor postingProcessor)
 {
-    private PostingProcessor _postingProcessor = postingProcessor;
+  private PostingProcessor _postingProcessor = postingProcessor;
 
-    [Function("PendingPostingsCatchupTrigger")]
-    public async Task Run([TimerTrigger("0 0 17 * * *")] TimerInfo myTimer)
+  [Function("PendingPostingsCatchupTrigger")]
+  public async Task Run([TimerTrigger("0 0 17 * * *")] TimerInfo myTimer)
   {
-        await _postingProcessor.CatchUp();
+    await _postingProcessor.CatchUp();
   }
 }

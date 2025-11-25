@@ -27,8 +27,6 @@ public class AuthDebug
             { "X-MS-CLIENT-PRINCIPAL-ID", req.Headers["X-MS-CLIENT-PRINCIPAL-ID"].ToString() },
             { "X-MS-CLIENT-PRINCIPAL-IDP", req.Headers["X-MS-CLIENT-PRINCIPAL-IDP"].ToString() },
             { "X-MS-CLIENT-PRINCIPAL-NAME", req.Headers["X-MS-CLIENT-PRINCIPAL-NAME"].ToString() },
-            { "IsAuthenticated", user?.UserId ?? "null"},
-            { "UserName", user?.UserDetails ?? "null" }
         };
 
         return new OkObjectResult(headers);

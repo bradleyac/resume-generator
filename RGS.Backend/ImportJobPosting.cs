@@ -7,14 +7,16 @@ using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using RGS.Backend.Services;
 using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cosmosClient, IConfiguration config)
+internal class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cosmosClient, UserService userService, IConfiguration config)
 {
     private readonly ILogger<ImportJobPosting> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
+    private readonly UserService _userService = userService;
     private readonly IConfiguration _config = config;
 
     // Allow anonymous access but require API key in header
@@ -24,10 +26,16 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
     {
         try
         {
-            var key = _config["Api:Key"];
-            var providedKey = req.Headers["x-api-key"].ToString();
+            var providedKey = req.Headers["x-api-key"].ToString().Trim();
 
-            if (string.IsNullOrEmpty(key) || key != providedKey)
+            if (string.IsNullOrEmpty(providedKey))
+            {
+                return new UnauthorizedResult();
+            }
+
+            var user = await _userService.GetUserByApiKeyAsync(providedKey);
+
+            if (user is null || user.ApiKey != providedKey)
             {
                 return new UnauthorizedResult();
             }
@@ -36,6 +44,7 @@ public class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cos
             var payload = await req.ReadFromJsonAsync<NewPostingModel>() ?? throw new ArgumentException("Invalid payload");
             var newPosting = new JobPosting
             (
+                user.UserId,
                 Guid.NewGuid().ToString(),
                 payload.Link,
                 payload.Company,

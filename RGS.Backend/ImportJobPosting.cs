@@ -51,8 +51,8 @@ internal class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient c
             var payload = await req.ReadFromJsonAsync<NewPostingModel>() ?? throw new ArgumentException("Invalid payload");
             var newPosting = new JobPosting
             (
-                currentUserId,
                 Guid.NewGuid().ToString(),
+                currentUserId,
                 payload.Link,
                 payload.Company,
                 payload.Title,

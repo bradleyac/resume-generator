@@ -18,6 +18,11 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
 
   public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
   {
+    if (context is null)
+    {
+      await next(context);
+      return;
+    }
     // Extract user information from Easy Auth headers
     var req = await context.GetHttpRequestDataAsync();
 
@@ -28,7 +33,6 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
       context.Items["User"] = principal;
     }
 
-    // Call the next middleware in the pipeline
     await next(context);
   }
 }

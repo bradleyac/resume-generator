@@ -24,3 +24,11 @@
   long-term: automate searching and ingesting
   ~~short-term: Manually trigger automatic scraping of current page via JS~~
     ~~Should be able to include submission in the script to be run.~~
+* Automated tests:
+    Integration tests for every endpoint
+    Integration tests for change feed processing
+    Unit tests
+    Start doing TDD?
+
+# TODOs
+* Figure out how to do IaC for CosmosDB settings changes/container creation. I should not be remembering what I did in DEV and applying it to PROD.

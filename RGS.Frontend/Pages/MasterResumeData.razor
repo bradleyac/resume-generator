@@ -57,6 +57,7 @@ else
         resumeData = new ResumeDataModel
         {
             id = data.id,
+            UserId = data.UserId,
             Name = data.Name,
             Title = data.Title,
             About = data.About,
@@ -76,7 +77,7 @@ else
     private async Task HandleValidSubmit(EditContext args)
     {
       ResumeDataModel model = (ResumeDataModel)args.Model;
-      ResumeData data = new ResumeData(model.id, model.Name, model.Title, model.About, model.StreetAddress, model.City, model.State, model.Zip, model.Contact, model.Jobs, model.Projects, model.Education, model.Skills, model.Bookshelf);
+      ResumeData data = new ResumeData(model.id, model.UserId, model.Name, model.Title, model.About, model.StreetAddress, model.City, model.State, model.Zip, model.Contact, model.Jobs, model.Projects, model.Education, model.Skills, model.Bookshelf);
       await ResumeDataService.SetMasterResumeDataAsync(data);
     }
 }

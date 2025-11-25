@@ -58,4 +58,4 @@ public static class PostingStatus
   public const string Archived = "Archived";
 }
 
-public record PostingStatusUpdate(string PostingId, string UserId, string NewStatus);
+public record PostingStatusUpdate(string PostingId, string NewStatus);

@@ -33,6 +33,7 @@ public record ResumeData(string id,
 public class ResumeDataModel
 {
   public required string id { get; set; }
+  public required string UserId { get; set; }
   public required string Name { get; set; }
   public required string Title { get; set; }
   public required string About { get; set; }

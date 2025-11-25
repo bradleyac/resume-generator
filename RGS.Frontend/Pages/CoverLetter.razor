@@ -63,7 +63,7 @@ else
     </section>;
 
   private RenderFragment CoverLetterText(ResumeData resumeData) => @<section class="cover-letter-text">
-    @foreach (var paragraph in @resumeData.CoverLetter.Split("|", StringSplitOptions.RemoveEmptyEntries))
+    @foreach (var paragraph in @resumeData.CoverLetter?.Split("|", StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>())
     {
       <p>@paragraph</p>
     }

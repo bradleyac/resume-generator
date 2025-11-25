@@ -22,10 +22,17 @@ internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosC
     {
         try
         {
+            // TODO: For master resume, use current user ID
+            var currentUser = _userService.GetCurrentUser();
+            if (currentUser is null)
+            {
+                return new UnauthorizedResult();
+            }
             var payload = await req.ReadFromJsonAsync<ResumeData>() ?? throw new ArgumentException("Invalid payload");
+            var postingId = payload.id == "master" ? currentUser.UserId : payload.id;
+
             var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
             var existingData = await resumeDataContainer.ReadItemAsync<ResumeData>(payload.id, new PartitionKey(payload.id));
-            var currentUser = _userService.GetCurrentUser();
 
             if (existingData.StatusCode != System.Net.HttpStatusCode.OK || existingData.Resource.UserId != currentUser?.UserId)
             {

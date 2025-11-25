@@ -14,6 +14,7 @@ public record Book(string Title, string Author);
 
 public record ResumeData(string id,
                          string UserId,
+                         bool IsMaster,
                          string Name,
                          string Title,
                          string About,
@@ -34,6 +35,7 @@ public class ResumeDataModel
 {
   public required string id { get; set; }
   public required string UserId { get; set; }
+  public required bool IsMaster { get; set; }
   public required string Name { get; set; }
   public required string Title { get; set; }
   public required string About { get; set; }

@@ -85,7 +85,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
 
   private async Task<ResumeData> GenerateResumeDataAsync(JobPosting posting, Container resumeDataContainer, AzureOpenAIClient aiClient)
   {
-    var masterResumeData = (await resumeDataContainer.ReadItemAsync<ResumeData>("master", new PartitionKey("master"))).Resource;
+    var masterResumeData = (await resumeDataContainer.ReadItemAsync<ResumeData>(posting.UserId, new PartitionKey(posting.UserId))).Resource;
 
     JSchemaGenerator generator = new JSchemaGenerator();
     var jsonSchema = generator.Generate(typeof(Rankings)).ToString();

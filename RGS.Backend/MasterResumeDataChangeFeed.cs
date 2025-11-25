@@ -20,7 +20,7 @@ internal class MasterResumeDataChangeFeed(ILogger<MasterResumeDataChangeFeed> lo
         LeaseContainerName = "leases",
         CreateLeaseContainerIfNotExists = true)] IReadOnlyList<ResumeData> input)
     {
-        var masterUpdates = input.Where(rd => rd.id == "master").Select(rd => rd with { id = Guid.NewGuid().ToString() }).ToList();
+        var masterUpdates = input.Where(rd => rd.IsMaster).Select(rd => rd with { id = Guid.NewGuid().ToString() }).ToList();
         if (masterUpdates.Count > 0)
         {
             var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeDataVersions");

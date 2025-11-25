@@ -30,6 +30,12 @@ internal class GetResumeData(ILogger<GetResumeData> logger, CosmosClient cosmosC
 
       var postingId = req.Query["postingId"].FirstOrDefault() ?? throw new ArgumentException("postingId missing");
       var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
+
+      if (postingId == "master")
+      {
+        postingId = currentUserId;
+      }
+
       var resumeData = await resumeDataContainer.ReadItemAsync<ResumeData>(postingId, new PartitionKey(postingId));
 
       return resumeData switch

@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Extensions.Logging;
 
@@ -18,25 +19,17 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
 
   public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
   {
-    if (context is null)
-    {
-      await next(context);
-      return;
-    }
     // Extract user information from Easy Auth headers
-    var req = await context.GetHttpRequestDataAsync();
+    var req = await (context?.GetHttpRequestDataAsync() ?? ValueTask.FromResult<HttpRequestData?>(null));
 
-    if (req is null)
+    if (req is not null)
     {
-      await next(context);
-      return;
-    }
-
-    var principalHeader = req.Headers.Single(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value.Single();
-    if (!string.IsNullOrEmpty(principalHeader))
-    {
-      var principal = JsonSerializer.Deserialize<EasyAuthUser>(Convert.FromBase64String(principalHeader));
-      context.Items["User"] = principal;
+      var principalHeader = req.Headers.Single(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value.Single();
+      if (!string.IsNullOrEmpty(principalHeader))
+      {
+        var principal = JsonSerializer.Deserialize<EasyAuthUser>(Convert.FromBase64String(principalHeader));
+        context.Items["User"] = principal;
+      }
     }
 
     await next(context);

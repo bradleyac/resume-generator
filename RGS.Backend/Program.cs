@@ -19,8 +19,8 @@ builder.Services
     .ConfigureFunctionsApplicationInsights()
     .AddApplicationServices();
 
-builder.UseMiddleware<EasyAuthMiddleware>();
 builder.UseMiddleware<FunctionContextAccessorMiddleware>();
+builder.UseMiddleware<EasyAuthMiddleware>();
 
 builder.Configuration.AddEnvironmentVariables();
 

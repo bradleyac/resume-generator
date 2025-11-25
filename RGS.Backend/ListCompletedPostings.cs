@@ -22,8 +22,8 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosm
     [Function("ListCompletedPostings")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        var currentUser = _userService.GetCurrentUser();
-        if (currentUser is null)
+        var currentUserId = _userService.GetCurrentUserId();
+        if (currentUserId is null)
         {
             return new UnauthorizedResult();
         }
@@ -56,7 +56,7 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosm
 
         var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
         var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()
-            .Where(p => p.UserId == currentUser.UserId)
+            .Where(p => p.UserId == currentUserId)
             .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
             .Where(p => status == null || p.Status == status)
             .Where(p => string.IsNullOrWhiteSpace(searchText) || p.Company.FullTextContains(searchText) || p.Title.FullTextContains(searchText) || p.PostingText.FullTextContains(searchText))

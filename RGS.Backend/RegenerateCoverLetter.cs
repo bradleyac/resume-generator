@@ -22,9 +22,9 @@ internal class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, Post
         var payload = await req.ReadFromJsonAsync<RegenerateCoverLetterModel>() ?? throw new ArgumentException("Invalid payload");
         var postings = _cosmosClient.GetContainer("Resumes", "Postings");
         var posting = await postings.ReadItemAsync<JobPosting>(payload.PostingId, new PartitionKey(payload.PostingId));
-        var currentUser = _userService.GetCurrentUser();
+        var currentUserId = _userService.GetCurrentUserId();
 
-        if (posting.StatusCode != System.Net.HttpStatusCode.OK || posting.Resource.UserId != currentUser?.UserId)
+        if (posting.StatusCode != System.Net.HttpStatusCode.OK || posting.Resource.UserId != currentUserId)
         {
             return new NotFoundResult();
         }

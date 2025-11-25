@@ -1,5 +1,6 @@
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
+using RGS.Backend.Middleware;
 using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend.Services;
@@ -35,11 +36,11 @@ internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor fu
     return results.FirstOrDefault();
   }
 
-  public UserModel? GetCurrentUser()
+  public string? GetCurrentUserId()
   {
     if (_functionContextAccessor.Current?.Items.TryGetValue("User", out var userObj) ?? false)
     {
-      return userObj as UserModel;
+      return (userObj as EasyAuthUser)?.UserId;
     }
     else
     {

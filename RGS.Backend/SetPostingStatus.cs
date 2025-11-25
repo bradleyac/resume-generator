@@ -34,9 +34,9 @@ internal class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient c
 
             var postings = _cosmosClient.GetContainer("Resumes", "Postings");
             var postingResponse = await postings.ReadItemAsync<JobPosting>(payload.PostingId, new PartitionKey(payload.PostingId));
-            var currentUser = _userService.GetCurrentUser();
+            var currentUserId = _userService.GetCurrentUserId();
 
-            if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK || postingResponse.Resource.UserId != currentUser?.UserId)
+            if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK || postingResponse.Resource.UserId != currentUserId)
             {
                 return new NotFoundResult();
             }

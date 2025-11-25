@@ -23,8 +23,8 @@ internal class DeletePosting(ILogger<DeletePosting> logger, CosmosClient cosmosC
             // TODO: CSRF protection
             // Currently using cookie-based authentication built into Azure Functions, and thus vulnerable to CSRF.
             // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.
-            var currentUser = _userService.GetCurrentUser();
-            if (currentUser is null)
+            var currentUserId = _userService.GetCurrentUserId();
+            if (currentUserId is null)
             {
                 return new UnauthorizedResult();
             }
@@ -34,7 +34,7 @@ internal class DeletePosting(ILogger<DeletePosting> logger, CosmosClient cosmosC
             var postingResult = await postings.ReadItemAsync<JobPosting>(postingId, new PartitionKey(postingId));
 
             // Ensure posting exits and current user owns it
-            if (postingResult.StatusCode != System.Net.HttpStatusCode.OK || postingResult.Resource?.UserId != currentUser.UserId)
+            if (postingResult.StatusCode != System.Net.HttpStatusCode.OK || postingResult.Resource?.UserId != currentUserId)
             {
                 return new NotFoundResult();
             }

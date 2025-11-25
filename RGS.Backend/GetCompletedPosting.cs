@@ -22,8 +22,8 @@ internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, Cosmos
   {
     try
     {
-      var currentUser = _userService.GetCurrentUser();
-      if (currentUser is null)
+      var currentUserId = _userService.GetCurrentUserId();
+      if (currentUserId is null)
       {
         return new UnauthorizedResult();
       }
@@ -37,7 +37,7 @@ internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, Cosmos
         null => new NotFoundResult(),
         ItemResponse<JobPosting> p => p switch
         {
-          { StatusCode: System.Net.HttpStatusCode.OK } => (p.Resource.UserId == currentUser.UserId) switch
+          { StatusCode: System.Net.HttpStatusCode.OK } => (p.Resource.UserId == currentUserId) switch
           {
             true => new JsonResult(p.Resource),
             false => new NotFoundResult()

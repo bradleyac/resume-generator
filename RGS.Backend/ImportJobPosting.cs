@@ -17,34 +17,41 @@ internal class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient c
     private readonly ILogger<ImportJobPosting> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
     private readonly UserService _userService = userService;
-    private readonly IConfiguration _config = config;
 
-    // Allow anonymous access but require API key in header
-    // TODO: Associate each API key with a user.
+    // Requires either user authentication or an API key in the "x-api-key" header
     [Function("ImportJobPosting")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
         try
         {
-            var providedKey = req.Headers["x-api-key"].ToString().Trim();
+            // See if user is authenticated, first
+            var currentUserId = _userService.GetCurrentUserId();
 
-            if (string.IsNullOrEmpty(providedKey))
+            // If not, check for API key
+            if (currentUserId is null)
             {
-                return new UnauthorizedResult();
-            }
+                var providedKey = req.Headers["x-api-key"].ToString().Trim();
 
-            var user = await _userService.GetUserByApiKeyAsync(providedKey);
+                if (string.IsNullOrEmpty(providedKey))
+                {
+                    return new UnauthorizedResult();
+                }
 
-            if (user is null || user.ApiKey != providedKey)
-            {
-                return new UnauthorizedResult();
+                var user = await _userService.GetUserByApiKeyAsync(providedKey);
+
+                if (user is null || user.ApiKey != providedKey)
+                {
+                    return new UnauthorizedResult();
+                }
+
+                currentUserId = user.UserId;
             }
 
             var postings = _cosmosClient.GetContainer("Resumes", "Postings");
             var payload = await req.ReadFromJsonAsync<NewPostingModel>() ?? throw new ArgumentException("Invalid payload");
             var newPosting = new JobPosting
             (
-                user.UserId,
+                currentUserId,
                 Guid.NewGuid().ToString(),
                 payload.Link,
                 payload.Company,

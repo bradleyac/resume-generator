@@ -24,7 +24,7 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
 
     if (req is not null)
     {
-      var principalHeader = req.Headers.SingleOrDefault(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value.SingleOrDefault();
+      var principalHeader = req.Headers.SingleOrDefault(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value?.SingleOrDefault();
       if (!string.IsNullOrEmpty(principalHeader))
       {
         var principal = JsonSerializer.Deserialize<EasyAuthUser>(Convert.FromBase64String(principalHeader));

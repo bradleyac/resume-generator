@@ -28,7 +28,7 @@ internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor fu
     var usersContainer = _cosmosClient.GetContainer("Resumes", "Users");
 
     var query = usersContainer.GetItemLinqQueryable<UserModel>()
-                              .Where(u => u.UserId == userId)
+                              .Where(u => u.id == userId)
                               .Take(1)
                               .ToFeedIterator();
 

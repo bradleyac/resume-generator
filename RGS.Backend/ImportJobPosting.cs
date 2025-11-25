@@ -44,7 +44,7 @@ internal class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient c
                     return new UnauthorizedResult();
                 }
 
-                currentUserId = user.UserId;
+                currentUserId = user.id;
             }
 
             var postings = _cosmosClient.GetContainer("Resumes", "Postings");

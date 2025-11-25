@@ -22,14 +22,9 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
     var req = await context.GetHttpRequestDataAsync();
 
     var principalHeader = req.Headers.Single(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value.Single();
-    _logger.LogInformation("Easy Auth Principal Header: {PrincipalHeader}", principalHeader);
     if (!string.IsNullOrEmpty(principalHeader))
     {
-      var decoded = Convert.FromBase64String(principalHeader);
-      var json = Encoding.UTF8.GetString(decoded);
-      var principal = JsonSerializer.Deserialize<EasyAuthUser>(json);
-      _logger.LogInformation("Easy Auth Principal JSON: {PrincipalJson}", principal);
-
+      var principal = JsonSerializer.Deserialize<EasyAuthUser>(Convert.FromBase64String(principalHeader));
       context.Items["User"] = principal;
     }
 

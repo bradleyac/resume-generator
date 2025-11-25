@@ -73,6 +73,7 @@ namespace RGS.Frontend.Pages
       Postings = Postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Archived } : p).ToList();
     }
 
+    // TODO: Is this necessary?
     private async Task OnResubmitPosting(string postingId)
     {
       await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Pending));

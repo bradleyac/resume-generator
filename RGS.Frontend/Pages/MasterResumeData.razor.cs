@@ -23,11 +23,10 @@ public partial class MasterResumeData : ComponentBase, IDisposable
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    if (firstRender)
+    if (_subscription is null && editForm is not null)
     {
       Logger.LogInformation("EditForm is null? {isNull}", editForm is null);
       Logger.LogInformation("EditContext is null? {isNull}", editForm?.EditContext is null);
-      _subscription?.Dispose();
       _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
         a => editForm!.EditContext!.OnFieldChanged += a,
         a => editForm!.EditContext!.OnFieldChanged -= a)

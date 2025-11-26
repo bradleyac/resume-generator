@@ -9,7 +9,7 @@
 else
 {
   <div class="m-3">
-    <EditForm @ref="editForm" Model="resumeData" @key="resumeData" OnValidSubmit="HandleValidSubmit">
+    <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit">
       <DataAnnotationsValidator />
       <ValidationSummary />
       <div class="mb-3">

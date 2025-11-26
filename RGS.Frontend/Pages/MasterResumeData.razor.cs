@@ -1,13 +1,14 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
 using R3;
+using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared.ViewModels;
 
 namespace RGS.Frontend.Pages;
 
 public partial class MasterResumeData : ComponentBase, IDisposable
 {
-  private EditForm? editForm;
+  private EditContext? editContext;
   private ResumeDataModel resumeData = null!;
   private bool _disposedValue;
   private IDisposable? _subscription;
@@ -19,23 +20,24 @@ public partial class MasterResumeData : ComponentBase, IDisposable
   {
     // Load master resume data
     resumeData = await ResumeDataService.GetMasterResumeDataAsync();
+    editContext = new(resumeData);
   }
 
   protected override async Task OnAfterRenderAsync(bool firstRender)
   {
-    if (_subscription is null && editForm is not null)
+    if (_subscription is null && editContext is not null)
     {
       Logger.LogInformation("subscribing");
       _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
-        a => editForm!.EditContext!.OnFieldChanged += a,
-        a => editForm!.EditContext!.OnFieldChanged -= a)
-        .Where(_ => editForm!.EditContext!.Validate())
+        a => editContext!.OnFieldChanged += a,
+        a => editContext!.OnFieldChanged -= a)
+        .Where(_ => editContext!.Validate())
         .Debounce(TimeSpan.FromMilliseconds(500))
         .Do(async () =>
         {
           Logger.LogInformation("Handling submit from subscription");
-          editForm!.EditContext!.MarkAsUnmodified();
-          await HandleValidSubmit(editForm.EditContext);
+          editContext!.MarkAsUnmodified();
+          await HandleValidSubmit(editContext);
         })
         .Subscribe();
     }

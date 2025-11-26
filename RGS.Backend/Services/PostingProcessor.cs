@@ -160,7 +160,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
     }
 
     ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
-    var response = chatClient.CompleteChat(messages, requestOptions);
+    var response = await chatClient.CompleteChatAsync(messages, requestOptions);
 
     return response.Value.Content[0].Text;
   }

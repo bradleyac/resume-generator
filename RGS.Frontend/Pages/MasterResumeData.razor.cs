@@ -31,6 +31,7 @@ public partial class MasterResumeData : ComponentBase, IDisposable
       _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
         a => editContext!.OnFieldChanged += a,
         a => editContext!.OnFieldChanged -= a)
+        .Do(() => Logger.LogInformation("Handling raw events from subscription"))
         .Where(_ => editContext!.Validate())
         .Debounce(TimeSpan.FromMilliseconds(500))
         .Do(async () =>

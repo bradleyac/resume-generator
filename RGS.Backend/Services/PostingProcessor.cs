@@ -109,7 +109,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
             new UserChatMessage("Read the job description and assign a score between 0 and 10 to each bullet according to how appropriate it would be to appear on a resume for the job description. Return the scores associated by id."),
         ];
     ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
-    var response = chatClient.CompleteChat(messages, requestOptions);
+    var response = await chatClient.CompleteChatAsync(messages, requestOptions);
 
     var rankings = JsonSerializer.Deserialize<Rankings>(response.Value.Content[0].Text) ?? throw new InvalidOperationException("Failed to deserialize rankings");
     var idToLengthWeightMap = bullets.ToDictionary(b => (b.id, b.jobid), b => b.bulletText.Length / LineLength + 1);

@@ -13,6 +13,7 @@ public partial class MasterResumeData : ComponentBase, IDisposable
   private IDisposable? _subscription;
 
   [Inject] private IResumeDataService ResumeDataService { get; set; } = null!;
+  [Inject] private ILogger<MasterResumeData> Logger { get; set; } = null!;
 
   protected override async Task OnInitializedAsync()
   {
@@ -24,6 +25,8 @@ public partial class MasterResumeData : ComponentBase, IDisposable
   {
     if (firstRender)
     {
+      Logger.LogInformation("EditForm is null? {isNull}", editForm is null);
+      Logger.LogInformation("EditContext is null? {isNull}", editForm?.EditContext is null);
       _subscription?.Dispose();
       _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
         a => editForm!.EditContext!.OnFieldChanged += a,

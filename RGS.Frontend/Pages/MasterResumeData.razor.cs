@@ -34,6 +34,7 @@ public partial class MasterResumeData : ComponentBase, IDisposable
         .Where(_ => editForm!.EditContext!.Validate())
         .Do(async () =>
         {
+          Logger.LogInformation("Handling submit from subscription");
           editForm!.EditContext!.MarkAsUnmodified();
           await HandleValidSubmit(editForm.EditContext);
         })

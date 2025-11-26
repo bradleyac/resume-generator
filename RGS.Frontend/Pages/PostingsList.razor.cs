@@ -5,7 +5,7 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Frontend.Pages
 {
-  public partial class PostingsList
+  public partial class PostingsList : ComponentBase
   {
     [Inject] private IPostingsService PostingsService { get; set; } = null!;
     [Inject] private NavigationManager NavigationManager { get; set; } = null!;

@@ -8,6 +8,8 @@ using Microsoft.Identity.Client;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
 using RGS.Backend.Services;
+using RGS.Backend.Shared.ViewModels;
+using System.ComponentModel.DataAnnotations;
 
 namespace RGS.Backend;
 
@@ -28,7 +30,13 @@ internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosC
             {
                 return new UnauthorizedResult();
             }
-            var payload = await req.ReadFromJsonAsync<ResumeData>() ?? throw new ArgumentException("Invalid payload");
+            var payload = await req.ReadFromJsonAsync<ResumeDataModel>() ?? throw new ArgumentException("Invalid payload");
+
+            if (!Validator.TryValidateObject(payload, new ValidationContext(payload), []))
+            {
+                return new BadRequestResult();
+            }
+
             var postingId = payload.id == "master" ? currentUserId : payload.id;
 
             var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
@@ -39,7 +47,24 @@ internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosC
                 return new NotFoundResult();
             }
 
-            await resumeDataContainer.UpsertItemAsync(payload, new PartitionKey(payload.id));
+            var newData = existingData.Resource with
+            {
+                About = payload.About!,
+                City = payload.City!,
+                Name = payload.Name!,
+                State = payload.State!,
+                StreetAddress = payload.StreetAddress!,
+                Title = payload.Title!,
+                Zip = payload.Zip!,
+                Contact = payload.Contact!.ValidatedUnrawp(),
+                Bookshelf = [.. payload.Bookshelf.Select(b => b.ValidatedUnwrap())],
+                Education = [.. payload.Education.Select(e => e.ValidatedUnwrap())],
+                Jobs = [.. payload.Jobs.Select(j => j.ValidatedUnwrap())],
+                Projects = [.. payload.Projects.Select(p => p.ValidatedUnwrap())],
+                Skills = [.. payload.Skills.Select(s => s.ValidatedUnwrap())],
+            };
+
+            await resumeDataContainer.UpsertItemAsync(newData, new PartitionKey(newData.id));
             return new OkResult();
         }
         catch (Exception e)

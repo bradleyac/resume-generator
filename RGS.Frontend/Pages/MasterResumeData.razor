@@ -9,77 +9,40 @@
 else
 {
   <div class="m-3">
-  <EditForm Model="@resumeData" @key="@resumeData" OnValidSubmit="HandleValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-        <div class="mb-3">
-      <label for="name" class="form-label">Name</label>
-      <InputText id="name" class="form-control" @bind-Value="resumeData.Name" />
-    </div>
-        <div class="mb-3">
-      <label for="title" class="form-label">Title</label>
-      <InputText id="title" class="form-control" @bind-Value="resumeData.Title" />
-    </div>
-        <div class="mb-3">
-      <label for="about" class="form-label">About</label>
-      <InputText id="about" class="form-control" @bind-Value="resumeData.About" />
-    </div>
-    <div class="mb-3">
-      <label for="street-address" class="form-label">Street Address</label>
-      <InputText id="street-address" class="form-control" @bind-Value="resumeData.StreetAddress" />
-    </div>
-    <div class="mb-3">
-      <label for="city" class="form-label">City</label>
-      <InputText id="city" class="form-control" @bind-Value="resumeData.City" />
-    </div>
-    <div class="mb-3">
-      <label for="state" class="form-label">State</label>
-      <InputText id="state" class="form-control" @bind-Value="resumeData.State" />
-    </div>
-    <div class="mb-3">
-      <label for="zip" class="form-label">Zip</label>
-      <InputText id="zip" class="form-control" @bind-Value="resumeData.Zip" />
-    </div>
-    <div class="mb-3">
-      <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
-  </EditForm>
+    <EditForm @ref="editForm" Model="resumeData" @key="resumeData" OnValidSubmit="HandleValidSubmit">
+      <DataAnnotationsValidator />
+      <ValidationSummary />
+      <div class="mb-3">
+        <label for="name" class="form-label">Name</label>
+        <InputText id="name" class="form-control" @bind-Value="resumeData.Name" />
+      </div>
+      <div class="mb-3">
+        <label for="title" class="form-label">Title</label>
+        <InputText id="title" class="form-control" @bind-Value="resumeData.Title" />
+      </div>
+      <div class="mb-3">
+        <label for="about" class="form-label">About</label>
+        <InputText id="about" class="form-control" @bind-Value="resumeData.About" />
+      </div>
+      <div class="mb-3">
+        <label for="street-address" class="form-label">Street Address</label>
+        <InputText id="street-address" class="form-control" @bind-Value="resumeData.StreetAddress" />
+      </div>
+      <div class="mb-3">
+        <label for="city" class="form-label">City</label>
+        <InputText id="city" class="form-control" @bind-Value="resumeData.City" />
+      </div>
+      <div class="mb-3">
+        <label for="state" class="form-label">State</label>
+        <InputText id="state" class="form-control" @bind-Value="resumeData.State" />
+      </div>
+      <div class="mb-3">
+        <label for="zip" class="form-label">Zip</label>
+        <InputText id="zip" class="form-control" @bind-Value="resumeData.Zip" />
+      </div>
+      <div class="mb-3">
+        <button type="submit" class="btn btn-primary">Submit</button>
+      </div>
+    </EditForm>
   </div>
-}
-
-@code {
-    private ResumeDataModel resumeData = null!;
-    [Inject] private IResumeDataService ResumeDataService { get; set; } = null!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        // Load master resume data
-        var data = await ResumeDataService.GetMasterResumeDataAsync();
-        resumeData = new ResumeDataModel
-        {
-            id = data.id,
-            UserId = data.UserId,
-            IsMaster = data.IsMaster,
-            Name = data.Name,
-            Title = data.Title,
-            About = data.About,
-            StreetAddress = data.StreetAddress,
-            City = data.City,
-            State = data.State,
-            Zip = data.Zip,
-            Contact = data.Contact,
-            Education = data.Education,
-            Jobs = data.Jobs,
-            Skills = data.Skills,
-            Projects = data.Projects,
-            Bookshelf = data.Bookshelf
-        };
-    }
-    
-    private async Task HandleValidSubmit(EditContext args)
-    {
-      ResumeDataModel model = (ResumeDataModel)args.Model;
-      ResumeData data = new ResumeData(model.id, model.UserId, model.IsMaster, model.Name, model.Title, model.About, model.StreetAddress, model.City, model.State, model.Zip, model.Contact, model.Jobs, model.Projects, model.Education, model.Skills, model.Bookshelf);
-      await ResumeDataService.SetMasterResumeDataAsync(data);
-    }
 }

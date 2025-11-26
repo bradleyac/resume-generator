@@ -1,11 +1,12 @@
 using System.Net.Http.Json;
 using RGS.Backend.Shared.Models;
+using RGS.Backend.Shared.ViewModels;
 using RGS.Frontend;
 
 internal interface IResumeDataService
 {
-  Task<ResumeData> GetMasterResumeDataAsync();
-  Task SetMasterResumeDataAsync(ResumeData resumeData);
+  Task<ResumeDataModel> GetMasterResumeDataAsync();
+  Task SetMasterResumeDataAsync(ResumeDataModel resumeData);
 }
 
 internal class ResumeDataService(HttpClient httpClient, ILogger<PostingsService> logger) : IResumeDataService
@@ -13,12 +14,12 @@ internal class ResumeDataService(HttpClient httpClient, ILogger<PostingsService>
   private readonly HttpClient _httpClient = httpClient;
   private readonly ILogger<PostingsService> _logger = logger;
 
-  public async Task<ResumeData> GetMasterResumeDataAsync()
+  public async Task<ResumeDataModel> GetMasterResumeDataAsync()
   {
-    return await _httpClient.GetFromJsonAsync<ResumeData>($"/api/GetResumeData?postingId=master") ?? throw new RGSException("Failed to retrieve master resume data");
+    return await _httpClient.GetFromJsonAsync<ResumeDataModel>($"/api/GetResumeData?postingId=master") ?? throw new RGSException("Failed to retrieve master resume data");
   }
 
-  public async Task SetMasterResumeDataAsync(ResumeData resumeData)
+  public async Task SetMasterResumeDataAsync(ResumeDataModel resumeData)
   {
     await _httpClient.PostAsync("/api/SetResumeData", JsonContent.Create(resumeData));
   }

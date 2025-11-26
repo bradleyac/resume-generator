@@ -12,7 +12,7 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cosmosClient, UserService userService, IConfiguration config)
+internal class ImportJobPosting(ILogger<ImportJobPosting> logger, CosmosClient cosmosClient, UserService userService)
 {
     private readonly ILogger<ImportJobPosting> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;

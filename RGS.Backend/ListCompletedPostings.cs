@@ -35,8 +35,15 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosm
 
         if (req.Query.TryGetValue("lastImportedAt", out var lastImportedAtValues))
         {
-            lastImportedAt = DateTime.Parse(lastImportedAtValues.First()).ToUniversalTime();
-            _logger.LogInformation(lastImportedAt.ToString());
+            if (DateTime.TryParse(lastImportedAtValues.First(), out var parsedDateTime))
+            {
+                lastImportedAt = parsedDateTime.ToUniversalTime();
+                _logger.LogInformation(lastImportedAt.ToString());
+            }
+            else
+            {
+                return new BadRequestObjectResult("Invalid lastImportedAt format");
+            }
         }
 
         if (req.Query.TryGetValue("lastId", out var lastIdValues))

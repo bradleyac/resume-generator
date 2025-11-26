@@ -6,8 +6,10 @@
 * ~~Cover letter generation~~
 * ~~Allow re-generating just the cover letter with additional feedback for the model.~~
   Keep a history of feedback given for a particular posting.
+    Event sourcing opportunity?
 * ~~Search across postings~~
 * Goal setting?
+    Move this idea to ADHD helper/productivity app?
 * More than one user
   ~~Everything must be owned by a user~~
   ~~Forbid actions on another user's resources~~

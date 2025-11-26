@@ -2,6 +2,16 @@ namespace RGS.Backend.Shared.Models;
 
 public record Job(string Title, string Company, string Location, string Start, string End, string[] Bullets);
 
+public class JobModel
+{
+  public required string Title { get; set; }
+  public required string Company { get; set; }
+  public required string Location { get; set; }
+  public required string Start { get; set; }
+  public required string End { get; set; }
+  public required string[] Bullets { get; set; }
+}
+
 public record Project(string Name, string Description, string[] Technologies, string When);
 
 public record Education(string Degree, string School, string Location, string Graduation);

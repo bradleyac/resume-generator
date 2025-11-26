@@ -20,14 +20,14 @@ internal class EasyAuthMiddleware : IFunctionsWorkerMiddleware
   public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
   {
     // Extract user information from Easy Auth headers
-    var req = await (context?.GetHttpRequestDataAsync() ?? default);
+    var req = await context.GetHttpRequestDataAsync();
 
     if (req is not null)
     {
       var principalHeader = req.Headers.SingleOrDefault(kvp => kvp.Key == "X-MS-CLIENT-PRINCIPAL").Value?.SingleOrDefault();
       if (!string.IsNullOrEmpty(principalHeader))
       {
-        var principal = JsonSerializer.Deserialize<EasyAuthUser>(Convert.FromBase64String(principalHeader));
+        var principal = JsonSerializer.Deserialize<EasyAuthUser>(Convert.FromBase64String(principalHeader)) ?? throw new InvalidOperationException("Failed to deserialize Easy Auth user");
         context.Items["User"] = principal;
       }
     }

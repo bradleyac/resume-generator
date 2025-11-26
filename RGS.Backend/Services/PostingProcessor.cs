@@ -111,7 +111,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
     ChatClient chatClient = aiClient.GetChatClient("gpt-5-mini");
     var response = chatClient.CompleteChat(messages, requestOptions);
 
-    var rankings = JsonSerializer.Deserialize<Rankings>(response.Value.Content[0].Text);
+    var rankings = JsonSerializer.Deserialize<Rankings>(response.Value.Content[0].Text) ?? throw new InvalidOperationException("Failed to deserialize rankings");
     var idToLengthWeightMap = bullets.ToDictionary(b => (b.id, b.jobid), b => b.bulletText.Length / LineLength + 1);
 
     var bestOfEach = rankings.wts.GroupBy(wt => wt.jobid).SelectMany(g => g.OrderByDescending(wt => wt.wt).Take(4));

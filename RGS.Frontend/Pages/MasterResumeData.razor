@@ -1,4 +1,5 @@
 ﻿@page "/MasterResumeData"
+
 <PageTitle>Master Resume Data</PageTitle>
 
 @if (resumeData is null)
@@ -8,7 +9,7 @@
 else
 {
   <div class="m-3">
-  <EditForm Model="@resumeData" @key="@resumeData" method="post" OnValidSubmit="HandleValidSubmit">
+  <EditForm Model="@resumeData" @key="@resumeData" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
         <div class="mb-3">

@@ -33,8 +33,8 @@ public static class BuilderExtensions
         var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
         @this.AddSingleton(new CosmosClient(connectionString));
 
-        var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint");
-        var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey");
+        var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint") ?? throw new InvalidOperationException("AzureOpenAIEndpoint not set");
+        var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey") ?? throw new InvalidOperationException("AzureOpenAIKey not set");
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
 
         @this.AddTransient<PostingProcessor>();

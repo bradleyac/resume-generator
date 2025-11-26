@@ -18,18 +18,25 @@ public partial class MasterResumeData : ComponentBase, IDisposable
   {
     // Load master resume data
     resumeData = await ResumeDataService.GetMasterResumeDataAsync();
-    _subscription?.Dispose();
-    _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
-      a => editForm!.EditContext!.OnFieldChanged += a,
-      a => editForm!.EditContext!.OnFieldChanged -= a)
-      .Debounce(TimeSpan.FromMilliseconds(500))
-      .Where(_ => editForm!.EditContext!.Validate())
-      .Do(async () =>
-      {
-        editForm!.EditContext!.MarkAsUnmodified();
-        await HandleValidSubmit(editForm.EditContext);
-      })
-      .Subscribe();
+  }
+
+  protected override async Task OnAfterRenderAsync(bool firstRender)
+  {
+    if (firstRender)
+    {
+      _subscription?.Dispose();
+      _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
+        a => editForm!.EditContext!.OnFieldChanged += a,
+        a => editForm!.EditContext!.OnFieldChanged -= a)
+        .Debounce(TimeSpan.FromMilliseconds(500))
+        .Where(_ => editForm!.EditContext!.Validate())
+        .Do(async () =>
+        {
+          editForm!.EditContext!.MarkAsUnmodified();
+          await HandleValidSubmit(editForm.EditContext);
+        })
+        .Subscribe();
+    }
   }
 
   private async Task HandleValidSubmit(EditContext args)

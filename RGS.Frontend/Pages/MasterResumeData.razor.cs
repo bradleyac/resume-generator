@@ -27,18 +27,16 @@ public partial class MasterResumeData : ComponentBase, IDisposable
   {
     if (_subscription is null && editContext is not null)
     {
-      Logger.LogInformation("subscribing");
       _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
         a => editContext!.OnFieldChanged += a,
         a => editContext!.OnFieldChanged -= a)
-        .Do(() => Logger.LogInformation("Handling raw events from subscription"))
-        .Where(_ => editContext!.Validate())
+        .Select(sa => sa.sender as EditContext)
+        .Where(ec => ec?.Validate() ?? false)
         .Debounce(TimeSpan.FromMilliseconds(500))
-        .Do(async () =>
+        .Do(async (ec) =>
         {
-          Logger.LogInformation("Handling submit from subscription");
-          editContext!.MarkAsUnmodified();
-          await HandleValidSubmit(editContext);
+          ec!.MarkAsUnmodified();
+          await HandleValidSubmit(ec);
         })
         .Subscribe();
     }

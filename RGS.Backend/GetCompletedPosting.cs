@@ -11,11 +11,11 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient, UserService userService)
+internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient, IUserService userService)
 {
   private readonly ILogger<ListCompletedPostings> _logger = logger;
   private readonly CosmosClient _cosmosClient = cosmosClient;
-  private readonly UserService _userService = userService;
+  private readonly IUserService _userService = userService;
 
   [Function("GetCompletedPosting")]
   public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)

@@ -9,12 +9,12 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, PostingProcessor postingProcessor, CosmosClient cosmosClient, UserService userService)
+internal class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, PostingProcessor postingProcessor, CosmosClient cosmosClient, IUserService userService)
 {
     private readonly ILogger<RegenerateCoverLetter> _logger = logger;
     private readonly PostingProcessor _postingProcessor = postingProcessor;
     private readonly CosmosClient _cosmosClient = cosmosClient;
-    private readonly UserService _userService = userService;
+    private readonly IUserService _userService = userService;
 
     [Function("RegenerateCoverLetter")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)

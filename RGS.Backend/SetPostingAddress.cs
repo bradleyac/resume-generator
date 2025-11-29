@@ -9,11 +9,11 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class SetPostingAddress(ILogger<SetPostingStatus> logger, CosmosClient cosmosClient, UserService userService)
+internal class SetPostingAddress(ILogger<SetPostingStatus> logger, CosmosClient cosmosClient, IUserService userService)
 {
     private readonly ILogger<SetPostingStatus> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
-    private readonly UserService _userService = userService;
+    private readonly IUserService _userService = userService;
 
     [Function("SetPostingAddress")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)

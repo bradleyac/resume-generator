@@ -5,7 +5,14 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend.Services;
 
-internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor functionContextAccessor)
+internal interface IUserService
+{
+  string? GetCurrentUserId();
+  Task<UserModel?> GetUserByApiKeyAsync(string apiKey);
+  Task<UserModel?> GetUserByIdAsync(string userId);
+}
+
+internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor functionContextAccessor) : IUserService
 {
   private readonly CosmosClient _cosmosClient = cosmosClient;
   private readonly FunctionContextAccessor _functionContextAccessor = functionContextAccessor;
@@ -47,4 +54,16 @@ internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor fu
       return null;
     }
   }
+}
+
+internal class DevelopmentUserService : IUserService
+{
+  public string? GetCurrentUserId()
+  {
+    return "13b1c25378654837956349833d60216e";
+  }
+
+  public Task<UserModel?> GetUserByApiKeyAsync(string apiKey) => Task.FromResult<UserModel?>(new UserModel { id = "13b1c25378654837956349833d60216e", ApiKey = apiKey, UserDetails = "andrew.charles.bradley@gmail.com" });
+
+  public Task<UserModel?> GetUserByIdAsync(string userId) => Task.FromResult<UserModel?>(new UserModel { id = userId, ApiKey = "13b1c25378654837956349833d60216e", UserDetails = "andrew.charles.bradley@gmail.com" });
 }

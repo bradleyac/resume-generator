@@ -13,11 +13,11 @@ using System.ComponentModel.DataAnnotations;
 
 namespace RGS.Backend;
 
-internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosClient, UserService userService)
+internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosClient, IUserService userService)
 {
     private readonly ILogger<SetResumeData> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
-    private readonly UserService _userService = userService;
+    private readonly IUserService _userService = userService;
 
     [Function("SetResumeData")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)

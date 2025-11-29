@@ -17,7 +17,7 @@ builder.ConfigureFunctionsWebApplication();
 builder.Services
     .AddApplicationInsightsTelemetryWorkerService()
     .ConfigureFunctionsApplicationInsights()
-    .AddApplicationServices();
+    .AddApplicationServices(builder.Environment.IsDevelopment());
 
 builder.UseMiddleware<FunctionContextAccessorMiddleware>();
 builder.UseMiddleware<EasyAuthMiddleware>();
@@ -28,7 +28,7 @@ builder.Build().Run();
 
 public static class BuilderExtensions
 {
-    public static IServiceCollection AddApplicationServices(this IServiceCollection @this)
+    public static IServiceCollection AddApplicationServices(this IServiceCollection @this, bool isDevelopment)
     {
         var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
         @this.AddSingleton(new CosmosClient(connectionString));
@@ -38,7 +38,14 @@ public static class BuilderExtensions
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
 
         @this.AddTransient<PostingProcessor>();
-        @this.AddScoped<UserService>();
+        if (isDevelopment)
+        {
+            @this.AddScoped<IUserService, DevelopmentUserService>();
+        }
+        else
+        {
+            @this.AddScoped<IUserService, UserService>();
+        }
         @this.AddScoped<FunctionContextAccessor>();
 
         return @this;

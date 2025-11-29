@@ -9,11 +9,11 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class DeletePosting(ILogger<DeletePosting> logger, CosmosClient cosmosClient, UserService userService)
+internal class DeletePosting(ILogger<DeletePosting> logger, CosmosClient cosmosClient, IUserService userService)
 {
     private readonly ILogger<DeletePosting> _logger = logger;
     private readonly CosmosClient _cosmosClient = cosmosClient;
-    private readonly UserService _userService = userService;
+    private readonly IUserService _userService = userService;
 
     [Function("DeletePosting")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "DeletePosting/{postingId}")] HttpRequest req, string postingId)

@@ -37,6 +37,7 @@ public partial class MasterResumeData : ComponentBase, IDisposable
         {
           ec!.MarkAsUnmodified();
           await HandleValidSubmit(ec);
+          StateHasChanged();
         })
         .Subscribe();
     }

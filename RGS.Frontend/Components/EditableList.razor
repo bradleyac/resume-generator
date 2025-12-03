@@ -1,0 +1,26 @@
+﻿@using System.Reflection.Emit
+@using System.ComponentModel.DataAnnotations
+@using RGS.Backend.Shared.ViewModels
+
+@typeparam TItem where TItem : new()
+
+<h3>@Label</h3>
+<div class="m-3">
+  @foreach (var (item, index) in List.WithIndex())
+  {
+    if (@ItemTemplate is not null)
+    {
+      <div @key="@index">
+        @ItemTemplate(item)
+      </div>
+    }
+  }
+  <button onclick="@(() => ItemAdded.InvokeAsync(new TItem()))">+</button>
+</div>
+
+@code {
+  [Parameter] public required string Label { get; set; } = "";
+  [Parameter] public required IReadOnlyList<TItem> List { get; set; } = [];
+  [Parameter] public required EventCallback<TItem> ItemAdded { get; set; }
+  [Parameter] public required RenderFragment<TItem>? ItemTemplate { get; set; }
+}

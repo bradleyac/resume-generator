@@ -1,47 +1,59 @@
 ﻿@page "/MasterResumeData"
+@using Blazilla
+@using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Components
+@using System.Runtime.CompilerServices
+@using System.Linq.Expressions
 
 <PageTitle>Master Resume Data</PageTitle>
 
 @if (resumeData is null)
 {
-  <p>Loading master resume data...</p>
+  <p class="m-3">Loading master resume data...</p>
 }
 else
 {
   <div class="m-3">
     <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit">
-      <DataAnnotationsValidator />
+      <FluentValidator />
       <ValidationSummary />
-      <div class="mb-3">
-        <label for="name" class="form-label">Name</label>
-        <InputText id="name" class="form-control" @bind-Value="resumeData.Name" />
-      </div>
-      <div class="mb-3">
-        <label for="title" class="form-label">Title</label>
-        <InputText id="title" class="form-control" @bind-Value="resumeData.Title" />
-      </div>
-      <div class="mb-3">
-        <label for="about" class="form-label">About</label>
-        <InputText id="about" class="form-control" @bind-Value="resumeData.About" />
-      </div>
-      <div class="mb-3">
-        <label for="street-address" class="form-label">Street Address</label>
-        <InputText id="street-address" class="form-control" @bind-Value="resumeData.StreetAddress" />
-      </div>
-      <div class="mb-3">
-        <label for="city" class="form-label">City</label>
-        <InputText id="city" class="form-control" @bind-Value="resumeData.City" />
-      </div>
-      <div class="mb-3">
-        <label for="state" class="form-label">State</label>
-        <InputText id="state" class="form-control" @bind-Value="resumeData.State" />
-      </div>
-      <div class="mb-3">
-        <label for="zip" class="form-label">Zip</label>
-        <InputText id="zip" class="form-control" @bind-Value="resumeData.Zip" />
-      </div>
-      <div class="mb-3">
-        <button type="submit" class="btn btn-primary">Submit</button>
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Name)" />
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Title)" />
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.About)" />
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.StreetAddress)" Label="Street Address" />
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.City)" />
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.State)" />
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Zip)" />
+      <div class="d-flex flex-column mt-4 gap-4">
+        <Collapsible Label="Skills">
+          <div class="my-4 d-flex flex-column gap-4 border p-3 col-12 col-lg-6">
+            @foreach (var (category, catIndex) in resumeData.Skills.WithIndex())
+            {
+              <div class="d-flex flex-column border p-3 position-relative">
+                <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => OnSkillCategoryRemoved(catIndex)">
+                  <Icon Name="IconName.XLg" />
+                </Badge>
+                <SkillList @key="catIndex" Model="category" OnSkillAdded="(skill) => OnSkillAdded(category, skill)" OnSkillRemoved="(index) => OnSkillRemoved(category, index)" />
+              </div>
+            }
+            <div class="d-flex gap-2 place-items-center">
+              <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
+              <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => OnSkillCategoryAdded(@NewCategory!))">Add Skill Category</Button>
+            </div>
+          </div>
+        </Collapsible>
+        <Collapsible Label="Projects">
+          <p>Projects</p>
+        </Collapsible>
+        <Collapsible Label="Jobs">
+          <p>Jobs</p>
+        </Collapsible>
+        <Collapsible Label="Education">
+          <p>Education</p>
+        </Collapsible>
+        <Collapsible Label="Books">
+          <p>Books</p>
+        </Collapsible>
       </div>
     </EditForm>
   </div>

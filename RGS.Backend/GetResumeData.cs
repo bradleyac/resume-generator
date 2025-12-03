@@ -45,7 +45,7 @@ internal class GetResumeData(ILogger<GetResumeData> logger, CosmosClient cosmosC
         {
           { StatusCode: System.Net.HttpStatusCode.OK } => (p.Resource.UserId == currentUserId) switch
           {
-            true => new JsonResult(p.Resource),
+            true => new JsonResult(p.Resource.Wrap()),
             false => new NotFoundResult()
           },
           _ => new NotFoundResult()

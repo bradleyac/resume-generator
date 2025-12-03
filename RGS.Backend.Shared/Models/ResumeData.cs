@@ -11,7 +11,7 @@ public record Job(string Title, string Company, string Location, string Start, s
     Title = Title,
     Start = Start,
     End = End,
-    Bullets = [.. Bullets],
+    Bullets = [.. Bullets.Select(b => new BindableString { Value = b })],
   };
 };
 
@@ -21,7 +21,7 @@ public record Project(string Name, string Description, string[] Technologies, st
   {
     Description = Description,
     Name = Name,
-    Technologies = [.. Technologies],
+    Technologies = [.. Technologies.Select(t => new BindableString { Value = t })],
     When = When
   };
 };
@@ -51,7 +51,7 @@ public record SkillCategory(string Label, string[] Items)
 {
   public SkillCategoryModel Wrap() => new SkillCategoryModel
   {
-    Items = [.. Items],
+    Items = [.. Items.Select(i => new BindableString { Value = i })],
     Label = Label
   };
 };
@@ -100,6 +100,7 @@ public record ResumeData(string id,
     Projects = [.. Projects.Select(p => p.Wrap())],
     Education = [.. Education.Select(e => e.Wrap())],
     Skills = [.. Skills.Select(s => s.Wrap())],
-    Bookshelf = [.. Bookshelf.Select(b => b.Wrap())]
+    Bookshelf = [.. Bookshelf.Select(b => b.Wrap())],
+    CoverLetter = CoverLetter
   };
 }

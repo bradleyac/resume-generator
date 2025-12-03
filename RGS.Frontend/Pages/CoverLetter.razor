@@ -1,4 +1,5 @@
 ﻿@page "/cover/{PostingId}"
+@using RGS.Backend.Shared.ViewModels
 @layout ResumeLayout
 
 @if (isLoading)
@@ -19,7 +20,7 @@ else
   [Parameter] public string PostingId { get; set; } = string.Empty;
   public string PageTitle => $"abradley-cover-letter-{resumeData.id}";
 
-  private ResumeData resumeData = null!;
+  private ResumeDataModel resumeData = null!;
   private JobPosting posting = null!;
   private bool isLoading = true;
 
@@ -31,46 +32,46 @@ else
     isLoading = false;
   }
 
-  private RenderFragment HeaderSection(ResumeData resumeData) => @<header class="header">
-    <div class="name-title">
-      <h1>@resumeData.Name</h1>
-      <h2>@resumeData.Title</h2>
-    </div>
-    <div class="contact">
-      @ContactSection(resumeData)
-    </div>
-    <div class="background"></div>
+  private RenderFragment HeaderSection(ResumeDataModel resumeData) => @<header class="header">
+      <div class="name-title">
+        <h1>@resumeData.Name</h1>
+        <h2>@resumeData.Title</h2>
+      </div>
+      <div class="contact">
+        @ContactSection(resumeData)
+      </div>
+      <div class="background"></div>
   </header>;
 
-  private RenderFragment ContactSection(ResumeData resumeData) => @<section>
-    <p>@resumeData.StreetAddress</p>
-    <p>@resumeData.City, @resumeData.State @resumeData.Zip</p>
-    <p>@resumeData.Contact.Phone</p>
-    <p>@resumeData.Contact.Email</p>
-    </section>;
+private RenderFragment ContactSection(ResumeDataModel resumeData) => @<section>
+  <p>@resumeData.StreetAddress</p>
+  <p>@resumeData.City!, @resumeData.State @resumeData.Zip</p>
+  <p>@resumeData.Contact?.Phone</p>
+  <p>@resumeData.Contact?.Email</p>
+</section>;
 
-  private RenderFragment BodySection(ResumeData resumeData, JobPosting posting) => @<section class="body">
-    @CompanySection(posting)
-    @CoverLetterText(resumeData)
-    @SignatureSection(resumeData)
-    </section>;
+private RenderFragment BodySection(ResumeDataModel resumeData, JobPosting posting) => @<section class="body">
+@CompanySection(posting)
+@CoverLetterText(resumeData)
+@SignatureSection(resumeData)
+</section>;
 
-  private RenderFragment CompanySection(JobPosting posting) => @<section class="company">
-    <p>Hiring Manager</p>
-    <p>@posting.Company</p>
-    <p>@posting.StreetAddress</p>
-    <p>@posting.City, @posting.State @posting.Zip</p>
-    </section>;
+private RenderFragment CompanySection(JobPosting posting) => @<section class="company">
+  <p>Hiring Manager</p>
+  <p>@posting.Company</p>
+  <p>@posting.StreetAddress</p>
+  <p>@posting.City, @posting.State @posting.Zip</p>
+</section>;
 
-  private RenderFragment CoverLetterText(ResumeData resumeData) => @<section class="cover-letter-text">
-    @foreach (var paragraph in @resumeData.CoverLetter?.Split("|", StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>())
-    {
-      <p>@paragraph</p>
-    }
-    </section>;
+private RenderFragment CoverLetterText(ResumeDataModel resumeData) => @<section class="cover-letter-text">
+@foreach (var paragraph in @resumeData.CoverLetter?.Split("|", StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>())
+{
+    <p>@paragraph</p>
+}
+</section>;
 
-  private RenderFragment SignatureSection(ResumeData resumeData) => @<section class="signature">
-      <p>Sincerely,</p>
-      <p>@resumeData.Name</p>
-    </section>;
+private RenderFragment SignatureSection(ResumeDataModel resumeData) => @<section class="signature">
+  <p>Sincerely,</p>
+  <p>@resumeData.Name</p>
+</section>;
 }

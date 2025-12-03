@@ -1,0 +1,24 @@
+﻿<div class="d-flex gap-3">
+  <Button title="Toggle Skills" Color="ButtonColor.Primary" @onclick="@(async () => await collapse.ToggleAsync())">
+    @if (IsCollapsed)
+    {
+      <Icon Name="IconName.ChevronUp" />
+    }
+    else
+    {
+      <Icon Name="IconName.ChevronDown" />
+    }
+  </Button>
+  <h3>@Label</h3>
+</div>
+<Collapse @ref="collapse" OnHidden="() => IsCollapsed = true" OnShown="() => IsCollapsed = false">
+  @ChildContent
+</Collapse>
+@code {
+  private Collapse collapse = default!;
+  public bool IsCollapsed { get; set; } = true;
+  [Parameter]
+  public required RenderFragment ChildContent { get; set; } = default!;
+  [Parameter]
+  public required string Label { get; set; } = "";
+}

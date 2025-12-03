@@ -6,10 +6,14 @@
   <label>Posting Id: </label>
   <LoadingText TextObject=@posting?.id />
   <div class="d-flex gap-2" role="group" aria-label="Actions">
-    <button class="btn btn-primary" @onclick="() => NavigateToResume(PostingId)">View Resume</button>
-    <button class="btn btn-primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</button>
-    <button class="btn btn-primary" @onclick="OnUpdatePostingAddressClicked"><i class="bi bi-geo-fill" /></button>
-    <button class="btn btn-primary" @onclick="OnRegenerateCoverLetterClicked"><i class="bi bi-arrow-clockwise" /></button>
+    <Button Color="ButtonColor.Primary" @onclick="() => NavigateToResume(PostingId)">View Resume</Button>
+    <Button Color="ButtonColor.Primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</Button>
+    <Button Color="ButtonColor.Primary" @onclick="OnUpdatePostingAddressClicked">
+      <Icon Name="IconName.GeoFill" />
+    </Button>
+    <Button Color="ButtonColor.Primary" @onclick="OnRegenerateCoverLetterClicked">
+      <Icon Name="IconName.ArrowClockwise" />
+    </Button>
   </div>
   <label>Imported: </label>
   <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />

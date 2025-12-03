@@ -1,5 +1,8 @@
+using FluentValidation;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using R3;
+using RGS.Backend.Shared.ViewModels;
 using RGS.Frontend;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
@@ -12,5 +15,7 @@ builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(apiBaseA
 builder.Services.AddScoped<IPostingsService, PostingsService>();
 builder.Services.AddScoped<IResumeDataService, ResumeDataService>();
 builder.Services.AddBlazorBootstrap();
+builder.Services.AddBlazorWebAssemblyR3();
+builder.Services.AddSingleton<IValidator<ResumeDataModel>, ResumeDataValidator>();
 
 await builder.Build().RunAsync();

@@ -18,12 +18,12 @@ public class JobModel
   [Required]
   public string? End { get; set; }
   [Required]
-  public List<string> Bullets { get; set; } = [];
+  public List<BindableString> Bullets { get; set; } = [];
 
   public Job ValidatedUnwrap()
   {
     Validator.ValidateObject(this, new ValidationContext(this));
-    return new Job(Title!, Company!, Location!, Start!, End!, [.. Bullets]);
+    return new Job(Title!, Company!, Location!, Start!, End!, [.. Bullets.Select(b => b.Value!)]);
   }
 }
 
@@ -34,13 +34,13 @@ public class ProjectModel
   [Required]
   public string? Description { get; set; }
   [Required]
-  public List<string> Technologies { get; set; } = [];
+  public List<BindableString> Technologies { get; set; } = [];
   [Required]
   public string? When { get; set; }
   public Project ValidatedUnwrap()
   {
     Validator.ValidateObject(this, new ValidationContext(this));
-    return new Project(Name!, Description!, [.. Technologies], When!);
+    return new Project(Name!, Description!, [.. Technologies.Select(t => t.Value!)], When!);
   }
 }
 
@@ -81,11 +81,11 @@ public class SkillCategoryModel
   [Required]
   public string? Label { get; set; }
   [Required]
-  public List<string> Items { get; set; } = [];
+  public List<BindableString> Items { get; set; } = [];
   public SkillCategory ValidatedUnwrap()
   {
     Validator.ValidateObject(this, new ValidationContext(this));
-    return new SkillCategory(Label!, [.. Items]);
+    return new SkillCategory(Label!, [.. Items.Select(i => i.Value!)]);
   }
 }
 
@@ -122,6 +122,7 @@ public class ResumeDataModel
   public string? State { get; set; }
   [Required]
   public string? Zip { get; set; }
+  public string? CoverLetter { get; set; }
   [Required]
   public ContactModel? Contact { get; set; }
   [Required]
@@ -154,7 +155,8 @@ public class ResumeDataModel
       [.. Projects.Select(p => p.ValidatedUnwrap())],
       [.. Education.Select(e => e.ValidatedUnwrap())],
       [.. Skills.Select(s => s.ValidatedUnwrap())],
-      [.. Bookshelf.Select(b => b.ValidatedUnwrap())]
+      [.. Bookshelf.Select(b => b.ValidatedUnwrap())],
+      CoverLetter: CoverLetter
     );
   }
 }

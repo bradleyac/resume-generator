@@ -26,10 +26,7 @@ public class ResumeDataValidator : AbstractValidator<ResumeDataModel>
     RuleForEach(rd => rd.Skills).ChildRules((validator) =>
     {
       validator.RuleFor(cat => cat.Label).NotEmpty().WithMessage("Label is required.");
-      validator.RuleForEach(cat => cat.Items).ChildRules((subValidator) =>
-      {
-        subValidator.RuleFor(item => item.Value).NotEmpty().WithMessage("Skill value is required.");
-      });
+      validator.RuleForEach(cat => cat.Items).NotEmpty().WithMessage("Skill value is required.");
     });
   }
 }

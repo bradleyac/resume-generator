@@ -8,7 +8,7 @@ internal interface IPostingsService
   Task<JobPosting> GetPostingAsync(string postingId);
   Task<List<PostingSummary>> GetPostingsAsync();
   IAsyncEnumerable<List<PostingSummary>> GetPostingsStreamAsync(string status, string searchText);
-  Task<ResumeDataModel> GetResumeDataAsync(string postingId);
+  Task<ResumeData> GetResumeDataAsync(string postingId);
   Task UpdatePostingAddressAsync(UpdatePostingAddressModel addressUpdate);
   Task RegenerateCoverLetterAsync(RegenerateCoverLetterModel regenerateModel);
   Task SubmitNewPostingAsync(NewPostingModel model);
@@ -31,9 +31,9 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
     return await _httpClient.GetFromJsonAsync<List<PostingSummary>>($"/api/ListCompletedPostings") ?? throw new RGSException("Failed to retrieve postings");
   }
 
-  public async Task<ResumeDataModel> GetResumeDataAsync(string postingId)
+  public async Task<ResumeData> GetResumeDataAsync(string postingId)
   {
-    return await _httpClient.GetFromJsonAsync<ResumeDataModel>($"/api/GetResumeData?postingId={postingId}") ?? throw new RGSException("Failed to retrieve resume data");
+    return await _httpClient.GetFromJsonAsync<ResumeData>($"/api/GetResumeData?postingId={postingId}") ?? throw new RGSException("Failed to retrieve resume data");
   }
 
   public async Task SubmitNewPostingAsync(NewPostingModel model)

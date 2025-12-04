@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
+using Blazilla;
 using BlazorBootstrap;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Forms;
@@ -14,7 +15,6 @@ public partial class MasterResumeData : ComponentBase, IDisposable
 {
   private EditContext? editContext;
   private ResumeDataModel resumeData = null!;
-  private bool SkillCategoryCollapsed { get; set; }
   private bool _disposedValue;
   private IDisposable? _subscription;
   private IDisposable? _otherSubscription;
@@ -28,7 +28,7 @@ public partial class MasterResumeData : ComponentBase, IDisposable
   protected override async Task OnInitializedAsync()
   {
     // Load master resume data
-    resumeData = await ResumeDataService.GetMasterResumeDataAsync();
+    resumeData = (await ResumeDataService.GetMasterResumeDataAsync()).Wrap();
     editContext = new(resumeData);
     _otherSubscription?.Dispose();
     _otherSubscription = editContext.EnableDataAnnotationsValidation(_serviceProvider);
@@ -53,38 +53,28 @@ public partial class MasterResumeData : ComponentBase, IDisposable
     }
   }
 
-  private async Task OnSkillAdded(SkillCategoryModel model, BindableString str)
+  private async Task OnSkillCategoryChanged(SkillCategory changed, int index)
   {
-    model.Items.Add(str);
-    await HandleSubmit(editContext!);
-    StateHasChanged();
-  }
-
-  private async Task OnSkillRemoved(SkillCategoryModel model, int index)
-  {
-    model.Items.RemoveAt(index);
-    await HandleSubmit(editContext!);
-    StateHasChanged();
+    resumeData.Skills = [.. resumeData.Skills.Select((skill, i) => i == index ? changed : skill)];
+    editContext!.NotifyFieldChanged(FieldIdentifier.Create(() => resumeData.Skills));
   }
 
   private async Task OnSkillCategoryAdded(string category)
   {
     NewCategory = "";
-    resumeData.Skills.Add(new SkillCategoryModel { Label = category, Items = [] });
-    await HandleSubmit(editContext!);
-    StateHasChanged();
+    resumeData.Skills.Add(new SkillCategory(category, []));
+    editContext!.NotifyFieldChanged(FieldIdentifier.Create(() => resumeData.Skills));
   }
 
   private async Task OnSkillCategoryRemoved(int index)
   {
     resumeData.Skills.RemoveAt(index);
-    await HandleSubmit(editContext!);
-    StateHasChanged();
+    editContext!.NotifyFieldChanged(FieldIdentifier.Create(() => resumeData.Skills));
   }
 
   private async Task HandleValidSubmit(EditContext args)
   {
-    ResumeDataModel data = (ResumeDataModel)args.Model;
+    ResumeData data = (ResumeData)args.Model;
     await ResumeDataService.SetMasterResumeDataAsync(data);
   }
 
@@ -93,7 +83,7 @@ public partial class MasterResumeData : ComponentBase, IDisposable
     ResumeDataModel data = (ResumeDataModel)args.Model;
     if (args.Validate())
     {
-      await ResumeDataService.SetMasterResumeDataAsync(data);
+      await ResumeDataService.SetMasterResumeDataAsync(data.Unwrap());
     }
     else
     {

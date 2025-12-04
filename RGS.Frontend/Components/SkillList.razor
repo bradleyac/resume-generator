@@ -1,13 +1,13 @@
 ﻿@using BlazorBootstrap
 @using RGS.Backend.Shared.ViewModels
+@using System.Configuration
 
-
-<div>
-  <FormField @bind-Value="@(Model.Label)" class="col-3" Label=@($"Skill Category") />
-  <div class="mb-3 d-flex flex-wrap gap-3">
+<div class="d-flex flex-column gap-4">
+  <FormField @bind-Value="@(Model.Label)" @bind-Value:after="LabelChanged" class="col-6" Label=@("Skill Category") />
+  <div class="d-flex flex-wrap gap-3 ms-3">
     @foreach (var (item, index) in @Model.Items.WithIndex())
     {
-      <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item.Value<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => OnSkillRemoved.InvokeAsync(index)">
+      <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item.Value<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => RemoveSkillAt(index)">
           <Icon Name="IconName.XLg" />
         </Badge>
       </Badge>
@@ -15,23 +15,35 @@
   </div>
   <div class="d-flex gap-2 place-items-center">
     <label for="@newSkillId" class="collapse">Add Skill</label>
-    <input id="@newSkillId" type="text" class="col-sm-6 col-md-4 col-lg-3" @bind-value="@NewSkill" @bind-value:event="oninput" />
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewSkill is null or "")" @onclick="@OnClick">Add Skill</Button>
+    <input id="@newSkillId" type="text" class="col-6" @bind-value="@NewSkill" @bind-value:event="oninput" />
+    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewSkill is null or "")" @onclick="@AddSkill">Add Skill</Button>
   </div>
 </div>
 
 @code {
-  [Parameter] public required SkillCategoryModel Model { get; set; }
-  // TODO: Replace these with a ModelChanged eventcallback and handle add/remove here?
-  [Parameter] public required EventCallback<BindableString> OnSkillAdded { get; set; }
-  [Parameter] public required EventCallback<int> OnSkillRemoved { get; set; }
+  [Parameter] public required SkillCategory Category { get; set; }
+  [Parameter] public required EventCallback<SkillCategory> CategoryChanged { get; set; }
+  private SkillCategoryModel Model { get; set; } = default!;
   private string NewSkill { get; set; } = "";
   private string newSkillId = Guid.NewGuid().ToString();
 
-  private async Task OnClick()
+  private async Task AddSkill()
   {
-    string newSkill = NewSkill;
+    Model.Items.Add(new BindableString { Value = NewSkill });
     NewSkill = "";
-    await OnSkillAdded.InvokeAsync(new BindableString { Value = newSkill });
+    await CategoryChanged.InvokeAsync(Model.Unwrap());
+  }
+
+  private async Task RemoveSkillAt(int index)
+  {
+    Model.Items.RemoveAt(index);
+    await CategoryChanged.InvokeAsync(Model.Unwrap());
+  }
+
+  private Task LabelChanged() => CategoryChanged.InvokeAsync(Model.Unwrap());
+
+  protected override void OnParametersSet()
+  {
+    Model = Category.Wrap();
   }
 }

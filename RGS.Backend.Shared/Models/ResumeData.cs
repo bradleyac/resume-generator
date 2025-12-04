@@ -2,7 +2,17 @@ using RGS.Backend.Shared.ViewModels;
 
 namespace RGS.Backend.Shared.Models;
 
-public record Job(string Title, string Company, string Location, string Start, string End, string[] Bullets)
+public interface IWrappable<TWrapped>
+{
+  TWrapped Wrap();
+}
+
+public interface IUnwrappable<TUnwrapped>
+{
+  TUnwrapped Unwrap();
+}
+
+public record Job(string Title, string Company, string Location, string Start, string End, string[] Bullets) : IWrappable<JobModel>
 {
   public JobModel Wrap() => new JobModel
   {
@@ -15,7 +25,7 @@ public record Job(string Title, string Company, string Location, string Start, s
   };
 };
 
-public record Project(string Name, string Description, string[] Technologies, string When)
+public record Project(string Name, string Description, string[] Technologies, string When) : IWrappable<ProjectModel>
 {
   public ProjectModel Wrap() => new ProjectModel
   {
@@ -26,7 +36,7 @@ public record Project(string Name, string Description, string[] Technologies, st
   };
 };
 
-public record Education(string Degree, string School, string Location, string Graduation)
+public record Education(string Degree, string School, string Location, string Graduation) : IWrappable<EducationModel>
 {
   public EducationModel Wrap() => new EducationModel
   {
@@ -37,7 +47,7 @@ public record Education(string Degree, string School, string Location, string Gr
   };
 };
 
-public record Contact(string Email, string Phone, string Github)
+public record Contact(string Email, string Phone, string Github) : IWrappable<ContactModel>
 {
   public ContactModel Wrap() => new ContactModel
   {
@@ -47,7 +57,7 @@ public record Contact(string Email, string Phone, string Github)
   };
 };
 
-public record SkillCategory(string Label, string[] Items)
+public record SkillCategory(string Label, string[] Items) : IWrappable<SkillCategoryModel>
 {
   public SkillCategoryModel Wrap() => new SkillCategoryModel
   {
@@ -56,7 +66,7 @@ public record SkillCategory(string Label, string[] Items)
   };
 };
 
-public record Book(string Title, string Author)
+public record Book(string Title, string Author) : IWrappable<BookModel>
 {
   public BookModel Wrap() => new BookModel
   {
@@ -82,11 +92,12 @@ public record ResumeData(string id,
                          SkillCategory[] Skills,
                          Book[] Bookshelf,
                          Rankings? GeneratedRankings = null,
-                         string? CoverLetter = null)
+                         string? CoverLetter = null) : IWrappable<ResumeDataModel>
 {
   public ResumeDataModel Wrap() => new ResumeDataModel
   {
     id = id,
+    UserId = UserId,
     IsMaster = IsMaster,
     Name = Name,
     Title = Title,
@@ -95,12 +106,11 @@ public record ResumeData(string id,
     City = City,
     State = State,
     Zip = Zip,
-    Contact = Contact.Wrap(),
-    Jobs = [.. Jobs.Select(j => j.Wrap())],
-    Projects = [.. Projects.Select(p => p.Wrap())],
-    Education = [.. Education.Select(e => e.Wrap())],
-    Skills = [.. Skills.Select(s => s.Wrap())],
-    Bookshelf = [.. Bookshelf.Select(b => b.Wrap())],
-    CoverLetter = CoverLetter
+    Contact = Contact,
+    Jobs = Jobs.ToList(),
+    Projects = Projects.ToList(),
+    Education = Education.ToList(),
+    Skills = Skills.ToList(),
+    Bookshelf = Bookshelf.ToList(),
   };
 }

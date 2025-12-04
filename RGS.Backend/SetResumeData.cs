@@ -24,19 +24,19 @@ internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosC
     {
         try
         {
-            // TODO: For master resume, use current user ID
             var currentUserId = _userService.GetCurrentUserId();
             if (currentUserId is null)
             {
                 return new UnauthorizedResult();
             }
-            var payload = await req.ReadFromJsonAsync<ResumeDataModel>() ?? throw new ArgumentException("Invalid payload");
+            var payload = await req.ReadFromJsonAsync<ResumeData>() ?? throw new ArgumentException("Invalid payload");
 
             if (!Validator.TryValidateObject(payload, new ValidationContext(payload), []))
             {
                 return new BadRequestResult();
             }
 
+            // "master" for each user is stored as their userid.
             var postingId = payload.id == "master" ? currentUserId : payload.id;
 
             var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
@@ -47,24 +47,7 @@ internal class SetResumeData(ILogger<SetResumeData> logger, CosmosClient cosmosC
                 return new NotFoundResult();
             }
 
-            var newData = existingData.Resource with
-            {
-                About = payload.About!,
-                City = payload.City!,
-                Name = payload.Name!,
-                State = payload.State!,
-                StreetAddress = payload.StreetAddress!,
-                Title = payload.Title!,
-                Zip = payload.Zip!,
-                Contact = payload.Contact!.ValidatedUnrawp(),
-                Bookshelf = [.. payload.Bookshelf.Select(b => b.ValidatedUnwrap())],
-                Education = [.. payload.Education.Select(e => e.ValidatedUnwrap())],
-                Jobs = [.. payload.Jobs.Select(j => j.ValidatedUnwrap())],
-                Projects = [.. payload.Projects.Select(p => p.ValidatedUnwrap())],
-                Skills = [.. payload.Skills.Select(s => s.ValidatedUnwrap())],
-            };
-
-            await resumeDataContainer.UpsertItemAsync(newData, new PartitionKey(newData.id));
+            await resumeDataContainer.UpsertItemAsync(payload, new PartitionKey(payload.id));
             return new OkResult();
         }
         catch (Exception e)

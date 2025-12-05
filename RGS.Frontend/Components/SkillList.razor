@@ -1,13 +1,17 @@
 ﻿@using BlazorBootstrap
+@using R3
 @using RGS.Backend.Shared.ViewModels
 @using System.Configuration
+@using RGS.Frontend.ViewModels
+
+@implements IDisposable
 
 <div class="d-flex flex-column gap-4">
-  <FormField @bind-Value="@(Model.Label)" @bind-Value:after="LabelChanged" class="col-6" Label=@("Skill Category") />
+  <FormField @bind-Value="@(ViewModel.Label.Value)" class="col-6" Label=@("Skill Category") />
   <div class="d-flex flex-wrap gap-3 ms-3">
-    @foreach (var (item, index) in @Model.Items.WithIndex())
+    @foreach (var (item, index) in @ViewModel.Items.Value.WithIndex())
     {
-      <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item.Value<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => RemoveSkillAt(index)">
+      <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => RemoveSkillAt(index)">
           <Icon Name="IconName.XLg" />
         </Badge>
       </Badge>
@@ -23,27 +27,36 @@
 @code {
   [Parameter] public required SkillCategory Category { get; set; }
   [Parameter] public required EventCallback<SkillCategory> CategoryChanged { get; set; }
-  private SkillCategoryModel Model { get; set; } = default!;
+  private SkillListViewModel ViewModel { get; set; } = default!;
   private string NewSkill { get; set; } = "";
   private string newSkillId = Guid.NewGuid().ToString();
+  private CompositeDisposable _subscription = new();
+  private bool _disposedValue;
 
   private async Task AddSkill()
   {
-    Model.Items.Add(new BindableString { Value = NewSkill });
+    ViewModel.Items.Value = [.. ViewModel.Items.Value, NewSkill];
     NewSkill = "";
-    await CategoryChanged.InvokeAsync(Model.Unwrap());
   }
 
   private async Task RemoveSkillAt(int index)
   {
-    Model.Items.RemoveAt(index);
-    await CategoryChanged.InvokeAsync(Model.Unwrap());
+    ViewModel.Items.Value = [.. ViewModel.Items.Value[..index], .. ViewModel.Items.Value[(index + 1)..]];
   }
 
-  private Task LabelChanged() => CategoryChanged.InvokeAsync(Model.Unwrap());
-
-  protected override void OnParametersSet()
+  protected override void OnInitialized()
   {
-    Model = Category.Wrap();
+    ViewModel = new(Category);
+    ViewModel.Category.DistinctUntilChanged().WhereNotNull().SubscribeAwait(async (cat, token) => await CategoryChanged.InvokeAsync(cat)).AddTo(_subscription);
+  }
+
+  public void Dispose()
+  {
+    if (!_disposedValue)
+    {
+      ViewModel?.Dispose();
+    }
+
+    _disposedValue = true;
   }
 }

@@ -1,0 +1,67 @@
+﻿@implements IDisposable
+@using Fluxor
+@using R3
+@using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Store.EditResumeDataFeature
+
+<EditForm EditContext="@EditContext" FormName="EditBook">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+  <div class="d-flex flex-column gap-4">
+    <FormField @bind-Value="@(Model.Title)" class="col-3" />
+    <FormField @bind-Value="@(Model.Author)" class="col-3" />
+  </div>
+</EditForm>
+
+@code {
+  private EditContext EditContext { get; set; } = null!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+  [Parameter] public required Book Book { get; set; }
+  [Parameter] public required int BookIndex { get; set; }
+  public BookModel Model { get; set; } = null!;
+  private CompositeDisposable? _subscription;
+  private bool _disposedValue;
+
+  protected override void OnInitialized()
+  {
+    base.OnInitialized();
+
+    Model = new()
+    {
+      Author = Book.Author,
+      Title = Book.Title,
+    };
+
+    _subscription = new CompositeDisposable();
+    EditContext = new EditContext(Model);
+    EditContext.Validate();
+    Observable.FromEventHandler<FieldChangedEventArgs>(
+    a => EditContext.OnFieldChanged += a,
+    a => EditContext.OnFieldChanged -= a
+    ).Select(args => args.sender as EditContext)
+    .WhereNotNull()
+    .Where(ec => ec.Validate())
+    .Select(ec => (BookModel)ec.Model)
+    .Subscribe(model =>
+    {
+      EditContext.MarkAsUnmodified();
+      Dispatcher.Dispatch(new UpdateBookAction(BookIndex, new Book(model.Title!, model.Author!)));
+    })
+    .AddTo(_subscription);
+  }
+
+  protected override void OnParametersSet()
+  {
+    EditContext.Validate();
+  }
+
+  public void Dispose()
+  {
+    if (!_disposedValue)
+    {
+      _subscription?.Dispose();
+    }
+
+    _disposedValue = true;
+  }
+}

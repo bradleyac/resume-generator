@@ -1,0 +1,102 @@
+﻿@implements IDisposable
+@using Fluxor
+@using R3
+@using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Store.EditResumeDataFeature
+
+<EditForm EditContext="@EditContext" FormName="EditJob">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+  <div class="d-flex flex-column gap-4">
+    <FormField @bind-Value="@(Model.Title)" class="col-3" />
+    <FormField @bind-Value="@(Model.Company)" class="col-3" />
+    <FormField @bind-Value="@(Model.Location)" class="col-3" />
+    <FormField @bind-Value="@(Model.Start)" class="col-3" />
+    <FormField @bind-Value="@(Model.End)" class="col-3" />
+    <div class="d-flex flex-wrap gap-3 ms-3">
+      @foreach (var (item, index) in @Model.Bullets.WithIndex())
+      {
+        <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="@(() => RemoveBulletAt(index))">
+            <Icon Name="IconName.XLg" />
+          </Badge>
+        </Badge>
+      }
+    </div>
+    <div class="d-flex gap-2 place-items-center">
+      <label for="@newEntryId" class="collapse">Add Technology</label>
+      <input id="@newEntryId" type="text" class="col-sm-6 col-md-4 col-lg-3" @bind-value="@NewBullet" @bind-value:event="oninput" />
+      <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewBullet is null or "")" @onclick="AddBullet">Add Technology</Button>
+    </div>
+  </div>
+</EditForm>
+
+@code {
+  private EditContext EditContext { get; set; } = null!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+  [Parameter] public required Job Job { get; set; }
+  [Parameter] public required int JobIndex { get; set; }
+  public JobModel Model { get; set; } = null!;
+  private string NewBullet { get; set; } = "";
+  private string newEntryId = Guid.NewGuid().ToString();
+  private CompositeDisposable? _subscription;
+  private bool _disposedValue;
+
+  private async Task AddBullet()
+  {
+    Dispatcher.Dispatch(new AddBulletAction { Bullet = NewBullet, JobIndex = JobIndex });
+    NewBullet = "";
+  }
+
+  private async Task RemoveBulletAt(int index)
+  {
+    Dispatcher.Dispatch(new RemoveBulletAction { BulletIndex = index, JobIndex = JobIndex });
+  }
+
+  protected override void OnInitialized()
+  {
+    base.OnInitialized();
+
+    Model = new()
+    {
+      Company = Job.Company,
+      Title = Job.Title,
+      Location = Job.Location,
+      Start = Job.Start,
+      End = Job.End,
+      Bullets = [.. Job.Bullets],
+    };
+
+    _subscription = new CompositeDisposable();
+    EditContext = new EditContext(Model);
+    EditContext.Validate();
+    Observable.FromEventHandler<FieldChangedEventArgs>(
+    a => EditContext.OnFieldChanged += a,
+    a => EditContext.OnFieldChanged -= a
+    ).Select(args => args.sender as EditContext)
+    .WhereNotNull()
+    .Where(ec => ec.Validate())
+    .Select(ec => (JobModel)ec.Model)
+    .Subscribe(model =>
+    {
+      EditContext.MarkAsUnmodified();
+      Dispatcher.Dispatch(new UpdateJobAction(JobIndex, new Job(model.Title!, model.Company!, model.Location!, model.Start!, model.End!, [.. model.Bullets])));
+    })
+    .AddTo(_subscription);
+  }
+
+  protected override void OnParametersSet()
+  {
+    Model.Bullets = Job.Bullets.ToList();
+    EditContext.Validate();
+  }
+
+  public void Dispose()
+  {
+    if (!_disposedValue)
+    {
+      _subscription?.Dispose();
+    }
+
+    _disposedValue = true;
+  }
+}

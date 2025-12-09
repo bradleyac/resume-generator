@@ -1,60 +1,78 @@
 ﻿@page "/MasterResumeData"
+@inherits FluxorComponent;
 @using Blazilla
+@using Fluxor.Blazor.Web.Components
 @using RGS.Backend.Shared.ViewModels
 @using RGS.Frontend.Components
 @using System.Runtime.CompilerServices
 @using System.Linq.Expressions
+@using RGS.Frontend.Store.EditResumeDataFeature
 
 <PageTitle>Master Resume Data</PageTitle>
 
-@if (resumeData is null)
+@if (State.Value?.ResumeData is null)
 {
   <p class="m-3">Loading master resume data...</p>
 }
 else
 {
-  <div class="m-3">
-    <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit">
+  <div class="m-3 position-relative d-flex flex-column col-12 col-lg-6">
+    <div class="save-state-indicator">
+      <SaveStateIndicator />
+    </div>
+    @* <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit">
       <FluentValidator />
-      <ValidationSummary />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Name)" />
+      <ValidationSummary /> *@
+    @* <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Name)" />
       <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Title)" />
       <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.About)" />
       <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.StreetAddress)" Label="Street Address" />
       <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.City)" />
       <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.State)" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Zip)" />
-      <div class="d-flex flex-column mt-4 gap-4">
-        <Collapsible Label="Skills">
-          <div class="my-4 d-flex flex-column gap-4 border p-3 col-12 col-lg-6">
-            @foreach (var (category, catIndex) in resumeData.Skills.WithIndex())
-            {
-              <div class="d-flex flex-column border p-3 position-relative">
-                <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => OnSkillCategoryRemoved(catIndex)">
-                  <Icon Name="IconName.XLg" />
-                </Badge>
-                <SkillList @key="catIndex" @bind-Category:get="category" @bind-Category:set="cat => OnSkillCategoryChanged(cat, catIndex)" />
-              </div>
-            }
-            <div class="d-flex gap-2 place-items-center">
-              <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
-              <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => OnSkillCategoryAdded(@NewCategory!))">Add Skill Category</Button>
+      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Zip)" /> *@
+    <div class="d-flex flex-column mt-4 gap-4 pe-4">
+      <Collapsible Label="Bio">
+        <div class="my-4 d-flex flex-column gap-4 border p-3">
+          <BioEditor Bio="State.Value.ResumeData.Bio" />
+        </div>
+      </Collapsible>
+      <Collapsible Label="Skills">
+        <div class="my-4 d-flex flex-column gap-4 border p-3">
+          @foreach (var (category, catIndex) in State.Value.ResumeData.Skills.WithIndex())
+          {
+            <div class="d-flex flex-column border p-3 position-relative">
+              <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => Dispatcher.Dispatch(new RemoveSkillCategoryAction(catIndex))">
+                <Icon Name="IconName.XLg" />
+              </Badge>
+              <SkillList @key="catIndex" Category="category" SkillCategoryIndex="catIndex" />
             </div>
+          }
+          <div class="d-flex gap-2 place-items-center">
+            <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
+            <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => Dispatcher.Dispatch(new AddSkillCategoryAction(@NewCategory!)))">Add Skill Category</Button>
           </div>
-        </Collapsible>
-        <Collapsible Label="Projects">
-          <p>Projects</p>
-        </Collapsible>
-        <Collapsible Label="Jobs">
-          <p>Jobs</p>
-        </Collapsible>
-        <Collapsible Label="Education">
-          <p>Education</p>
-        </Collapsible>
-        <Collapsible Label="Books">
-          <p>Books</p>
-        </Collapsible>
-      </div>
-    </EditForm>
+        </div>
+      </Collapsible>
+      <Collapsible Label="Projects">
+        <div class="my-4 d-flex flex-column gap-4 border p-3">
+          <ProjectList Projects="State.Value.ResumeData.Projects" />
+        </div>
+      </Collapsible>
+      <Collapsible Label="Jobs">
+        <div class="my-4 d-flex flex-column gap-4 border p-3">
+          <JobList Jobs="State.Value.ResumeData.Jobs" />
+        </div>
+      </Collapsible>
+      <Collapsible Label="Education">
+        <div class="my-4 d-flex flex-column gap-4 border p-3">
+          <EducationList Educations="State.Value.ResumeData.Education" />
+        </div>
+      </Collapsible>
+      <Collapsible Label="Books">
+        <div class="my-4 d-flex flex-column gap-4 border p-3">
+          <BookList Books="State.Value.ResumeData.Bookshelf" />
+        </div>
+      </Collapsible>
+    </div>
   </div>
 }

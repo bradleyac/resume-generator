@@ -15,11 +15,17 @@
   ~~Forbid actions on another user's resources~~
   Each user gets an API key and can view it
 * Master resume data management interface
-  Allow CRUD operations on:
-    bullets
-    books
-    projects
-    skills
+  ~~Allow CRUD operations on:~~
+    ~~bullets~~
+    ~~books~~
+    ~~projects~~
+    ~~skills~~
+  Polish more
+    Field widths need another look
+    Resume bullets are a little different than skills or technologies because they are sentences. Are badges right for them?
+    Padding
+    Titles and alignment
+    Better experience creating new items with more than one field (jobs, projects, books)
 * Make ingestion script work on sites other than Indeed
   ~~LinkedIn~~
   Dice

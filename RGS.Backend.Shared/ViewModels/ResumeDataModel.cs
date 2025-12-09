@@ -5,7 +5,7 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend.Shared.ViewModels;
 
-public class JobModel : IUnwrappable<Job>
+public class JobModel
 {
   [Required]
   public string? Title { get; set; }
@@ -18,33 +18,22 @@ public class JobModel : IUnwrappable<Job>
   [Required]
   public string? End { get; set; }
   [Required]
-  public List<BindableString> Bullets { get; set; } = [];
-
-  public Job Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new Job(Title!, Company!, Location!, Start!, End!, [.. Bullets.Select(b => b.Value!)]);
-  }
+  public List<string> Bullets { get; set; } = [];
 }
 
-public class ProjectModel : IUnwrappable<Project>
+public class ProjectModel
 {
   [Required]
   public string? Name { get; set; }
   [Required]
   public string? Description { get; set; }
   [Required]
-  public List<BindableString> Technologies { get; set; } = [];
+  public List<string> Technologies { get; set; } = [];
   [Required]
   public string? When { get; set; }
-  public Project Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new Project(Name!, Description!, [.. Technologies.Select(t => t.Value!)], When!);
-  }
 }
 
-public class EducationModel : IUnwrappable<Education>
+public class EducationModel
 {
   [Required]
   public string? Degree { get; set; }
@@ -54,14 +43,9 @@ public class EducationModel : IUnwrappable<Education>
   public string? Location { get; set; }
   [Required]
   public string? Graduation { get; set; }
-  public Education Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new Education(Degree!, School!, Location!, Graduation!);
-  }
 }
 
-public class ContactModel : IUnwrappable<Contact>
+public class ContactModel
 {
   [Required]
   public string? Email { get; set; }
@@ -69,47 +53,26 @@ public class ContactModel : IUnwrappable<Contact>
   public string? Phone { get; set; }
   [Required]
   public string? Github { get; set; }
-  public Contact Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new Contact(Email!, Phone!, Github!);
-  }
 }
 
-public class SkillCategoryModel : IUnwrappable<SkillCategory>
+public class SkillCategoryModel
 {
   [Required]
   public string? Label { get; set; }
   [Required]
-  public List<BindableString> Items { get; set; } = [];
-  public SkillCategory Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new SkillCategory(Label!, [.. Items.Select(i => i.Value!)]);
-  }
+  public List<string> Items { get; set; } = [];
 }
 
-public class BookModel : IUnwrappable<Book>
+public class BookModel
 {
   [Required]
   public string? Title { get; set; }
   [Required]
   public string? Author { get; set; }
-  public Book Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new Book(Title!, Author!);
-  }
 }
 
-public class ResumeDataModel : IUnwrappable<ResumeData>
+public class BioModel
 {
-  [Required]
-  public string? id { get; set; }
-  [Required]
-  public string? UserId { get; set; }
-  [Required]
-  public bool IsMaster { get; set; }
   [Required]
   public string? Name { get; set; }
   [Required]
@@ -124,39 +87,4 @@ public class ResumeDataModel : IUnwrappable<ResumeData>
   public string? State { get; set; }
   [Required]
   public string? Zip { get; set; }
-  [Required]
-  public Contact? Contact { get; set; }
-  [Required]
-  public List<Job> Jobs { get; set; } = [];
-  [Required]
-  public List<Project> Projects { get; set; } = [];
-  [Required]
-  public List<Education> Education { get; set; } = [];
-  [Required]
-  public List<SkillCategory> Skills { get; set; } = [];
-  [Required]
-  public List<Book> Bookshelf { get; set; } = [];
-  public ResumeData Unwrap()
-  {
-    Validator.ValidateObject(this, new ValidationContext(this));
-    return new ResumeData
-    (
-      id!,
-      UserId!,
-      IsMaster,
-      Name!,
-      Title!,
-      About!,
-      StreetAddress!,
-      City!,
-      State!,
-      Zip!,
-      Contact!,
-      Jobs.ToArray(),
-      Projects.ToArray(),
-      Education.ToArray(),
-      Skills.ToArray(),
-      Bookshelf.ToArray()
-    );
-  }
 }

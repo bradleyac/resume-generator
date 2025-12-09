@@ -1,0 +1,75 @@
+﻿@using Fluxor
+@using Fluxor.Blazor.Web.Components
+@using R3
+@using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Store.EditResumeDataFeature
+@inherits FluxorComponent;
+
+<EditForm EditContext="@EditContext" FormName="EditBiography">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+  <div class="d-flex flex-column gap-4">
+    <FormField @bind-Value="@(Model.Name)" class="col-6" />
+    <FormField @bind-Value="@(Model.Title)" class="col-6" />
+    <FormField @bind-Value="@(Model.About)" class="col-6" />
+    <FormField @bind-Value="@(Model.StreetAddress)" class="col-6" Label=@("Street Address") />
+    <FormField @bind-Value="@(Model.City)" class="col-6" />
+    <FormField @bind-Value="@(Model.State)" class="col-6" />
+    <FormField @bind-Value="@(Model.Zip)" class="col-6" />
+  </div>
+</EditForm>
+
+
+@code {
+  [Parameter] public required Bio Bio { get; set; }
+
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+
+  private EditContext EditContext { get; set; } = null!;
+  private BioModel Model { get; set; } = null!;
+  private CompositeDisposable? _subscription = null!;
+  private bool _disposedValue;
+
+  protected override void OnInitialized()
+  {
+    base.OnInitialized();
+
+    Model = new()
+    {
+      Name = Bio.Name,
+      Title = Bio.Title,
+      About = Bio.About,
+      City = Bio.City,
+      State = Bio.State,
+      StreetAddress = Bio.StreetAddress,
+      Zip = Bio.Zip
+    };
+    _subscription = new CompositeDisposable();
+    EditContext = new EditContext(Model);
+    Observable.FromEventHandler<FieldChangedEventArgs>(
+    a => EditContext.OnFieldChanged += a,
+    a => EditContext.OnFieldChanged -= a
+    ).Select(args => args.sender as EditContext)
+    .WhereNotNull()
+    .Where(ec => ec.Validate())
+    .Select(ec => (BioModel)ec.Model)
+    .Subscribe(model =>
+    {
+      EditContext.MarkAsUnmodified();
+      Dispatcher.Dispatch(new UpdateBioAction(new Bio(model.Name!, model.Title!, model.About!, model.StreetAddress!, model.City!, model.State!, model.Zip!)));
+    })
+    .AddTo(_subscription); ;
+  }
+
+  protected override async ValueTask DisposeAsyncCore(bool disposing)
+  {
+    await base.DisposeAsyncCore(disposing);
+
+    if (!_disposedValue)
+    {
+      _subscription?.Dispose();
+    }
+
+    _disposedValue = true;
+  }
+}

@@ -55,13 +55,13 @@ private RenderFragment JobComponent(Job job) => @<section>
 </section>;
 
 private RenderFragment ResumeHeaderSection(ResumeData resumeData) => @<header class="header">
-  <h1>@resumeData.Name</h1>
-  <h2>@resumeData.Title</h2>
-  <p>@resumeData.About</p>
+  <h1>@resumeData.Bio.Name</h1>
+  <h2>@resumeData.Bio.Title</h2>
+  <p>@resumeData.Bio.About</p>
 </header>;
 
 private RenderFragment ContactSection(ResumeData resumeData) => @<section class="contact">
-  <p class="address">@resumeData.City, @resumeData.State</p>
+  <p class="address">@resumeData.Bio.City, @resumeData.Bio.State</p>
   <p class="gmail">@resumeData.Contact?.Email</p>
   <p class="phone">@resumeData.Contact?.Phone</p>
   <p class="github">@resumeData.Contact?.Github</p>

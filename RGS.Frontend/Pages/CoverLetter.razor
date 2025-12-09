@@ -34,8 +34,8 @@ else
 
   private RenderFragment HeaderSection(ResumeData resumeData) => @<header class="header">
       <div class="name-title">
-        <h1>@resumeData.Name</h1>
-        <h2>@resumeData.Title</h2>
+        <h1>@resumeData.Bio.Name</h1>
+        <h2>@resumeData.Bio.Title</h2>
       </div>
       <div class="contact">
         @ContactSection(resumeData)
@@ -44,8 +44,8 @@ else
   </header>;
 
 private RenderFragment ContactSection(ResumeData resumeData) => @<section>
-  <p>@resumeData.StreetAddress</p>
-  <p>@resumeData.City!, @resumeData.State @resumeData.Zip</p>
+  <p>@resumeData.Bio.StreetAddress</p>
+  <p>@resumeData.Bio.City!, @resumeData.Bio.State @resumeData.Bio.Zip</p>
   <p>@resumeData.Contact?.Phone</p>
   <p>@resumeData.Contact?.Email</p>
 </section>;
@@ -72,6 +72,6 @@ private RenderFragment CoverLetterText(ResumeData resumeData) => @<section class
 
 private RenderFragment SignatureSection(ResumeData resumeData) => @<section class="signature">
   <p>Sincerely,</p>
-  <p>@resumeData.Name</p>
+  <p>@resumeData.Bio.Name</p>
 </section>;
 }

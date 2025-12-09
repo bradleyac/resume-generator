@@ -6,8 +6,8 @@
 </div>
 
 @code {
-  [Parameter] public Expression<Func<string?>> ValueExpression { get; set; } = default!;
-  [Parameter] public string? Value { get; set; } = default!;
+  [Parameter] public Expression<Func<string?>> ValueExpression { get; set; } = null!;
+  [Parameter] public string? Value { get; set; } = null!;
   [Parameter] public EventCallback<string?> ValueChanged { get; set; }
   [Parameter] public string? Label { get; set; }
   [Parameter(CaptureUnmatchedValues = true)]

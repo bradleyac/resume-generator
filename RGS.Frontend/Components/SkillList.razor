@@ -1,60 +1,93 @@
 ﻿@using BlazorBootstrap
+@using Fluxor
 @using R3
 @using RGS.Backend.Shared.ViewModels
 @using System.Configuration
+@using RGS.Frontend.Store.EditResumeDataFeature
 @using RGS.Frontend.ViewModels
 
 @implements IDisposable
 
-<div class="d-flex flex-column gap-4">
-  <FormField @bind-Value="@(ViewModel.Label.Value)" class="col-6" Label=@("Skill Category") />
-  <div class="d-flex flex-wrap gap-3 ms-3">
-    @foreach (var (item, index) in @ViewModel.Items.Value.WithIndex())
-    {
-      <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => RemoveSkillAt(index)">
-          <Icon Name="IconName.XLg" />
+<EditForm EditContext="@EditContext" FormName="EditSkillCategory">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+  <div class="d-flex flex-column gap-4">
+    <FormField @bind-Value="@(Model.Label)" class="col-6" Label=@("Skill Category") />
+    <div class="d-flex flex-wrap gap-3 ms-3">
+      @foreach (var (item, index) in @Model.Items.WithIndex())
+      {
+        <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => RemoveSkillAt(index)">
+            <Icon Name="IconName.XLg" />
+          </Badge>
         </Badge>
-      </Badge>
-    }
+      }
+    </div>
+    <div class="d-flex gap-2 place-items-center">
+      <label for="@newSkillId" class="collapse">Add Skill</label>
+      <input id="@newSkillId" type="text" class="col-6" @bind-value="@NewSkill" @bind-value:event="oninput" />
+      <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewSkill is null or "")" @onclick="@AddSkill">Add Skill</Button>
+    </div>
   </div>
-  <div class="d-flex gap-2 place-items-center">
-    <label for="@newSkillId" class="collapse">Add Skill</label>
-    <input id="@newSkillId" type="text" class="col-6" @bind-value="@NewSkill" @bind-value:event="oninput" />
-    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewSkill is null or "")" @onclick="@AddSkill">Add Skill</Button>
-  </div>
-</div>
+</EditForm>
 
 @code {
+  private EditContext EditContext { get; set; } = null!;
+  [Parameter] public required int SkillCategoryIndex { get; set; }
   [Parameter] public required SkillCategory Category { get; set; }
-  [Parameter] public required EventCallback<SkillCategory> CategoryChanged { get; set; }
-  private SkillListViewModel ViewModel { get; set; } = default!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+  private SkillCategoryModel Model { get; set; } = null!;
   private string NewSkill { get; set; } = "";
   private string newSkillId = Guid.NewGuid().ToString();
-  private CompositeDisposable _subscription = new();
+  private CompositeDisposable? _subscription;
   private bool _disposedValue;
 
   private async Task AddSkill()
   {
-    ViewModel.Items.Value = [.. ViewModel.Items.Value, NewSkill];
+    Dispatcher.Dispatch(new AddSkillAction { Skill = NewSkill, SkillCategoryIndex = SkillCategoryIndex });
     NewSkill = "";
   }
 
   private async Task RemoveSkillAt(int index)
   {
-    ViewModel.Items.Value = [.. ViewModel.Items.Value[..index], .. ViewModel.Items.Value[(index + 1)..]];
+    Dispatcher.Dispatch(new RemoveSkillAction { SkillIndex = index, SkillCategoryIndex = SkillCategoryIndex });
   }
 
   protected override void OnInitialized()
   {
-    ViewModel = new(Category);
-    ViewModel.Category.DistinctUntilChanged().WhereNotNull().SubscribeAwait(async (cat, token) => await CategoryChanged.InvokeAsync(cat)).AddTo(_subscription);
+    base.OnInitialized();
+
+    Model = new()
+    {
+      Items = [.. Category.Items],
+      Label = Category.Label
+    };
+    _subscription = new CompositeDisposable();
+    EditContext = new EditContext(Model);
+    Observable.FromEventHandler<FieldChangedEventArgs>(
+    a => EditContext.OnFieldChanged += a,
+    a => EditContext.OnFieldChanged -= a
+    ).Select(args => args.sender as EditContext)
+    .WhereNotNull()
+    .Where(ec => ec.Validate())
+    .Select(ec => (SkillCategoryModel)ec.Model)
+    .Subscribe(model =>
+    {
+      EditContext.MarkAsUnmodified();
+      Dispatcher.Dispatch(new UpdateSkillCategoryAction(SkillCategoryIndex, new SkillCategory(model.Label!, model.Items.ToArray())));
+    })
+    .AddTo(_subscription);
+  }
+
+  protected override void OnParametersSet()
+  {
+    Model.Items = [.. Category.Items];
   }
 
   public void Dispose()
   {
     if (!_disposedValue)
     {
-      ViewModel?.Dispose();
+      _subscription?.Dispose();
     }
 
     _disposedValue = true;

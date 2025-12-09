@@ -1,0 +1,29 @@
+﻿@using Fluxor
+@using Fluxor.Blazor.Web.Components
+@using RGS.Frontend.Store
+@using RGS.Frontend.Store.EditResumeDataFeature
+@inherits FluxorComponent
+
+<div class="save-indicator @ClassName">
+  @if (State.Value.SaveState.SaveStatus == SaveStatus.Dirty)
+  {
+    <Icon Name="IconName.Asterisk" />
+  }
+  else if (State.Value.SaveState.SaveStatus == SaveStatus.Clean)
+  {
+    <Icon Name="IconName.CheckLg" />
+  }
+  else
+  {
+    <Icon Name="IconName.XLg" />
+    <p class="text-danger">@State.Value.SaveState.Message</p>
+  }
+</div>
+
+@code {
+  [Inject] private IState<EditResumeDataState> State { get; set; } = null!;
+  private string ClassName => State.Value.SaveState.SaveStatus switch
+  {
+    _ => "bg-body",
+  };
+}

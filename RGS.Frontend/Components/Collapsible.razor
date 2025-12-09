@@ -15,10 +15,10 @@
   @ChildContent
 </Collapse>
 @code {
-  private Collapse collapse = default!;
+  private Collapse collapse = null!;
   public bool IsCollapsed { get; set; } = true;
   [Parameter]
-  public required RenderFragment ChildContent { get; set; } = default!;
+  public required RenderFragment ChildContent { get; set; } = null!;
   [Parameter]
   public required string Label { get; set; } = "";
 }

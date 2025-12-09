@@ -16,4 +16,7 @@ public static class Extensions
   }
 
   public static IEnumerable<(T, int)> WithIndex<T>(this IEnumerable<T> @this) => @this.Select((e, i) => (e, i));
+
+  public static IEnumerable<T> ReplaceAt<T>(this IEnumerable<T> @this, int index, Func<T, T> transform) => @this.Select((e, i) => i == index ? transform(e) : e);
+  public static IEnumerable<T> RemoveAt<T>(this IEnumerable<T> @this, int index) => @this.Where((e, i) => i != index);
 }

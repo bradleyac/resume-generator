@@ -1,93 +1,54 @@
-using System.ComponentModel.DataAnnotations;
-using System.Runtime.CompilerServices;
-using Blazilla;
-using BlazorBootstrap;
+using System.ComponentModel;
+using Fluxor;
+using Fluxor.Blazor.Web.Components;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Forms;
 using R3;
 using RGS.Backend.Shared.Models;
-using RGS.Backend.Shared.ViewModels;
-using RGS.Frontend.Components;
+using RGS.Frontend.Store;
+using RGS.Frontend.Store.EditResumeDataFeature;
 
 namespace RGS.Frontend.Pages;
 
-public partial class MasterResumeData : ComponentBase, IDisposable
+public partial class MasterResumeData : FluxorComponent, IDisposable
 {
-  private EditContext? editContext;
-  private ResumeDataModel resumeData = null!;
+  private CompositeDisposable _subscription = new();
   private bool _disposedValue;
-  private IDisposable? _subscription;
-  private IDisposable? _otherSubscription;
 
-  [Inject] private IResumeDataService ResumeDataService { get; set; } = null!;
+  [Inject] private IState<EditResumeDataState> State { get; set; } = null!;
   [Inject] private ILogger<MasterResumeData> Logger { get; set; } = null!;
-  [Inject] private IServiceProvider _serviceProvider { get; set; } = null!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
 
   private string NewCategory { get; set; } = "";
 
   protected override async Task OnInitializedAsync()
   {
+    await base.OnInitializedAsync();
+
     // Load master resume data
-    resumeData = (await ResumeDataService.GetMasterResumeDataAsync()).Wrap();
-    editContext = new(resumeData);
-    _otherSubscription?.Dispose();
-    _otherSubscription = editContext.EnableDataAnnotationsValidation(_serviceProvider);
-  }
+    Dispatcher.Dispatch(new FetchResumeDataAction());
 
-  protected override async Task OnAfterRenderAsync(bool firstRender)
-  {
-    if (_subscription is null && editContext is not null)
-    {
-      _subscription = Observable.FromEventHandler<FieldChangedEventArgs>(
-        a => editContext!.OnFieldChanged += a,
-        a => editContext!.OnFieldChanged -= a)
-        .Select(sa => sa.sender as EditContext)
-        .Where(ec => ec?.Validate() ?? false)
+    var edits = Observable.FromEventHandler(
+      a => State.StateChanged += a,
+      a => State.StateChanged -= a)
+      .Select(e => e.sender as IState<EditResumeDataState>);
+    var retries = Observable.Interval(TimeSpan.FromMilliseconds(5000))
+      .Select<Unit, IState<EditResumeDataState>?>(_ => State);
+
+    // Submit edits and retries as necessary.
+    // TODO: Give up on retries eventually?
+    Observable.Merge(edits, retries)
+        .WhereNotNull()
+        .Where(state => state.Value.ResumeData is not null && state.Value.SaveState.SaveStatus is SaveStatus.Dirty or SaveStatus.Faulted)
         .Debounce(TimeSpan.FromMilliseconds(500))
-        .SubscribeAwait(async (ec, ct) =>
-        {
-          await HandleSubmit(ec!);
-          ec!.MarkAsUnmodified();
-          StateHasChanged();
-        }, AwaitOperation.ThrottleFirstLast);
-    }
+        .Subscribe(state => HandleSubmit(state.Value.ResumeData!))
+        .AddTo(_subscription);
   }
 
-  private async Task OnSkillCategoryChanged(SkillCategory changed, int index)
+  private void HandleSubmit(ResumeData resumeData)
   {
-    resumeData.Skills = [.. resumeData.Skills.Select((skill, i) => i == index ? changed : skill)];
-    editContext!.NotifyFieldChanged(FieldIdentifier.Create(() => resumeData.Skills));
-  }
-
-  private async Task OnSkillCategoryAdded(string category)
-  {
-    NewCategory = "";
-    resumeData.Skills.Add(new SkillCategory(category, []));
-    editContext!.NotifyFieldChanged(FieldIdentifier.Create(() => resumeData.Skills));
-  }
-
-  private async Task OnSkillCategoryRemoved(int index)
-  {
-    resumeData.Skills.RemoveAt(index);
-    editContext!.NotifyFieldChanged(FieldIdentifier.Create(() => resumeData.Skills));
-  }
-
-  private async Task HandleValidSubmit(EditContext args)
-  {
-    ResumeData data = (ResumeData)args.Model;
-    await ResumeDataService.SetMasterResumeDataAsync(data);
-  }
-
-  private async Task HandleSubmit(EditContext args)
-  {
-    ResumeDataModel data = (ResumeDataModel)args.Model;
-    if (args.Validate())
+    if (resumeData is not null)
     {
-      await ResumeDataService.SetMasterResumeDataAsync(data.Unwrap());
-    }
-    else
-    {
-      Logger.LogInformation("Invalid submit");
+      Dispatcher.Dispatch(new UpdateResumeDataAction(resumeData));
     }
   }
 

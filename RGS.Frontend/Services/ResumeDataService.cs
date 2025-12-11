@@ -21,10 +21,6 @@ internal class ResumeDataService(HttpClient httpClient, ILogger<PostingsService>
 
   public async Task SetMasterResumeDataAsync(ResumeData resumeData)
   {
-    if (Random.Shared.NextDouble() > .5)
-    {
-      throw new Exception("Failed to save Resume Data");
-    }
     await _httpClient.PostAsync("/api/SetResumeData", JsonContent.Create(resumeData));
   }
 }

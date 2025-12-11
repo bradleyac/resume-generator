@@ -8,8 +8,8 @@
   <DataAnnotationsValidator />
   <ValidationSummary />
   <div class="d-flex flex-column gap-4">
-    <FormField @bind-Value="@(Model.Title)" class="col-3" />
-    <FormField @bind-Value="@(Model.Author)" class="col-3" />
+    <FormField @bind-Value="@(Model.Title)" class="col-6" />
+    <FormField @bind-Value="@(Model.Author)" class="col-6" />
   </div>
 </EditForm>
 
@@ -24,6 +24,7 @@
 
   protected override void OnInitialized()
   {
+    // TODO: Sub to state instead of taking a prop. Maybe take prop for ID? But then we need IDs.
     base.OnInitialized();
 
     Model = new()

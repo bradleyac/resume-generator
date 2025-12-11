@@ -39,6 +39,8 @@
     Integration tests for change feed processing
     Unit tests
     Start doing TDD?
+* Additional statuses after applied for jobs I've heard back about?
+    Add place for notes?
 
 # TODOs
 * Figure out how to do IaC for CosmosDB settings changes/container creation. I should not be remembering what I did in DEV and applying it to PROD.

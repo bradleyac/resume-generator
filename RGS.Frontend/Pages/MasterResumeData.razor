@@ -16,63 +16,68 @@
 }
 else
 {
-  <div class="m-3 position-relative d-flex flex-column col-12 col-lg-6">
+  <div class="m-3 position-relative d-flex flex-column">
     <div class="save-state-indicator">
       <SaveStateIndicator />
     </div>
-    @* <EditForm EditContext="editContext" OnValidSubmit="HandleValidSubmit">
-      <FluentValidator />
-      <ValidationSummary /> *@
-    @* <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Name)" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Title)" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.About)" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.StreetAddress)" Label="Street Address" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.City)" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.State)" />
-      <FormField class="col-12 col-md-8 col-lg-6" @bind-Value="@(resumeData.Zip)" /> *@
     <div class="d-flex flex-column mt-4 gap-4 pe-4">
-      <Collapsible Label="Bio">
-        <div class="my-4 d-flex flex-column gap-4 border p-3">
-          <BioEditor Bio="State.Value.ResumeData.Bio" />
-        </div>
-      </Collapsible>
-      <Collapsible Label="Skills">
-        <div class="my-4 d-flex flex-column gap-4 border p-3">
-          @foreach (var (category, catIndex) in State.Value.ResumeData.Skills.WithIndex())
-          {
-            <div class="d-flex flex-column border p-3 position-relative">
-              <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => Dispatcher.Dispatch(new RemoveSkillCategoryAction(catIndex))">
-                <Icon Name="IconName.XLg" />
-              </Badge>
-              <SkillList @key="catIndex" Category="category" SkillCategoryIndex="catIndex" />
+      <Accordion AlwaysOpen="true">
+        <AccordionItem Title="Bio">
+          <Content>
+            <div class="d-flex flex-column gap-4">
+              <BioEditor Bio="State.Value.ResumeData.Bio" />
             </div>
-          }
-          <div class="d-flex gap-2 place-items-center">
-            <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
-            <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => Dispatcher.Dispatch(new AddSkillCategoryAction(@NewCategory!)))">Add Skill Category</Button>
-          </div>
-        </div>
-      </Collapsible>
-      <Collapsible Label="Projects">
-        <div class="my-4 d-flex flex-column gap-4 border p-3">
-          <ProjectList Projects="State.Value.ResumeData.Projects" />
-        </div>
-      </Collapsible>
-      <Collapsible Label="Jobs">
-        <div class="my-4 d-flex flex-column gap-4 border p-3">
-          <JobList Jobs="State.Value.ResumeData.Jobs" />
-        </div>
-      </Collapsible>
-      <Collapsible Label="Education">
-        <div class="my-4 d-flex flex-column gap-4 border p-3">
-          <EducationList Educations="State.Value.ResumeData.Education" />
-        </div>
-      </Collapsible>
-      <Collapsible Label="Books">
-        <div class="my-4 d-flex flex-column gap-4 border p-3">
-          <BookList Books="State.Value.ResumeData.Bookshelf" />
-        </div>
-      </Collapsible>
+          </Content>
+        </AccordionItem>
+        <AccordionItem Title="Skills">
+          <Content>
+            <div class="d-flex flex-column gap-4 my-3">
+              @foreach (var (category, catIndex) in State.Value.ResumeData.Skills.WithIndex())
+              {
+                <div class="d-flex flex-column border p-3 position-relative">
+                  <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => Dispatcher.Dispatch(new RemoveSkillCategoryAction(catIndex))">
+                    <Icon Name="IconName.XLg" />
+                  </Badge>
+                  <SkillList @key="catIndex" Category="category" SkillCategoryIndex="catIndex" />
+                </div>
+              }
+              <div class="d-flex gap-2 place-items-center">
+                <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
+                <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => Dispatcher.Dispatch(new AddSkillCategoryAction(@NewCategory!)))">Add Skill Category</Button>
+              </div>
+
+            </div>
+          </Content>
+        </AccordionItem>
+        <AccordionItem Title="Projects">
+          <Content>
+            <div class="d-flex flex-column gap-4">
+              <ProjectList Projects="State.Value.ResumeData.Projects" />
+            </div>
+          </Content>
+        </AccordionItem>
+        <AccordionItem Title="Jobs">
+          <Content>
+            <div class="d-flex flex-column gap-4">
+              <JobList Jobs="State.Value.ResumeData.Jobs" />
+            </div>
+          </Content>
+        </AccordionItem>
+        <AccordionItem Title="Education">
+          <Content>
+            <div class="d-flex flex-column gap-4">
+              <EducationList Educations="State.Value.ResumeData.Education" />
+            </div>
+          </Content>
+        </AccordionItem>
+        <AccordionItem Title="Books">
+          <Content>
+            <div class="d-flex flex-column gap-4">
+              <BookList Books="State.Value.ResumeData.Bookshelf" />
+            </div>
+          </Content>
+        </AccordionItem>
+      </Accordion>
     </div>
   </div>
 }

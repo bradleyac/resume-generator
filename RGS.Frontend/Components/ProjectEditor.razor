@@ -8,9 +8,9 @@
   <DataAnnotationsValidator />
   <ValidationSummary />
   <div class="d-flex flex-column gap-4">
-    <FormField @bind-Value="@(Model.Name)" class="col-3" Label=@($"Project Name") />
-    <FormField @bind-Value="@(Model.Description)" class="col-3" />
-    <FormField @bind-Value="@(Model.When)" class="col-3" />
+    <FormField @bind-Value="@(Model.Name)" class="col-6" Label=@($"Project Name") />
+    <FormField @bind-Value="@(Model.Description)" class="col-6" />
+    <FormField @bind-Value="@(Model.When)" class="col-6" />
     <div class="d-flex flex-wrap gap-3 ms-3">
       @foreach (var (item, index) in @Model.Technologies.WithIndex())
       {

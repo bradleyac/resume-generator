@@ -10,7 +10,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "RGS_Api__BaseAddress": "http://localhost:7071"
-      }
+      },
+      "type": "safari"
     },
     "https": {
       "commandName": "Project",
@@ -21,7 +22,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
         "RGS_Api__BaseAddress": "http://localhost:7071"
-      }
+      },
+      "type": "safari"
     }
   }
 }

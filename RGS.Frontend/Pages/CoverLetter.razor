@@ -45,7 +45,7 @@ else
 
 private RenderFragment ContactSection(ResumeData resumeData) => @<section>
   <p>@resumeData.Bio.StreetAddress</p>
-  <p>@resumeData.Bio.City!, @resumeData.Bio.State @resumeData.Bio.Zip</p>
+  <p>@resumeData.Bio.City, @resumeData.Bio.State @resumeData.Bio.Zip</p>
   <p>@resumeData.Contact?.Phone</p>
   <p>@resumeData.Contact?.Email</p>
 </section>;

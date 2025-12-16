@@ -11,47 +11,24 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-internal class GetResumeData(ILogger<GetResumeData> logger, CosmosClient cosmosClient, IUserService userService)
+internal class GetResumeData(ILogger<GetResumeData> logger, IUserDataRepository userDataRepository)
 {
   private readonly ILogger<GetResumeData> _logger = logger;
-  private readonly CosmosClient _cosmosClient = cosmosClient;
-  private readonly IUserService _userService = userService;
+  private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
   [Function("GetResumeData")]
   public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
   {
     try
     {
-      var currentUserId = _userService.GetCurrentUserId();
-      if (currentUserId is null)
-      {
-        return new UnauthorizedResult();
-      }
-
       var postingId = req.Query["postingId"].FirstOrDefault() ?? throw new ArgumentException("postingId missing");
-      var resumeDataContainer = _cosmosClient.GetContainer("Resumes", "ResumeData");
-
-      if (postingId == "master")
-      {
-        postingId = currentUserId;
-      }
-
-      var resumeData = await resumeDataContainer.ReadItemAsync<ResumeData>(postingId, new PartitionKey(postingId));
+      var resumeData = await _userDataRepository.GetResumeDataAsync(postingId);
 
       return resumeData switch
       {
         null => new NotFoundResult(),
-        ItemResponse<ResumeData> p => p switch
-        {
-          { StatusCode: System.Net.HttpStatusCode.OK } => (p.Resource.UserId == currentUserId) switch
-          {
-            true => new JsonResult(p.Resource),
-            false => new NotFoundResult()
-          },
-          _ => new NotFoundResult()
-        }
+        _ => new JsonResult(resumeData),
       };
-
     }
     catch (Exception e)
     {

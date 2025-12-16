@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\RGS.Backend.Shared\RGS.Backend.Shared.csproj" />
+    <ProjectReference Include="..\RGS.Backend\RGS.Backend.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

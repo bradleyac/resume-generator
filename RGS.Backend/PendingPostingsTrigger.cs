@@ -21,7 +21,7 @@ internal class PendingPostingsTrigger
     [Function("PendingPostingsTrigger")]
     public async Task Run([CosmosDBTrigger(
         databaseName: "Resumes",
-        containerName: "Postings",
+        containerName: "UserData",
         Connection = "CosmosDBConnectionString",
         LeaseContainerName = "leases",
         CreateLeaseContainerIfNotExists = true)] IReadOnlyList<JobPosting> input)

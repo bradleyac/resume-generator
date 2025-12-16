@@ -11,23 +11,16 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient, IUserService userService)
+internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, IUserDataRepository userDataRepository)
 {
     private readonly ILogger<ListCompletedPostings> _logger = logger;
-    private readonly CosmosClient _cosmosClient = cosmosClient;
-    private readonly IUserService _userService = userService;
+    private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
     private const int MaxPostingsToReturn = 10;
 
     [Function("ListCompletedPostings")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        var currentUserId = _userService.GetCurrentUserId();
-        if (currentUserId is null)
-        {
-            return new UnauthorizedResult();
-        }
-
         DateTime? lastImportedAt = null;
         string? lastId = null;
         string? status = null;
@@ -61,18 +54,6 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, Cosm
             searchText = searchTextValues.First();
         }
 
-        var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
-        var query = completedPostingsContainer.GetItemLinqQueryable<JobPosting>()
-            .Where(p => p.UserId == currentUserId)
-            .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
-            .Where(p => status == null || p.Status == status)
-            .Where(p => string.IsNullOrWhiteSpace(searchText) || p.Company.FullTextContains(searchText) || p.Title.FullTextContains(searchText) || p.PostingText.FullTextContains(searchText))
-            .Select(p => new { p.id, p.Company, p.Title, p.Link, p.ImportedAt, p.Status })
-            .OrderByDescending(p => p.ImportedAt)
-            .ThenBy(p => p.id)
-            .Take(MaxPostingsToReturn);
-
-        var list = await query.ToFeedIterator().ToListAsync();
-        return new JsonResult(list.Select(item => new PostingSummary(item.id, item.Link, item.Company, item.Title, item.ImportedAt, item.Status)).ToList());
+        return new JsonResult(await _userDataRepository.GetPostingListAsync(lastImportedAt, lastId, status, searchText));
     }
 }

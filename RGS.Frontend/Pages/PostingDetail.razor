@@ -18,13 +18,13 @@
   <label>Imported: </label>
   <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />
   <label for="link">Link: </label>
-  <a id="link" href=@posting?.Link>View</a>
+  <a id="link" href=@posting?.PostingData.Link>View</a>
   <label>Company: </label>
-  <LoadingText TextObject=@posting?.Company />
+  <LoadingText TextObject=@posting?.PostingData.Company />
   <label>Title: </label>
-  <LoadingText TextObject=@posting?.Title />
+  <LoadingText TextObject=@posting?.PostingData.Title />
   <label>Job Posting: </label>
-  <pre style="white-space: pre-wrap;">@posting?.PostingText</pre>
+  <pre style="white-space: pre-wrap;">@posting?.PostingData.PostingText</pre>
 </div>
 
 <Modal @ref="updateAddressModal" Title="Update Posting Address" IsVerticallyCentered="true">

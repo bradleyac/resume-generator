@@ -8,8 +8,8 @@ using RGS.Backend.Shared.Models;
 namespace RGS.Frontend.Store.EditResumeDataFeature;
 
 public record struct FetchResumeDataAction;
-public record struct FetchResumeDataResultAction(ResumeData ResumeData);
-public record struct UpdateResumeDataAction(ResumeData ResumeData);
+public record struct FetchResumeDataResultAction(SourceResumeData ResumeData);
+public record struct UpdateResumeDataAction(SourceResumeData ResumeData);
 public record struct UpdateResumeDataResultAction(bool Success, string? Message);
 public record struct SetSaveStateAction(SaveState SaveState);
 
@@ -28,7 +28,7 @@ internal class Effects(IResumeDataService resumeDataService)
   [EffectMethod(typeof(FetchResumeDataAction))]
   public async Task FetchResumeData(IDispatcher dispatcher)
   {
-    var resumeData = await _resumeDataService.GetMasterResumeDataAsync();
+    var resumeData = await _resumeDataService.GetSourceResumeDataAsync();
 
     if (resumeData is not null)
     {
@@ -41,7 +41,7 @@ internal class Effects(IResumeDataService resumeDataService)
   {
     try
     {
-      await _resumeDataService.SetMasterResumeDataAsync(action.ResumeData);
+      await _resumeDataService.SetSourceResumeDataAsync(action.ResumeData);
       dispatcher.Dispatch(new UpdateResumeDataResultAction(true, null));
     }
     catch (Exception ex)

@@ -9,11 +9,10 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient cosmosClient, IUserService userService)
+internal class SetPostingStatus(ILogger<SetPostingStatus> logger, IUserDataRepository userDataRepository)
 {
     private readonly ILogger<SetPostingStatus> _logger = logger;
-    private readonly CosmosClient _cosmosClient = cosmosClient;
-    private readonly IUserService _userService = userService;
+    private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
 
     [Function("SetPostingStatus")]
@@ -32,24 +31,9 @@ internal class SetPostingStatus(ILogger<SetPostingStatus> logger, CosmosClient c
                 return new BadRequestObjectResult("Invalid status");
             }
 
-            var postings = _cosmosClient.GetContainer("Resumes", "Postings");
-            var postingResponse = await postings.ReadItemAsync<JobPosting>(payload.PostingId, new PartitionKey(payload.PostingId));
-            var currentUserId = _userService.GetCurrentUserId();
+            bool result = await _userDataRepository.SetPostingStatusAsync(payload.PostingId, payload.NewStatus);
 
-            if (postingResponse.StatusCode != System.Net.HttpStatusCode.OK || postingResponse.Resource.UserId != currentUserId)
-            {
-                return new NotFoundResult();
-            }
-
-            var posting = postingResponse.Resource;
-
-            if (posting is not null && posting.Status != payload.NewStatus)
-            {
-                posting = posting with { Status = payload.NewStatus };
-                await postings.UpsertItemAsync(posting);
-            }
-
-            return new OkResult();
+            return result ? new OkResult() : new NotFoundResult();
         }
         catch (Exception e)
         {

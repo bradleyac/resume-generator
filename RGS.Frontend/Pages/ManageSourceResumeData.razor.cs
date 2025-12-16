@@ -9,13 +9,13 @@ using RGS.Frontend.Store.EditResumeDataFeature;
 
 namespace RGS.Frontend.Pages;
 
-public partial class MasterResumeData : FluxorComponent, IDisposable
+public partial class ManageSourceResumeData : FluxorComponent, IDisposable
 {
   private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
   [Inject] private IState<EditResumeDataState> State { get; set; } = null!;
-  [Inject] private ILogger<MasterResumeData> Logger { get; set; } = null!;
+  [Inject] private ILogger<ManageSourceResumeData> Logger { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
 
   private string NewCategory { get; set; } = "";
@@ -44,7 +44,7 @@ public partial class MasterResumeData : FluxorComponent, IDisposable
         .AddTo(_subscription);
   }
 
-  private void HandleSubmit(ResumeData resumeData)
+  private void HandleSubmit(SourceResumeData resumeData)
   {
     if (resumeData is not null)
     {

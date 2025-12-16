@@ -9,6 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RGS.Backend.Services;
 using RGS.Backend.Middleware;
+using RGS.Backend;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -31,7 +32,7 @@ public static class BuilderExtensions
     public static IServiceCollection AddApplicationServices(this IServiceCollection @this, bool isDevelopment)
     {
         var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString");
-        @this.AddSingleton(new CosmosClient(connectionString));
+        @this.AddSingleton(new CosmosClient(connectionString, new CosmosClientOptions { Serializer = new CosmosSystemTextJsonSerializer() }));
 
         var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint") ?? throw new InvalidOperationException("AzureOpenAIEndpoint not set");
         var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey") ?? throw new InvalidOperationException("AzureOpenAIKey not set");
@@ -47,6 +48,7 @@ public static class BuilderExtensions
             @this.AddScoped<IUserService, UserService>();
         }
         @this.AddScoped<FunctionContextAccessor>();
+        @this.AddScoped<IUserDataRepositoryFactory, UserDataRepositoryFactory>();
 
         return @this;
     }

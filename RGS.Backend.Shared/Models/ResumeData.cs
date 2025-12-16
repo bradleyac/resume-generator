@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using RGS.Backend.Shared.ViewModels;
 
 namespace RGS.Backend.Shared.Models;
@@ -16,9 +17,8 @@ public record Book(string Title, string Author);
 
 public record Bio(string Name, string Title, string About, string StreetAddress, string City, string State, string Zip);
 
-public record ResumeData(string id,
+public record ResumeData(string PostingId,
                          string UserId,
-                         bool IsMaster,
                          Bio Bio,
                          Contact Contact,
                          Job[] Jobs,
@@ -26,5 +26,8 @@ public record ResumeData(string id,
                          Education[] Education,
                          SkillCategory[] Skills,
                          Book[] Bookshelf,
-                         Rankings? GeneratedRankings = null,
-                         string? CoverLetter = null);
+                         Rankings? GeneratedRankings = null);
+
+public record CoverLetter(string PostingId, string UserId, string Text);
+
+public record SourceResumeData(string id, string UserId, Bio Bio, Contact Contact, Job[] Jobs, Project[] Projects, Education[] Education, SkillCategory[] Skills, Book[] Bookshelf) : UserDataRecord(id, UserId);

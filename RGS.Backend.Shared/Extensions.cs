@@ -5,7 +5,8 @@ namespace RGS.Backend.Shared;
 
 public static class Extensions
 {
-  public static async Task<IEnumerable<T>> ToListAsync<T>(this FeedIterator<T> @this)
+  // TODO: Handle ReadNextAsync failing
+  public static async Task<List<T>> ToListAsync<T>(this FeedIterator<T> @this)
   {
     List<T> results = [];
 

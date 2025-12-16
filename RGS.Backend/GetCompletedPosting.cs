@@ -11,41 +11,24 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, CosmosClient cosmosClient, IUserService userService)
+internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, IUserDataRepository userDataRepository)
 {
   private readonly ILogger<ListCompletedPostings> _logger = logger;
-  private readonly CosmosClient _cosmosClient = cosmosClient;
-  private readonly IUserService _userService = userService;
+  private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
   [Function("GetCompletedPosting")]
   public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
   {
     try
     {
-      var currentUserId = _userService.GetCurrentUserId();
-      if (currentUserId is null)
-      {
-        return new UnauthorizedResult();
-      }
-
       var completedPostingId = req.Query["completedPostingId"].FirstOrDefault() ?? throw new ArgumentException("Payload missing");
-      var completedPostingsContainer = _cosmosClient.GetContainer("Resumes", "Postings");
-      var posting = await completedPostingsContainer.ReadItemAsync<JobPosting>(completedPostingId, new PartitionKey(completedPostingId));
+      var posting = await _userDataRepository.GetPostingAsync(completedPostingId);
 
       return posting switch
       {
         null => new NotFoundResult(),
-        ItemResponse<JobPosting> p => p switch
-        {
-          { StatusCode: System.Net.HttpStatusCode.OK } => (p.Resource.UserId == currentUserId) switch
-          {
-            true => new JsonResult(p.Resource),
-            false => new NotFoundResult()
-          },
-          _ => new NotFoundResult()
-        }
+        _ => new JsonResult(posting),
       };
-
     }
     catch (Exception e)
     {

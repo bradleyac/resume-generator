@@ -45,7 +45,9 @@ public class RegenerateCoverLetterModel
   public string? AdditionalContext { get; set; }
 }
 
-public record JobPosting(string id, string UserId, string Link, string Company, string Title, string PostingText, DateTime ImportedAt, string? StreetAddress = null, string? City = null, string? State = null, string? Zip = null, string Status = PostingStatus.Pending);
+public record PostingDetails(string Link, string Company, string Title, string PostingText, string? StreetAddress = null, string? City = null, string? State = null, string? Zip = null);
+
+public record JobPosting(string id, string UserId, DateTime ImportedAt, PostingDetails PostingData, ResumeData? ResumeData = null, CoverLetter? CoverLetter = null, string Status = PostingStatus.Pending) : UserDataRecord(id, UserId);
 
 public record PostingSummary(string id, string Link, string Company, string Title, DateTime ImportedAt, string Status);
 
@@ -59,3 +61,9 @@ public static class PostingStatus
 }
 
 public record PostingStatusUpdate(string PostingId, string NewStatus);
+
+[JsonPolymorphic]
+[JsonDerivedType(typeof(JobPosting), "JobPosting")]
+[JsonDerivedType(typeof(User), "User")]
+[JsonDerivedType(typeof(SourceResumeData), "SourceResumeData")]
+public record UserDataRecord(string id, string UserId);

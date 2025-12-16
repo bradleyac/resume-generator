@@ -10,35 +10,35 @@ using RGS.Backend.Shared;
 using RGS.Backend.Services;
 using RGS.Backend.Shared.ViewModels;
 using System.ComponentModel.DataAnnotations;
+using Grpc.Core;
+using System.Net;
 
 namespace RGS.Backend;
 
-internal class SetResumeData(ILogger<SetResumeData> logger, IUserDataRepository userDataRepository)
+internal class SetSourceResumeData(ILogger<SetResumeData> logger, IUserDataRepository userDataRepository)
 {
     private readonly ILogger<SetResumeData> _logger = logger;
     private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
-    [Function("SetResumeData")]
+    [Function("SetSourceResumeData")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
         try
         {
-            var payload = await req.ReadFromJsonAsync<ResumeData>() ?? throw new ArgumentException("Invalid payload");
+            var payload = await req.ReadFromJsonAsync<SourceResumeData>() ?? throw new ArgumentException("Invalid payload");
 
-            // TODO: Standardize this.
             if (!Validator.TryValidateObject(payload, new ValidationContext(payload), []))
             {
                 return new BadRequestResult();
             }
 
-            bool result = await _userDataRepository.SetResumeDataAsync(payload);
+            bool result = await _userDataRepository.SetSourceResumeDataAsync(payload);
 
-            // TODO: This (and other IUserDataRepositoryOperations) might have been an error, not a not found. Boolean is not a good type for this result. Use Result pattern.
             return result ? new OkResult() : new NotFoundResult();
         }
         catch (Exception e)
         {
-            _logger.LogError(e, "Failed to set resume data");
+            _logger.LogError(e, "Failed to set source resume data");
             throw;
         }
     }

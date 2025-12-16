@@ -1,0 +1,4 @@
+JobPosting (UserId) - id: guid
+ResumeData (UserId) - id: guid
+CoverLetter (UserId) - id: guid
+User (UserId) - id: UserId (comes from EntraId)

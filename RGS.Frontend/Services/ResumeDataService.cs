@@ -5,8 +5,8 @@ using RGS.Frontend;
 
 internal interface IResumeDataService
 {
-  Task<ResumeData> GetMasterResumeDataAsync();
-  Task SetMasterResumeDataAsync(ResumeData resumeData);
+  Task<SourceResumeData> GetSourceResumeDataAsync();
+  Task SetSourceResumeDataAsync(SourceResumeData resumeData);
 }
 
 internal class ResumeDataService(HttpClient httpClient, ILogger<PostingsService> logger) : IResumeDataService
@@ -14,13 +14,13 @@ internal class ResumeDataService(HttpClient httpClient, ILogger<PostingsService>
   private readonly HttpClient _httpClient = httpClient;
   private readonly ILogger<PostingsService> _logger = logger;
 
-  public async Task<ResumeData> GetMasterResumeDataAsync()
+  public async Task<SourceResumeData> GetSourceResumeDataAsync()
   {
-    return await _httpClient.GetFromJsonAsync<ResumeData>($"/api/GetResumeData?postingId=master") ?? throw new RGSException("Failed to retrieve master resume data");
+    return await _httpClient.GetFromJsonAsync<SourceResumeData>($"/api/GetSourceResumeData") ?? throw new RGSException("Failed to retrieve master resume data");
   }
 
-  public async Task SetMasterResumeDataAsync(ResumeData resumeData)
+  public async Task SetSourceResumeDataAsync(SourceResumeData resumeData)
   {
-    await _httpClient.PostAsync("/api/SetResumeData", JsonContent.Create(resumeData));
+    await _httpClient.PostAsync("/api/SetSourceResumeData", JsonContent.Create(resumeData));
   }
 }

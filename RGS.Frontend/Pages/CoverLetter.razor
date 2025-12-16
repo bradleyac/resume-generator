@@ -10,32 +10,30 @@ else
 {
   <PageTitle>@PageTitle</PageTitle>
   <article class="cover-letter loaded">
-    @HeaderSection(resumeData)
-    @BodySection(resumeData, posting)
+    @HeaderSection(posting.ResumeData)
+    @BodySection(posting)
   </article>
 }
 
 @code {
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
-  public string PageTitle => $"abradley-cover-letter-{resumeData.id}";
+  public string PageTitle => $"abradley-cover-letter-{posting.id}";
 
-  private ResumeData resumeData = null!;
   private JobPosting posting = null!;
   private bool isLoading = true;
 
   protected override async Task OnInitializedAsync()
   {
     // Load posting details using PostingId
-    resumeData = await PostingsService.GetResumeDataAsync(PostingId);
     posting = await PostingsService.GetPostingAsync(PostingId);
     isLoading = false;
   }
 
-  private RenderFragment HeaderSection(ResumeData resumeData) => @<header class="header">
+  private RenderFragment HeaderSection(ResumeData? resumeData) => @<header class="header">
       <div class="name-title">
-        <h1>@resumeData.Bio.Name</h1>
-        <h2>@resumeData.Bio.Title</h2>
+        <h1>@resumeData?.Bio.Name</h1>
+        <h2>@resumeData?.Bio.Title</h2>
       </div>
       <div class="contact">
         @ContactSection(resumeData)
@@ -43,35 +41,35 @@ else
       <div class="background"></div>
   </header>;
 
-private RenderFragment ContactSection(ResumeData resumeData) => @<section>
-  <p>@resumeData.Bio.StreetAddress</p>
-  <p>@resumeData.Bio.City, @resumeData.Bio.State @resumeData.Bio.Zip</p>
-  <p>@resumeData.Contact?.Phone</p>
-  <p>@resumeData.Contact?.Email</p>
+private RenderFragment ContactSection(ResumeData? resumeData) => @<section>
+  <p>@resumeData?.Bio.StreetAddress</p>
+  <p>@resumeData?.Bio.City, @resumeData?.Bio.State @resumeData?.Bio.Zip</p>
+  <p>@resumeData?.Contact?.Phone</p>
+  <p>@resumeData?.Contact?.Email</p>
 </section>;
 
-private RenderFragment BodySection(ResumeData resumeData, JobPosting posting) => @<section class="body">
+private RenderFragment BodySection(JobPosting posting) => @<section class="body">
 @CompanySection(posting)
-@CoverLetterText(resumeData)
-@SignatureSection(resumeData)
+@CoverLetterText(posting.CoverLetter)
+@SignatureSection(posting.ResumeData)
 </section>;
 
 private RenderFragment CompanySection(JobPosting posting) => @<section class="company">
   <p>Hiring Manager</p>
-  <p>@posting.Company</p>
-  <p>@posting.StreetAddress</p>
-  <p>@posting.City, @posting.State @posting.Zip</p>
+  <p>@posting.PostingData.Company</p>
+  <p>@posting.PostingData.StreetAddress</p>
+  <p>@posting.PostingData.City, @posting.PostingData.State @posting.PostingData.Zip</p>
 </section>;
 
-private RenderFragment CoverLetterText(ResumeData resumeData) => @<section class="cover-letter-text">
-@foreach (var paragraph in @resumeData.CoverLetter?.Split("|", StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>())
+private RenderFragment CoverLetterText(RGS.Backend.Shared.Models.CoverLetter? coverLetter) => @<section class="cover-letter-text">
+@foreach (var paragraph in @coverLetter?.Text.Split("|", StringSplitOptions.RemoveEmptyEntries) ?? Enumerable.Empty<string>())
 {
     <p>@paragraph</p>
 }
 </section>;
 
-private RenderFragment SignatureSection(ResumeData resumeData) => @<section class="signature">
+private RenderFragment SignatureSection(ResumeData? resumeData) => @<section class="signature">
   <p>Sincerely,</p>
-  <p>@resumeData.Bio.Name</p>
+  <p>@resumeData?.Bio.Name</p>
 </section>;
 }

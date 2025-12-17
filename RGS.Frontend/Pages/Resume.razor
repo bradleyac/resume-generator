@@ -23,7 +23,7 @@ else
 @code {
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
-  public string PageTitle => $"abradley-resume-{resumeData.id}";
+  public string PageTitle => $"abradley-resume-{resumeData.PostingId}";
 
   private ResumeData resumeData = null!;
   private bool isLoading = true;

@@ -15,7 +15,6 @@ public class CosmosSystemTextJsonSerializer : CosmosSerializer
     _jsonSerializerOptions = new JsonSerializerOptions
     {
       WriteIndented = false,
-      AllowOutOfOrderMetadataProperties = true,
     };
   }
 

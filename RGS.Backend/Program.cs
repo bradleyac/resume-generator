@@ -49,6 +49,7 @@ public static class BuilderExtensions
         }
         @this.AddScoped<FunctionContextAccessor>();
         @this.AddScoped<IUserDataRepositoryFactory, UserDataRepositoryFactory>();
+        @this.AddScoped<IUserDataRepository, UserDataRepository>();
 
         return @this;
     }

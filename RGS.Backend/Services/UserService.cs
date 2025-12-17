@@ -46,6 +46,9 @@ internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor fu
     };
   }
 
+  // TODO: Split this out into a different service, it doesn't belong here.
+  // If this weren't here, this class could be a singleton. As it is, it's scoped
+  // and makes the other services that use it scoped as well.
   public string? GetCurrentUserId()
   {
     if (_functionContextAccessor.Current?.Items.TryGetValue("User", out var userObj) ?? false)

@@ -1,6 +1,5 @@
 using Azure;
 using Azure.AI.OpenAI;
-using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Builder;

@@ -10,7 +10,7 @@ using RGS.Backend.Shared;
 using RGS.Backend.Services;
 using System.Net;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class GetCompletedPosting(ILogger<GetCompletedPosting> logger, IUserDataRepository userDataRepository)
 {
@@ -23,13 +23,8 @@ internal class GetCompletedPosting(ILogger<GetCompletedPosting> logger, IUserDat
     var completedPostingId = req.Query["completedPostingId"].FirstOrDefault();
     if (completedPostingId is null) return new BadRequestResult();
 
-    var posting = await _userDataRepository.GetPostingAsync(completedPostingId);
+    var result = await _userDataRepository.GetPostingAsync(completedPostingId);
 
-    return posting switch
-    {
-      { IsSuccess: true, Value: var data } => new JsonResult(data),
-      { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-      _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-    };
+    return result.ToJsonActionResult();
   }
 }

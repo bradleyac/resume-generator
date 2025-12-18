@@ -8,7 +8,7 @@ using Microsoft.Identity.Client;
 using RGS.Backend.Services;
 using RGS.Backend.Shared.Models;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class DeletePosting(ILogger<DeletePosting> logger, IUserDataRepository userDataRepository)
 {
@@ -23,11 +23,6 @@ internal class DeletePosting(ILogger<DeletePosting> logger, IUserDataRepository 
         // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.
         var result = await _userDataRepository.DeletePostingAsync(postingId);
 
-        return result switch
-        {
-            { IsSuccess: true } => new OkResult(),
-            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-        };
+        return result.ToActionResult();
     }
 }

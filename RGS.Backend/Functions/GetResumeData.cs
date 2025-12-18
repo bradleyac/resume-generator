@@ -10,7 +10,7 @@ using RGS.Backend.Shared;
 using RGS.Backend.Services;
 using System.Net;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class GetResumeData(ILogger<GetResumeData> logger, IUserDataRepository userDataRepository)
 {
@@ -23,13 +23,8 @@ internal class GetResumeData(ILogger<GetResumeData> logger, IUserDataRepository 
     var postingId = req.Query["postingId"].FirstOrDefault();
     if (postingId is null) return new BadRequestResult();
 
-    var resumeData = await _userDataRepository.GetResumeDataAsync(postingId);
+    var result = await _userDataRepository.GetResumeDataAsync(postingId);
 
-    return resumeData switch
-    {
-      { IsSuccess: true, Value: var data } => new JsonResult(data),
-      { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-      _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-    };
+    return result.ToJsonActionResult();
   }
 }

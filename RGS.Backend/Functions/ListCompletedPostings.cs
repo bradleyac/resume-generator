@@ -8,8 +8,9 @@ using Microsoft.Identity.Client;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
 using RGS.Backend.Services;
+using System.Net;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, IUserDataRepository userDataRepository)
 {
@@ -52,13 +53,8 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, IUse
             searchText = searchTextValues.First();
         }
 
-        var postings = await _userDataRepository.GetPostingListAsync(lastImportedAt, lastId, status, searchText);
+        var result = await _userDataRepository.GetPostingListAsync(lastImportedAt, lastId, status, searchText);
 
-        return postings switch
-        {
-            { IsSuccess: true, Value: var postingList } => new JsonResult(postingList),
-            { IsSuccess: false, StatusCode: System.Net.HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-            _ => new StatusCodeResult((int)System.Net.HttpStatusCode.InternalServerError),
-        };
+        return result.ToJsonActionResult();
     }
 }

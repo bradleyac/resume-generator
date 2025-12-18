@@ -14,7 +14,7 @@ using Grpc.Core;
 using System.Net;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class SetSourceResumeData(ILogger<SetSourceResumeData> logger, IUserDataRepository userDataRepository)
 {
@@ -32,11 +32,6 @@ internal class SetSourceResumeData(ILogger<SetSourceResumeData> logger, IUserDat
 
         var result = await _userDataRepository.SetSourceResumeDataAsync(payload);
 
-        return result switch
-        {
-            { IsSuccess: true } => new OkResult(),
-            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-        };
+        return result.ToActionResult();
     }
 }

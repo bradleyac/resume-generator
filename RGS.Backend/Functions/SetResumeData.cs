@@ -12,7 +12,7 @@ using RGS.Backend.Shared.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class SetResumeData(ILogger<SetResumeData> logger, IUserDataRepository userDataRepository)
 {
@@ -30,11 +30,6 @@ internal class SetResumeData(ILogger<SetResumeData> logger, IUserDataRepository 
 
         var result = await _userDataRepository.SetResumeDataAsync(payload);
 
-        return result switch
-        {
-            { IsSuccess: true } => new OkResult(),
-            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-        };
+        return result.ToActionResult();
     }
 }

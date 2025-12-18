@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Services;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class PendingPostingsTrigger
 {

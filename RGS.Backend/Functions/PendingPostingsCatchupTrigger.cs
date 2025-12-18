@@ -1,7 +1,7 @@
 using Microsoft.Azure.Functions.Worker;
 using RGS.Backend.Services;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class PendingPostingsCatchupTrigger(PostingProcessor postingProcessor)
 {

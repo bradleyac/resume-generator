@@ -11,7 +11,7 @@ using RGS.Backend.Services;
 using System.Runtime.Intrinsics.Arm;
 using System.Net;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class GetSourceResumeData(ILogger<GetSourceResumeData> logger, IUserDataRepository userDataRepository)
 {
@@ -21,11 +21,8 @@ internal class GetSourceResumeData(ILogger<GetSourceResumeData> logger, IUserDat
     [Function("GetSourceResumeData")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        return await _userDataRepository.GetSourceResumeDataAsync() switch
-        {
-            { IsSuccess: true, Value: SourceResumeData resumeData } => new JsonResult(resumeData),
-            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-        };
+        var result = await _userDataRepository.GetSourceResumeDataAsync();
+
+        return result.ToJsonActionResult();
     }
 }

@@ -11,7 +11,7 @@ using Microsoft.Extensions.Logging;
 using RGS.Backend.Services;
 using RGS.Backend.Shared.Models;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class ImportJobPosting(ILogger<ImportJobPosting> logger, ICurrentUserService currentUserService, IUserService userService, IUserDataRepositoryFactory userDataRepositoryFactory)
 {
@@ -62,13 +62,9 @@ internal class ImportJobPosting(ILogger<ImportJobPosting> logger, ICurrentUserSe
                 DateTime.UtcNow,
                 new PostingDetails(payload.Link, payload.Company, payload.Title, payload.PostingText)
             );
+            var result = await userDataRepository.SetPostingAsync(newPosting);
 
-            return await userDataRepository.SetPostingAsync(newPosting) switch
-            {
-                { IsSuccess: true } => new OkResult(),
-                { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-                _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
-            };
+            return result.ToActionResult();
         }
         catch (Exception e)
         {

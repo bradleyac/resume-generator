@@ -1,4 +1,5 @@
 using System.Net;
+using Microsoft.AspNetCore.Mvc;
 
 namespace RGS.Backend;
 
@@ -51,10 +52,43 @@ internal static class ResultExtensions
   /// </summary>
   /// <param name="statusCode"></param>
   /// <returns></returns>
-  public static HttpStatusCode FromCosmosDBStatusCode(this HttpStatusCode statusCode) =>
-    statusCode switch
+  public static HttpStatusCode FromCosmosDBStatusCode(this HttpStatusCode statusCode) => statusCode switch
+  {
+    HttpStatusCode.NotFound => HttpStatusCode.NotFound,
+    _ => HttpStatusCode.InternalServerError,
+  };
+
+  public static IActionResult ToJsonActionResult<T>(this Result<T> result)
+  {
+    return result switch
     {
-      HttpStatusCode.NotFound => HttpStatusCode.NotFound,
-      _ => HttpStatusCode.InternalServerError,
+      { IsSuccess: true } => new JsonResult(result.Value!),
+      var failure => new ObjectResult(new ProblemDetails
+      {
+        Title = "Operation failed",
+        Status = (int)(failure.StatusCode ?? HttpStatusCode.InternalServerError),
+        Detail = failure.ErrorMessage,
+      })
+      {
+        StatusCode = (int)(failure.StatusCode ?? HttpStatusCode.InternalServerError)
+      }
     };
+  }
+
+  public static IActionResult ToActionResult(this Result result)
+  {
+    return result switch
+    {
+      { IsSuccess: true } => new OkResult(),
+      var failure => new ObjectResult(new ProblemDetails
+      {
+        Title = "Operation failed",
+        Status = (int)(failure.StatusCode ?? HttpStatusCode.InternalServerError),
+        Detail = failure.ErrorMessage,
+      })
+      {
+        StatusCode = (int)(failure.StatusCode ?? HttpStatusCode.InternalServerError)
+      }
+    };
+  }
 }

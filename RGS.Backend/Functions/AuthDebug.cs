@@ -6,7 +6,7 @@ using Microsoft.Azure.Functions.Worker;
 using Microsoft.Extensions.Logging;
 using RGS.Backend.Middleware;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 public class AuthDebug
 {

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using RGS.Backend.Services;
 using RGS.Backend.Shared.Models;
 
-namespace RGS.Backend;
+namespace RGS.Backend.Functions;
 
 internal class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, PostingProcessor postingProcessor)
 {
@@ -22,11 +22,6 @@ internal class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, Post
         _logger.LogInformation("Re-generating cover letter.");
         var result = await _postingProcessor.RegenerateCoverLetterAsync(payload);
 
-        return result switch
-        {
-            { IsSuccess: true } => new OkResult(),
-            { IsSuccess: false, StatusCode: System.Net.HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
-            _ => new StatusCodeResult((int)System.Net.HttpStatusCode.InternalServerError),
-        };
+        return result.ToActionResult();
     }
 }

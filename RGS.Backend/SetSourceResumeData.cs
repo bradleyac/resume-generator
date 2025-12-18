@@ -15,9 +15,9 @@ using System.Net;
 
 namespace RGS.Backend;
 
-internal class SetSourceResumeData(ILogger<SetResumeData> logger, IUserDataRepository userDataRepository)
+internal class SetSourceResumeData(ILogger<SetSourceResumeData> logger, IUserDataRepository userDataRepository)
 {
-    private readonly ILogger<SetResumeData> _logger = logger;
+    private readonly ILogger<SetSourceResumeData> _logger = logger;
     private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
     [Function("SetSourceResumeData")]

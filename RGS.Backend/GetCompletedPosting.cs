@@ -11,9 +11,9 @@ using RGS.Backend.Services;
 
 namespace RGS.Backend;
 
-internal class GetCompletedPosting(ILogger<ListCompletedPostings> logger, IUserDataRepository userDataRepository)
+internal class GetCompletedPosting(ILogger<GetCompletedPosting> logger, IUserDataRepository userDataRepository)
 {
-  private readonly ILogger<ListCompletedPostings> _logger = logger;
+  private readonly ILogger<GetCompletedPosting> _logger = logger;
   private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
   [Function("GetCompletedPosting")]

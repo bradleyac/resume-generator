@@ -9,9 +9,9 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class SetPostingAddress(ILogger<SetPostingStatus> logger, IUserDataRepository userDataRepository)
+internal class SetPostingAddress(ILogger<SetPostingAddress> logger, IUserDataRepository userDataRepository)
 {
-    private readonly ILogger<SetPostingStatus> _logger = logger;
+    private readonly ILogger<SetPostingAddress> _logger = logger;
     private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
     [Function("SetPostingAddress")]

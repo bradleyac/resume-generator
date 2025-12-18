@@ -10,15 +10,13 @@ namespace RGS.Backend.Services;
 
 internal interface IUserService
 {
-  string? GetCurrentUserId();
   Task<User?> GetUserByApiKeyAsync(string apiKey);
   Task<User?> GetUserByIdAsync(string userId);
 }
 
-internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor functionContextAccessor) : IUserService
+internal class UserService(CosmosClient cosmosClient) : IUserService
 {
   private readonly CosmosClient _cosmosClient = cosmosClient;
-  private readonly FunctionContextAccessor _functionContextAccessor = functionContextAccessor;
 
   public async Task<User?> GetUserByApiKeyAsync(string apiKey)
   {
@@ -45,33 +43,4 @@ internal class UserService(CosmosClient cosmosClient, FunctionContextAccessor fu
       _ => null,
     };
   }
-
-  // TODO: Split this out into a different service, it doesn't belong here.
-  // If this weren't here, this class could be a singleton. As it is, it's scoped
-  // and makes the other services that use it scoped as well.
-  public string? GetCurrentUserId()
-  {
-    if (_functionContextAccessor.Current?.Items.TryGetValue("User", out var userObj) ?? false)
-    {
-      return (userObj as EasyAuthUser)?.UserId;
-    }
-    else
-    {
-      return null;
-    }
-  }
-}
-
-internal class DevelopmentUserService : IUserService
-{
-  private static readonly string DefaultSourceResumeDataId = Guid.NewGuid().ToString();
-  public string? GetCurrentUserId()
-  {
-    return "13b1c25378654837956349833d60216e";
-  }
-
-  public Task<User?> GetUserByApiKeyAsync(string apiKey) => Task.FromResult<User?>(new User("13b1c25378654837956349833d60216e", "13b1c25378654837956349833d60216e", apiKey, "andrew.charles.bradley@gmail.com", DefaultSourceResumeDataId));
-
-  // This could just be using the real thing instead of stubbed out like this, if GetCurrentUserId were somewhere else. GetCurrentUserId is the only reason this class exists.
-  public Task<User?> GetUserByIdAsync(string userId) => Task.FromResult<User?>(new User(userId, userId, "13b1c25378654837956349833d60216e", "andrew.charles.bradley@gmail.com", "0ab91230-14bd-4958-9afa-98c98bf44b78"));
 }

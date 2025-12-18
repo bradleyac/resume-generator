@@ -45,11 +45,11 @@ internal partial class UserDataRepository : IUserDataRepository
   private IUserService UserService { get; set; }
 
   // Get current user ID from userService
-  public UserDataRepository(CosmosClient cosmosClient, IUserService userService)
+  public UserDataRepository(CosmosClient cosmosClient, ICurrentUserService currentUserService, IUserService userService)
   {
     // TODO: Not great to throw here. What's a better overall pattern for handling errors like this in ASP.NET Core?
     // There are too many different ways for an error to surface, it should be consistent.
-    UserId = userService.GetCurrentUserId() ?? throw new InvalidOperationException("No authenticated user present");
+    UserId = currentUserService.GetCurrentUserId() ?? throw new InvalidOperationException("No authenticated user present");
     UserService = userService;
     CosmosClient = cosmosClient;
   }

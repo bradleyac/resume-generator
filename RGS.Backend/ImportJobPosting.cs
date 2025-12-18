@@ -13,9 +13,10 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend;
 
-internal class ImportJobPosting(ILogger<ImportJobPosting> logger, IUserService userService, IUserDataRepositoryFactory userDataRepositoryFactory)
+internal class ImportJobPosting(ILogger<ImportJobPosting> logger, ICurrentUserService currentUserService, IUserService userService, IUserDataRepositoryFactory userDataRepositoryFactory)
 {
     private readonly ILogger<ImportJobPosting> _logger = logger;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IUserService _userService = userService;
     private readonly IUserDataRepositoryFactory _userDataRepositoryFactory = userDataRepositoryFactory;
 
@@ -28,7 +29,7 @@ internal class ImportJobPosting(ILogger<ImportJobPosting> logger, IUserService u
             // TODO: This is more vulnerable to CSRF for allowing cookie-based auth here as well.
 
             // See if user is authenticated, first
-            var currentUserId = _userService.GetCurrentUserId();
+            var currentUserId = _currentUserService.GetCurrentUserId();
 
             // If not, check for API key
             if (currentUserId is null)

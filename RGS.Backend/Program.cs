@@ -41,12 +41,13 @@ public static class BuilderExtensions
         @this.AddTransient<PostingProcessor>();
         if (isDevelopment)
         {
-            @this.AddScoped<IUserService, DevelopmentUserService>();
+            @this.AddScoped<ICurrentUserService, DevelopmentCurrentUserService>();
         }
         else
         {
-            @this.AddScoped<IUserService, UserService>();
+            @this.AddScoped<ICurrentUserService, CurrentUserService>();
         }
+        @this.AddSingleton<IUserService, UserService>();
         @this.AddScoped<FunctionContextAccessor>();
         @this.AddScoped<IUserDataRepositoryFactory, UserDataRepositoryFactory>();
         @this.AddScoped<IUserDataRepository, UserDataRepository>();

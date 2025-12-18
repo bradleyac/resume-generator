@@ -16,7 +16,7 @@ internal class ResumeDataService(HttpClient httpClient, ILogger<PostingsService>
 
   public async Task<SourceResumeData> GetSourceResumeDataAsync()
   {
-    return await _httpClient.GetFromJsonAsync<SourceResumeData>($"/api/GetSourceResumeData") ?? throw new RGSException("Failed to retrieve master resume data");
+    return await _httpClient.GetFromJsonAsync<SourceResumeData>($"/api/GetSourceResumeData") ?? throw new RGSException("Failed to retrieve source resume data");
   }
 
   public async Task SetSourceResumeDataAsync(SourceResumeData resumeData)

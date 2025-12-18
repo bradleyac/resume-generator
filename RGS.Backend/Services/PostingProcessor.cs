@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.Text.Json;
 using Azure.AI.OpenAI;
 using Azure.AI.OpenAI.Chat;
-using Azure.Storage.Blobs;
 using Microsoft.Azure.Cosmos;
 using Microsoft.Azure.Cosmos.Linq;
 using Microsoft.Extensions.Logging;

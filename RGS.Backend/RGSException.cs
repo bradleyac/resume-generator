@@ -1,17 +1,16 @@
-internal partial class UserDataRepository
+namespace RGS.Backend;
+
+internal class RGSException : ApplicationException
 {
-  internal class RGSException : ApplicationException
+  public RGSException()
   {
-    public RGSException()
-    {
-    }
+  }
 
-    public RGSException(string? message) : base(message)
-    {
-    }
+  public RGSException(string? message) : base(message)
+  {
+  }
 
-    public RGSException(string? message, Exception? innerException) : base(message, innerException)
-    {
-    }
+  public RGSException(string? message, Exception? innerException) : base(message, innerException)
+  {
   }
 }

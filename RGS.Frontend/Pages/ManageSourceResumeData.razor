@@ -1,4 +1,4 @@
-﻿@page "/MasterResumeData"
+﻿@page "/SourceResumeData"
 @inherits FluxorComponent;
 @using Blazilla
 @using Fluxor.Blazor.Web.Components
@@ -8,11 +8,11 @@
 @using System.Linq.Expressions
 @using RGS.Frontend.Store.EditResumeDataFeature
 
-<PageTitle>Master Resume Data</PageTitle>
+<PageTitle>Manage Source Resume Data</PageTitle>
 
 @if (State.Value?.ResumeData is null)
 {
-  <p class="m-3">Loading master resume data...</p>
+  <p class="m-3">Loading source resume data...</p>
 }
 else
 {

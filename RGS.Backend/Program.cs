@@ -31,11 +31,11 @@ public static class BuilderExtensions
 {
     public static IServiceCollection AddApplicationServices(this IServiceCollection @this, bool isDevelopment)
     {
-        var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString") ?? throw new UserDataRepository.RGSException("CosmosDBConnectionString not set");
+        var connectionString = Environment.GetEnvironmentVariable("CosmosDBConnectionString") ?? throw new RGSException("CosmosDBConnectionString not set");
         @this.AddSingleton(new CosmosClient(connectionString, new CosmosClientOptions { Serializer = new CosmosSystemTextJsonSerializer() }));
 
-        var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint") ?? throw new UserDataRepository.RGSException("AzureOpenAIEndpoint not set");
-        var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey") ?? throw new UserDataRepository.RGSException("AzureOpenAIKey not set");
+        var openAIEndpoint = Environment.GetEnvironmentVariable("AzureOpenAIEndpoint") ?? throw new RGSException("AzureOpenAIEndpoint not set");
+        var openAIKey = Environment.GetEnvironmentVariable("AzureOpenAIKey") ?? throw new RGSException("AzureOpenAIKey not set");
         @this.AddTransient(typeof(AzureOpenAIClient), (_) => new AzureOpenAIClient(new Uri(openAIEndpoint), new AzureKeyCredential(openAIKey)));
 
         @this.AddTransient<PostingProcessor>();

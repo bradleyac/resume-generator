@@ -24,7 +24,6 @@ public partial class ManageSourceResumeData : FluxorComponent, IDisposable
   {
     await base.OnInitializedAsync();
 
-    // Load master resume data
     Dispatcher.Dispatch(new FetchResumeDataAction());
 
     var edits = Observable.FromEventHandler(

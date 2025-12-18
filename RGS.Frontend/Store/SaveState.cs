@@ -1,6 +1,6 @@
 using System;
 
-namespace RGS.Frontend.Store.EditResumeDataFeature;
+namespace RGS.Frontend.Store;
 
 public record SaveState(SaveStatus SaveStatus, string? Message)
 {

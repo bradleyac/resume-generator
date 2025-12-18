@@ -47,21 +47,27 @@ public class RegenerateCoverLetterModel
 
 public record PostingDetails(string Link, string Company, string Title, string PostingText, string? StreetAddress = null, string? City = null, string? State = null, string? Zip = null);
 
-public record JobPosting(string id, string UserId, DateTime ImportedAt, PostingDetails PostingData, ResumeData? ResumeData = null, CoverLetter? CoverLetter = null, string Status = PostingStatus.Pending) : UserDataRecord(id, UserId);
+public record Notes(string PostingId, string UserId, string Text);
+
+public record JobPosting(string id, string UserId, DateTime ImportedAt, PostingDetails PostingData, ResumeData? ResumeData = null, CoverLetter? CoverLetter = null, Notes? Notes = null, string Status = PostingStatus.Pending) : UserDataRecord(id, UserId);
 
 public record PostingSummary(string id, string Link, string Company, string Title, DateTime ImportedAt, string Status);
 
 public static class PostingStatus
 {
-  public static string[] ValidStatuses = new[] { Pending, Ready, Applied, Archived };
+  public static string[] ValidStatuses = new[] { Pending, Ready, Applied, Replied, Archived };
   public const string Pending = "Pending";
   public const string Ready = "Ready";
   public const string Applied = "Applied";
+  public const string Replied = "Replied";
   public const string Archived = "Archived";
 }
 
 public record PostingStatusUpdate(string PostingId, string NewStatus);
 
+// Polymorphic base type for user data records stored in Cosmos DB.
+// Use with care, because you have to write the base type when updating/inserting.
+// TODO: Find a better way to do polymorphic serialization with CosmosDB.
 [JsonPolymorphic]
 [JsonDerivedType(typeof(JobPosting), "JobPosting")]
 [JsonDerivedType(typeof(User), "User")]

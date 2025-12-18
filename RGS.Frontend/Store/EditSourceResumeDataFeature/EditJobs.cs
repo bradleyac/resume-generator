@@ -1,9 +1,8 @@
 using System;
 using Fluxor;
 using RGS.Backend.Shared.Models;
-using RGS.Frontend.Store.EditResumeDataFeature;
 
-namespace RGS.Frontend.Store.EditResumeDataFeature;
+namespace RGS.Frontend.Store.EditSourceResumeDataFeature;
 
 public record struct RemoveJobAction(int JobIndex);
 public record struct AddJobAction();
@@ -14,7 +13,7 @@ public record struct RemoveBulletAction(int JobIndex, int BulletIndex);
 internal static class JobReducers
 {
   [ReducerMethod]
-  public static EditResumeDataState RemoveJob(EditResumeDataState state, RemoveJobAction action)
+  public static EditSourceResumeDataState RemoveJob(EditSourceResumeDataState state, RemoveJobAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -29,7 +28,7 @@ internal static class JobReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddJob(EditResumeDataState state, AddJobAction action)
+  public static EditSourceResumeDataState AddJob(EditSourceResumeDataState state, AddJobAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -44,7 +43,7 @@ internal static class JobReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState UpdateJob(EditResumeDataState state, UpdateJobAction action)
+  public static EditSourceResumeDataState UpdateJob(EditSourceResumeDataState state, UpdateJobAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -59,7 +58,7 @@ internal static class JobReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddBullet(EditResumeDataState state, AddBulletAction action)
+  public static EditSourceResumeDataState AddBullet(EditSourceResumeDataState state, AddBulletAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -74,7 +73,7 @@ internal static class JobReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState RemoveBullet(EditResumeDataState state, RemoveBulletAction action)
+  public static EditSourceResumeDataState RemoveBullet(EditSourceResumeDataState state, RemoveBulletAction action)
   {
     if (state.ResumeData is null) return state;
 

@@ -1,54 +1,68 @@
 ﻿@page "/posting/{PostingId}"
 @using BlazorBootstrap
+@using Fluxor.Blazor.Web.Components
 @using RGS.Frontend.Components
+@using RGS.Frontend.Store.ViewPostingFeature
+@using Fluxor;
+@using R3;
+@inherits FluxorComponent;
 
-<div class="@ContainerClass card m-3 p-3">
-  <label>Posting Id: </label>
-  <LoadingText TextObject=@posting?.id />
-  <div class="d-flex gap-2" role="group" aria-label="Actions">
-    <Button Color="ButtonColor.Primary" @onclick="() => NavigateToResume(PostingId)">View Resume</Button>
-    <Button Color="ButtonColor.Primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</Button>
-    <Button Color="ButtonColor.Primary" @onclick="OnUpdatePostingAddressClicked">
-      <Icon Name="IconName.GeoFill" />
-    </Button>
-    <Button Color="ButtonColor.Primary" @onclick="OnRegenerateCoverLetterClicked">
-      <Icon Name="IconName.ArrowClockwise" />
-    </Button>
+@if (State.Value?.Posting is null)
+{
+  <div>Loading...</div>
+}
+else
+{
+  <div class="@ContainerClass card m-3 p-3">
+    <label>Posting Id: </label>
+    <LoadingText TextObject=@State.Value.Posting.id />
+    <div class="d-flex gap-2" role="group" aria-label="Actions">
+      <Button Color="ButtonColor.Primary" @onclick="() => NavigateToResume(PostingId)">View Resume</Button>
+      <Button Color="ButtonColor.Primary" @onclick="() => NavigateToCoverLetter(PostingId)">View Cover Letter</Button>
+      <Button Color="ButtonColor.Primary" @onclick="OnUpdatePostingAddressClicked">
+        <Icon Name="IconName.GeoFill" />
+      </Button>
+      <Button Color="ButtonColor.Primary" @onclick="OnRegenerateCoverLetterClicked">
+        <Icon Name="IconName.ArrowClockwise" />
+      </Button>
+    </div>
+    <label>Imported: </label>
+    <LoadingText TextObject=@State.Value.Posting.ImportedAt.ToLocalTime() />
+    <label for="link">Link: </label>
+    <a id="link" href=@State.Value.Posting.PostingData.Link>View</a>
+    <label>Company: </label>
+    <LoadingText TextObject=@State.Value.Posting.PostingData.Company />
+    <label>Title: </label>
+    <LoadingText TextObject=@State.Value.Posting.PostingData.Title />
+    <label>Job Posting: </label>
+    <pre style="white-space: pre-wrap;">@State.Value.Posting.PostingData.PostingText</pre>
+    <NotesEditor />
   </div>
-  <label>Imported: </label>
-  <LoadingText TextObject=@posting?.ImportedAt.ToLocalTime() />
-  <label for="link">Link: </label>
-  <a id="link" href=@posting?.PostingData.Link>View</a>
-  <label>Company: </label>
-  <LoadingText TextObject=@posting?.PostingData.Company />
-  <label>Title: </label>
-  <LoadingText TextObject=@posting?.PostingData.Title />
-  <label>Job Posting: </label>
-  <pre style="white-space: pre-wrap;">@posting?.PostingData.PostingText</pre>
-</div>
 
-<Modal @ref="updateAddressModal" Title="Update Posting Address" IsVerticallyCentered="true">
-  <BodyTemplate>
-    <UpdatePostingAddress PostingId=@PostingId OnCancel="() => updateAddressModal.HideAsync()" OnPostingSubmitted="() => updateAddressModal.HideAsync()" />
-  </BodyTemplate>
-</Modal>
+  <Modal @ref="updateAddressModal" Title="Update Posting Address" IsVerticallyCentered="true">
+    <BodyTemplate>
+      <UpdatePostingAddress PostingId=@PostingId OnCancel="() => updateAddressModal.HideAsync()" OnPostingSubmitted="() => updateAddressModal.HideAsync()" />
+    </BodyTemplate>
+  </Modal>
 
-<Modal @ref="resubmitModal" Title="Re-generate Cover Letter" IsVerticallyCentered="true">
-  <BodyTemplate>
-    <RegenerateCoverLetter PostingId=@PostingId OnCancel="() => resubmitModal.HideAsync()" OnClose="() => resubmitModal.HideAsync()" />
-  </BodyTemplate>
-</Modal>
+  <Modal @ref="resubmitModal" Title="Re-generate Cover Letter" IsVerticallyCentered="true">
+    <BodyTemplate>
+      <RegenerateCoverLetter PostingId=@PostingId OnCancel="() => resubmitModal.HideAsync()" OnClose="() => resubmitModal.HideAsync()" />
+    </BodyTemplate>
+  </Modal>
+}
 
 @code {
   [Inject] private NavigationManager NavigationManager { get; set; } = null!;
   [Inject] private IPostingsService PostingsService { get; set; } = null!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+  [Inject] private IState<ViewPostingState> State { get; set; } = null!;
   [Parameter] public string PostingId { get; set; } = string.Empty;
 
-  private JobPosting? posting;
   private Modal updateAddressModal = null!;
   private Modal resubmitModal = null!;
   private bool isLoading = true;
-  private string ContainerClass => isLoading ? "placeholder-glow" : posting?.Status switch
+  private string ContainerClass => isLoading ? "placeholder-glow" : State.Value?.Posting?.Status switch
   {
     PostingStatus.Ready => "border border-warning",
     PostingStatus.Applied => "border border-success",
@@ -58,8 +72,9 @@
 
   protected override async Task OnInitializedAsync()
   {
-    posting = await PostingsService.GetPostingAsync(PostingId);
-    isLoading = false;
+    await base.OnInitializedAsync();
+
+    Dispatcher.Dispatch(new FetchPostingAction(PostingId));
   }
 
   private Task OnUpdatePostingAddressClicked() => updateAddressModal.ShowAsync();

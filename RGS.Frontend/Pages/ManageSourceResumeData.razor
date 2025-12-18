@@ -6,7 +6,7 @@
 @using RGS.Frontend.Components
 @using System.Runtime.CompilerServices
 @using System.Linq.Expressions
-@using RGS.Frontend.Store.EditResumeDataFeature
+@using RGS.Frontend.Store.EditSourceResumeDataFeature
 
 <PageTitle>Manage Source Resume Data</PageTitle>
 
@@ -18,7 +18,7 @@ else
 {
   <div class="m-3 position-relative d-flex flex-column">
     <div class="save-state-indicator">
-      <SaveStateIndicator />
+      <EditSourceResumeDataSaveStateIndicator />
     </div>
     <div class="d-flex flex-column mt-4 gap-4 pe-4">
       <Accordion AlwaysOpen="true">

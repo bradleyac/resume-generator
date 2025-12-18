@@ -2,7 +2,7 @@ using System;
 using Fluxor;
 using RGS.Backend.Shared.Models;
 
-namespace RGS.Frontend.Store.EditResumeDataFeature;
+namespace RGS.Frontend.Store.EditSourceResumeDataFeature;
 
 public record struct RemoveSkillAction(int SkillCategoryIndex, int SkillIndex);
 public record struct AddSkillAction(int SkillCategoryIndex, string Skill);
@@ -13,7 +13,7 @@ public record struct AddSkillCategoryAction(string Label);
 public static class SkillReducers
 {
   [ReducerMethod]
-  public static EditResumeDataState RemoveSkill(EditResumeDataState state, RemoveSkillAction action)
+  public static EditSourceResumeDataState RemoveSkill(EditSourceResumeDataState state, RemoveSkillAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -28,7 +28,7 @@ public static class SkillReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddSkill(EditResumeDataState state, AddSkillAction action)
+  public static EditSourceResumeDataState AddSkill(EditSourceResumeDataState state, AddSkillAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -43,7 +43,7 @@ public static class SkillReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState UpdateSkillCategory(EditResumeDataState state, UpdateSkillCategoryAction action)
+  public static EditSourceResumeDataState UpdateSkillCategory(EditSourceResumeDataState state, UpdateSkillCategoryAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -58,7 +58,7 @@ public static class SkillReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState RemoveSkillCategory(EditResumeDataState state, RemoveSkillCategoryAction action)
+  public static EditSourceResumeDataState RemoveSkillCategory(EditSourceResumeDataState state, RemoveSkillCategoryAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -73,7 +73,7 @@ public static class SkillReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddSkillCategory(EditResumeDataState state, AddSkillCategoryAction action)
+  public static EditSourceResumeDataState AddSkillCategory(EditSourceResumeDataState state, AddSkillCategoryAction action)
   {
     if (state.ResumeData is null) return state;
 

@@ -1,33 +1,27 @@
-﻿@using Fluxor
+@using Fluxor
 @using Fluxor.Blazor.Web.Components
+@using Microsoft.Azure.Cosmos.Linq
 @using R3
 @using RGS.Backend.Shared.ViewModels
-@using RGS.Frontend.Store.EditSourceResumeDataFeature
-
+@using RGS.Frontend.Store.ViewPostingFeature
 @inherits FluxorComponent;
 
-<EditForm EditContext="@EditContext" FormName="EditBiography">
+<EditForm EditContext="@EditContext" FormName="EditNotes">
   <DataAnnotationsValidator />
   <ValidationSummary />
-  <div class="d-flex flex-column gap-4">
-    <FormField @bind-Value="@(Model.Name)" class="col-6" />
-    <FormField @bind-Value="@(Model.Title)" class="col-6" />
-    <FormField @bind-Value="@(Model.About)" class="col-6" />
-    <FormField @bind-Value="@(Model.StreetAddress)" class="col-6" Label=@("Street Address") />
-    <FormField @bind-Value="@(Model.City)" class="col-6" />
-    <FormField @bind-Value="@(Model.State)" class="col-6" />
-    <FormField @bind-Value="@(Model.Zip)" class="col-6" />
+  <div class="mb-3">
+    <label for="notes" class="form-label">Notes</label>
+    <OnInputInputTextArea id="notes" class="form-control" rows="5" @bind-Value="Model.Text" />
   </div>
 </EditForm>
 
 
 @code {
-  [Parameter] public required Bio Bio { get; set; }
-
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+  [Inject] private IState<ViewPostingState> ViewPostingState { get; set; } = null!;
 
   private EditContext EditContext { get; set; } = null!;
-  private BioModel Model { get; set; } = null!;
+  private NotesModel Model { get; set; } = null!;
   private CompositeDisposable? _subscription = null!;
   private bool _disposedValue;
 
@@ -37,13 +31,7 @@
 
     Model = new()
     {
-      Name = Bio.Name,
-      Title = Bio.Title,
-      About = Bio.About,
-      City = Bio.City,
-      State = Bio.State,
-      StreetAddress = Bio.StreetAddress,
-      Zip = Bio.Zip
+      Text = ViewPostingState.Value.Posting?.Notes?.Text ?? "",
     };
     _subscription = new CompositeDisposable();
     EditContext = new EditContext(Model);
@@ -53,11 +41,14 @@
     ).Select(args => args.sender as EditContext)
     .WhereNotNull()
     .Where(ec => ec.Validate())
-    .Select(ec => (BioModel)ec.Model)
+    .Select(ec => (NotesModel)ec.Model)
+    .Debounce(TimeSpan.FromMilliseconds(500))
     .Subscribe(model =>
     {
       EditContext.MarkAsUnmodified();
-      Dispatcher.Dispatch(new UpdateBioAction(new Bio(model.Name!, model.Title!, model.About!, model.StreetAddress!, model.City!, model.State!, model.Zip!)));
+      Dispatcher.Dispatch(new EditNotesAction(ViewPostingState.Value.Posting!.Notes is null
+  ? new Notes(ViewPostingState.Value.Posting!.id, ViewPostingState.Value.Posting.UserId, model.Text ?? "")
+  : ViewPostingState.Value.Posting.Notes with { Text = model.Text ?? "" }));
     })
     .AddTo(_subscription); ;
   }

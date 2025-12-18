@@ -14,6 +14,7 @@ internal interface IPostingsService
   Task SubmitNewPostingAsync(NewPostingModel model);
   Task SetPostingStatusAsync(PostingStatusUpdate statusUpdate);
   Task DeletePostingAsync(string postingId);
+  Task SetPostingNotes(Notes notes);
 }
 
 internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> logger) : IPostingsService
@@ -91,5 +92,10 @@ internal class PostingsService(HttpClient httpClient, ILogger<PostingsService> l
   public async Task RegenerateCoverLetterAsync(RegenerateCoverLetterModel regenerateModel)
   {
     await _httpClient.PostAsync("/api/RegenerateCoverLetter", JsonContent.Create(regenerateModel));
+  }
+
+  public async Task SetPostingNotes(Notes notes)
+  {
+    await _httpClient.PostAsync("/api/SetPostingNotes", JsonContent.Create(notes));
   }
 }

@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using R3;
 using RGS.Backend.Shared.ViewModels;
 using RGS.Frontend;
-using RGS.Frontend.Store.EditResumeDataFeature;
+using RGS.Frontend.Store.EditSourceResumeDataFeature;
+using RGS.Frontend.Store.ViewPostingFeature;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
@@ -16,7 +17,8 @@ string apiBaseAddress = builder.Configuration["Api:BaseAddress"] ?? throw new RG
 builder.Services.AddSingleton(sp => new HttpClient { BaseAddress = new Uri(apiBaseAddress) });
 builder.Services.AddSingleton<IPostingsService, PostingsService>();
 builder.Services.AddSingleton<IResumeDataService, ResumeDataService>();
-builder.Services.AddSingleton<Effects>();
+builder.Services.AddSingleton<EditSourceResumeDataEffects>();
+builder.Services.AddSingleton<ViewPostingEffects>();
 builder.Services.AddBlazorBootstrap();
 builder.Services.AddBlazorWebAssemblyR3();
 builder.Services.AddFluxor(configureFluxor =>

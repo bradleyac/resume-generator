@@ -1,9 +1,8 @@
 using System;
 using Fluxor;
 using RGS.Backend.Shared.Models;
-using RGS.Frontend.Store.EditResumeDataFeature;
 
-namespace RGS.Frontend.Store.EditResumeDataFeature;
+namespace RGS.Frontend.Store.EditSourceResumeDataFeature;
 
 public record struct RemoveProjectAction(int ProjectIndex);
 public record struct AddProjectAction();
@@ -14,7 +13,7 @@ public record struct RemoveTechAction(int ProjectIndex, int TechIndex);
 internal static class ProjectReducers
 {
   [ReducerMethod]
-  public static EditResumeDataState RemoveProject(EditResumeDataState state, RemoveProjectAction action)
+  public static EditSourceResumeDataState RemoveProject(EditSourceResumeDataState state, RemoveProjectAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -29,7 +28,7 @@ internal static class ProjectReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddProject(EditResumeDataState state, AddProjectAction action)
+  public static EditSourceResumeDataState AddProject(EditSourceResumeDataState state, AddProjectAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -44,7 +43,7 @@ internal static class ProjectReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState UpdateProject(EditResumeDataState state, UpdateProjectAction action)
+  public static EditSourceResumeDataState UpdateProject(EditSourceResumeDataState state, UpdateProjectAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -59,7 +58,7 @@ internal static class ProjectReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddTech(EditResumeDataState state, AddTechAction action)
+  public static EditSourceResumeDataState AddTech(EditSourceResumeDataState state, AddTechAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -74,7 +73,7 @@ internal static class ProjectReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState RemoveTech(EditResumeDataState state, RemoveTechAction action)
+  public static EditSourceResumeDataState RemoveTech(EditSourceResumeDataState state, RemoveTechAction action)
   {
     if (state.ResumeData is null) return state;
 

@@ -1,9 +1,8 @@
 using System;
 using Fluxor;
 using RGS.Backend.Shared.Models;
-using RGS.Frontend.Store.EditResumeDataFeature;
 
-namespace RGS.Frontend.Store.EditResumeDataFeature;
+namespace RGS.Frontend.Store.EditSourceResumeDataFeature;
 
 public record struct RemoveBookAction(int BookIndex);
 public record struct AddBookAction();
@@ -12,7 +11,7 @@ public record struct UpdateBookAction(int BookIndex, Book Book);
 internal static class BooksReducers
 {
   [ReducerMethod]
-  public static EditResumeDataState RemoveBook(EditResumeDataState state, RemoveBookAction action)
+  public static EditSourceResumeDataState RemoveBook(EditSourceResumeDataState state, RemoveBookAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -27,7 +26,7 @@ internal static class BooksReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState AddEducation(EditResumeDataState state, AddBookAction action)
+  public static EditSourceResumeDataState AddEducation(EditSourceResumeDataState state, AddBookAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -42,7 +41,7 @@ internal static class BooksReducers
   }
 
   [ReducerMethod]
-  public static EditResumeDataState UpdateEducation(EditResumeDataState state, UpdateBookAction action)
+  public static EditSourceResumeDataState UpdateEducation(EditSourceResumeDataState state, UpdateBookAction action)
   {
     if (state.ResumeData is null) return state;
 

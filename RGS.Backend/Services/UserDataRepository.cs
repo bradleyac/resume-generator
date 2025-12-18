@@ -26,15 +26,16 @@ internal interface IUserDataRepository
   Task<Result<ResumeData>> GetResumeDataAsync(string postingId);
   Task<Result<SourceResumeData>> GetSourceResumeDataAsync();
   Task<Result<SourceResumeData>> GetSourceResumeDataAsync(string resumeDataId);
-  Task<Result> SetResumeDataAsync(ResumeData resumeData);
-  Task<Result> SetSourceResumeDataAsync(SourceResumeData sourceResumeData);
   Task<Result<JobPosting>> GetPostingAsync(string postingId);
+  Task<Result<List<PostingSummary>>> GetPostingListAsync(DateTime? lastImportedAt, string? lastId, string? status, string? searchText);
+  Task<Result> SetResumeDataAsync(ResumeData resumeData);
   Task<Result> SetPostingAsync(JobPosting posting);
+  Task<Result> SetSourceResumeDataAsync(SourceResumeData sourceResumeData);
   Task<Result> DeletePostingAsync(string postingId);
   Task<Result> SetPostingStatusAsync(string postingId, string status);
   Task<Result> SetPostingAddressAsync(UpdatePostingAddressModel update);
-  Task<Result> SetCoverLetterAsync(string postingId, CoverLetter coverLetter);
-  Task<Result<List<PostingSummary>>> GetPostingListAsync(DateTime? lastImportedAt, string? lastId, string? status, string? searchText);
+  Task<Result> SetCoverLetterAsync(CoverLetter coverLetter);
+  Task<Result> SetPostingNotesAsync(Notes notes);
 }
 
 internal partial class UserDataRepository : IUserDataRepository
@@ -108,7 +109,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.UpsertItemAsync(sourceResumeData);
+      var response = await container.UpsertItemAsync<UserDataRecord>(sourceResumeData);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set source resume data", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -144,7 +145,7 @@ internal partial class UserDataRepository : IUserDataRepository
     {
 
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.UpsertItemAsync(posting);
+      var response = await container.UpsertItemAsync<UserDataRecord>(posting);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set job posting", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -160,7 +161,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.PatchItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value), [PatchOperation.Set("Status", status)]);
+      var response = await container.PatchItemAsync<UserDataRecord>(postingId, new PartitionKey(UserId.Value), [PatchOperation.Set("/Status", status)]);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set job posting status", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -171,12 +172,12 @@ internal partial class UserDataRepository : IUserDataRepository
     }
   }
 
-  public async Task<Result> SetCoverLetterAsync(string postingId, CoverLetter coverLetter)
+  public async Task<Result> SetCoverLetterAsync(CoverLetter coverLetter)
   {
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.PatchItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value), [PatchOperation.Set("CoverLetter", coverLetter)]);
+      var response = await container.PatchItemAsync<UserDataRecord>(coverLetter.PostingId, new PartitionKey(UserId.Value), [PatchOperation.Set("/CoverLetter", coverLetter)]);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set cover letter", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -263,7 +264,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.UpsertItemAsync(resumeData);
+      var response = await container.PatchItemAsync<UserDataRecord>(resumeData.PostingId, new PartitionKey(UserId.Value), [PatchOperation.Set("/ResumeData", resumeData)]);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set resume data", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -279,12 +280,12 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.PatchItemAsync<JobPosting>(update.PostingId, new PartitionKey(UserId.Value),
+      var response = await container.PatchItemAsync<UserDataRecord>(update.PostingId, new PartitionKey(UserId.Value),
       [
-        PatchOperation.Set("PostingData.StreetAddress", update.StreetAddress),
-        PatchOperation.Set("PostingData.City", update.City),
-        PatchOperation.Set("PostingData.State", update.State),
-        PatchOperation.Set("PostingData.Zip", update.Zip)
+        PatchOperation.Set("/PostingData/StreetAddress", update.StreetAddress),
+        PatchOperation.Set("/PostingData/City", update.City),
+        PatchOperation.Set("/PostingData/State", update.State),
+        PatchOperation.Set("/PostingData/Zip", update.Zip)
       ]);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set posting address", response.StatusCode.FromCosmosDBStatusCode());
@@ -293,6 +294,22 @@ internal partial class UserDataRepository : IUserDataRepository
     {
       Logger.LogError(ex, "Exception occurred while setting posting address");
       return Result.Failure($"Exception occurred while setting posting address: {ex.Message}", HttpStatusCode.InternalServerError);
+    }
+  }
+
+  public async Task<Result> SetPostingNotesAsync(Notes notes)
+  {
+    try
+    {
+      var container = CosmosClient.GetContainer("Resumes", "UserData");
+      var response = await container.PatchItemAsync<UserDataRecord>(notes.PostingId, new PartitionKey(UserId.Value), [PatchOperation.Set("/Notes", notes)]);
+
+      return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set notes", response.StatusCode.FromCosmosDBStatusCode());
+    }
+    catch (Exception ex)
+    {
+      Logger.LogError(ex, "Exception occurred while setting notes");
+      return Result.Failure($"Exception occurred while setting notes: {ex.Message}", HttpStatusCode.InternalServerError);
     }
   }
 }

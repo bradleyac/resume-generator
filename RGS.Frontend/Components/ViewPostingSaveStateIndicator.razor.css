@@ -1,0 +1,20 @@
+.save-indicator {
+  display: flex;
+  gap: .5em;
+  padding: 1em;
+  box-shadow: 0 0 1px 1px black;
+  border-radius: 1.5em;
+  height: 3em;
+  aspect-ratio: 1 / 1;
+  align-items: center;
+
+  >p {
+    margin: 0;
+    padding: 0;
+  }
+
+  &:has(p) {
+    aspect-ratio: unset;
+    width: max-content;
+  }
+}

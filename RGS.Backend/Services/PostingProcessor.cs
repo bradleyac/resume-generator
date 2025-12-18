@@ -74,7 +74,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
         return Result.Failure(coverLetterResult.ErrorMessage!, postingResult.StatusCode!.Value);
       }
 
-      return await _userDataRepository.SetCoverLetterAsync(posting.id, coverLetterResult.Value!);
+      return await _userDataRepository.SetCoverLetterAsync(coverLetterResult.Value!);
     }
     catch (Exception ex)
     {

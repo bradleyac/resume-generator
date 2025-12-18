@@ -1,7 +1,7 @@
 ﻿@using Fluxor
 @using Fluxor.Blazor.Web.Components
 @using RGS.Frontend.Store
-@using RGS.Frontend.Store.EditResumeDataFeature
+@using RGS.Frontend.Store.EditSourceResumeDataFeature
 @inherits FluxorComponent
 
 <div class="save-indicator @ClassName">
@@ -21,7 +21,7 @@
 </div>
 
 @code {
-  [Inject] private IState<EditResumeDataState> State { get; set; } = null!;
+  [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
   private string ClassName => State.Value.SaveState.SaveStatus switch
   {
     _ => "bg-body",

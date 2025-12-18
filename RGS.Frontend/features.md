@@ -53,7 +53,7 @@ s
       ~~There must be an established pattern for this out there. What are other people doing?~~
       ~~Have all controllers use this?~~
       ~~This is known as the Result pattern in C#.~~
-    Use standard ProblemDetails?
+    ~~Use standard ProblemDetails?~~
 * Identify places where transient errors could occur and mitigate them
     Not just HttpClient: CosmosClient and AzureOpenAIClient as well. CosmosClient may do some retries on gets already, but not create/update, so those may need to be handled.
 * Standardize request validation

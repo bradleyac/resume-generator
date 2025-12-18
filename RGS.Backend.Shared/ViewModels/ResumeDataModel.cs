@@ -88,3 +88,8 @@ public class BioModel
   [Required]
   public string? Zip { get; set; }
 }
+
+public class NotesModel
+{
+  public string? Text { get; set; }
+}

@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Components;
 using R3;
 using RGS.Backend.Shared.Models;
 using RGS.Frontend.Store;
-using RGS.Frontend.Store.EditResumeDataFeature;
+using RGS.Frontend.Store.EditSourceResumeDataFeature;
 
 namespace RGS.Frontend.Pages;
 
@@ -14,7 +14,7 @@ public partial class ManageSourceResumeData : FluxorComponent, IDisposable
   private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
-  [Inject] private IState<EditResumeDataState> State { get; set; } = null!;
+  [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
   [Inject] private ILogger<ManageSourceResumeData> Logger { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
 
@@ -29,9 +29,9 @@ public partial class ManageSourceResumeData : FluxorComponent, IDisposable
     var edits = Observable.FromEventHandler(
       a => State.StateChanged += a,
       a => State.StateChanged -= a)
-      .Select(e => e.sender as IState<EditResumeDataState>);
+      .Select(e => e.sender as IState<EditSourceResumeDataState>);
     var retries = Observable.Interval(TimeSpan.FromMilliseconds(5000))
-      .Select<Unit, IState<EditResumeDataState>?>(_ => State);
+      .Select<Unit, IState<EditSourceResumeDataState>?>(_ => State);
 
     // Submit edits and retries as necessary.
     // TODO: Give up on retries eventually?

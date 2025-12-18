@@ -1,0 +1,3 @@
+﻿@inherits InputTextArea;
+
+<textarea @attributes="AdditionalAttributes" name="@NameAttributeValue" class="@CssClass" value="@CurrentValueAsString" @oninput="EventCallback.Factory.CreateBinder<string>(this, __value => CurrentValueAsString = __value, CurrentValueAsString!)" />

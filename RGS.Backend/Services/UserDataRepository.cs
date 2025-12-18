@@ -39,7 +39,7 @@ internal interface IUserDataRepository
 
 internal partial class UserDataRepository : IUserDataRepository
 {
-  private string UserId { get; set; }
+  private Lazy<string> UserId { get; init; }
   private CosmosClient CosmosClient { get; set; }
   private IUserService UserService { get; set; }
   private ILogger<UserDataRepository> Logger { get; init; }
@@ -47,9 +47,7 @@ internal partial class UserDataRepository : IUserDataRepository
   // Get current user ID from userService
   public UserDataRepository(CosmosClient cosmosClient, ICurrentUserService currentUserService, IUserService userService, ILogger<UserDataRepository> logger)
   {
-    // TODO: Not great to throw here. What's a better overall pattern for handling errors like this in ASP.NET Core?
-    // There are too many different ways for an error to surface, it should be consistent.
-    UserId = currentUserService.GetCurrentUserId() ?? throw new InvalidOperationException("No authenticated user present");
+    UserId = new Lazy<string>(() => currentUserService.GetCurrentUserId() ?? throw new InvalidOperationException("No current user"));
     UserService = userService;
     CosmosClient = cosmosClient;
     Logger = logger;
@@ -58,7 +56,7 @@ internal partial class UserDataRepository : IUserDataRepository
   // Provided user ID
   public UserDataRepository(CosmosClient cosmosClient, IUserService userService, string userId, ILogger<UserDataRepository> logger)
   {
-    UserId = userId;
+    UserId = new Lazy<string>(() => userId);
     UserService = userService;
     CosmosClient = cosmosClient;
     Logger = logger;
@@ -69,8 +67,8 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var user = await UserService.GetUserByIdAsync(UserId) ?? throw new InvalidOperationException($"User {UserId} not found");
-      var response = await container.ReadItemAsync<SourceResumeData>(user.SourceResumeDataId, new PartitionKey(UserId));
+      var user = await UserService.GetUserByIdAsync(UserId.Value) ?? throw new InvalidOperationException($"User {UserId.Value} not found");
+      var response = await container.ReadItemAsync<SourceResumeData>(user.SourceResumeDataId, new PartitionKey(UserId.Value));
 
       return response.StatusCode switch
       {
@@ -90,7 +88,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.ReadItemAsync<SourceResumeData>(resumeDataId, new PartitionKey(UserId));
+      var response = await container.ReadItemAsync<SourceResumeData>(resumeDataId, new PartitionKey(UserId.Value));
 
       return response.StatusCode switch
       {
@@ -125,7 +123,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.ReadItemAsync<JobPosting>(postingId, new PartitionKey(UserId));
+      var response = await container.ReadItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value));
 
       return response.StatusCode switch
       {
@@ -162,7 +160,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.PatchItemAsync<JobPosting>(postingId, new PartitionKey(UserId), [PatchOperation.Set("Status", status)]);
+      var response = await container.PatchItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value), [PatchOperation.Set("Status", status)]);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set job posting status", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -178,7 +176,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.PatchItemAsync<JobPosting>(postingId, new PartitionKey(UserId), [PatchOperation.Set("CoverLetter", coverLetter)]);
+      var response = await container.PatchItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value), [PatchOperation.Set("CoverLetter", coverLetter)]);
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set cover letter", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -194,7 +192,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.ReadItemAsync<JobPosting>(postingId, new PartitionKey(UserId));
+      var response = await container.ReadItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value));
 
       return response.StatusCode switch
       {
@@ -218,7 +216,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.DeleteItemAsync<JobPosting>(postingId, new PartitionKey(UserId));
+      var response = await container.DeleteItemAsync<JobPosting>(postingId, new PartitionKey(UserId.Value));
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to delete posting", response.StatusCode.FromCosmosDBStatusCode());
     }
@@ -240,8 +238,8 @@ internal partial class UserDataRepository : IUserDataRepository
       // TODO: This is tricky because not all IQueryable methods are supported by Cosmos DB LINQ provider.
       // Need to ensure that any methods used here can be translated to Cosmos DB queries.
       // Also tricky because $type isn't mapped to a property that can be queried against.
-      var query = container.GetItemLinqQueryable<JobPosting>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(UserId) })
-          .Where(p => p.UserId == UserId)
+      var query = container.GetItemLinqQueryable<JobPosting>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(UserId.Value) })
+          .Where(p => p.UserId == UserId.Value)
           .Where(p => p.Status != null) // This is doing a lot of work to exclude non-JobPosting types
           .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
           .Where(p => status == null || p.Status == status)
@@ -281,7 +279,7 @@ internal partial class UserDataRepository : IUserDataRepository
     try
     {
       var container = CosmosClient.GetContainer("Resumes", "UserData");
-      var response = await container.PatchItemAsync<JobPosting>(update.PostingId, new PartitionKey(UserId),
+      var response = await container.PatchItemAsync<JobPosting>(update.PostingId, new PartitionKey(UserId.Value),
       [
         PatchOperation.Set("PostingData.StreetAddress", update.StreetAddress),
         PatchOperation.Set("PostingData.City", update.City),

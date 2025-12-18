@@ -21,10 +21,10 @@
     ~~projects~~
     ~~skills~~
   Polish more
-    Field widths need another look
-    Resume bullets are a little different than skills or technologies because they are sentences. Are badges right for them?
-    Padding
-    Titles and alignment
+    ~~Field widths need another look~~
+    ~~Resume bullets are a little different than skills or technologies because they are sentences. Are badges right for them?~~
+    ~~Padding~~
+    ~~Titles and alignment~~
     Better experience creating new items with more than one field (jobs, projects, books)
 * Make ingestion script work on sites other than Indeed
   ~~LinkedIn~~
@@ -48,11 +48,11 @@ s
 * Figure out how to do IaC for CosmosDB settings changes/container creation. I should not be remembering what I did in DEV and applying it to PROD.
 * ~~Move CoverLetter out of ResumeData and into its own container? No reason to send CoverLetter every time with the ResumeData, especially when editing it.~~
 * ~~Instead of one container per document type, use a single container with a "type" field. This is a best practice. One container per document type is an anti-pattern.~~
-* Research ASP.NET Core error handling patterns and choose a consistent way to handle errors. Right now it's sometimes an exception, sometimes a success or failure result.
-    Maybe/Either monad in C#? A way to chain operations that could possibly fail, definitely handling every error. Catch all exceptions and return an error that can be translated into a response.
-      There must be an established pattern for this out there. What are other people doing?
-      Have all controllers use this?
-      This is known as the Result pattern in C#.
+* ~~Research ASP.NET Core error handling patterns and choose a consistent way to handle errors. Right now it's sometimes an exception, sometimes a success or failure result.~~
+    ~~Maybe/Either monad in C#? A way to chain operations that could possibly fail, definitely handling every error. Catch all exceptions and return an error that can be translated into a response.~~
+      ~~There must be an established pattern for this out there. What are other people doing?~~
+      ~~Have all controllers use this?~~
+      ~~This is known as the Result pattern in C#.~~
     Use standard ProblemDetails?
 * Identify places where transient errors could occur and mitigate them
     Not just HttpClient: CosmosClient and AzureOpenAIClient as well. CosmosClient may do some retries on gets already, but not create/update, so those may need to be handled.

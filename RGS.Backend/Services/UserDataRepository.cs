@@ -155,17 +155,22 @@ internal partial class UserDataRepository : IUserDataRepository
     const int MaxPostingsToReturn = 10;
 
     var container = CosmosClient.GetContainer("Resumes", "UserData");
-    var query = container.GetItemLinqQueryable<JobPosting>()
+
+    // TODO: This is tricky because not all IQueryable methods are supported by Cosmos DB LINQ provider.
+    // Need to ensure that any methods used here can be translated to Cosmos DB queries.
+    // Also tricky because $type isn't mapped to a property that can be queried against.
+    var query = container.GetItemLinqQueryable<JobPosting>(requestOptions: new QueryRequestOptions { PartitionKey = new PartitionKey(UserId) })
         .Where(p => p.UserId == UserId)
+        .Where(p => p.Status != null) // This is doing a lot of work to exclude non-JobPosting types
         .Where(p => lastImportedAt == null || (p.ImportedAt == lastImportedAt && p.id.CompareTo(lastId) > 0) || p.ImportedAt < lastImportedAt)
         .Where(p => status == null || p.Status == status)
         .Where(p => string.IsNullOrWhiteSpace(searchText) || p.PostingData.Company.FullTextContains(searchText) || p.PostingData.Title.FullTextContains(searchText) || p.PostingData.PostingText.FullTextContains(searchText))
-        .Select(p => new PostingSummary(p.id, p.PostingData.Company, p.PostingData.Title, p.PostingData.Link, p.ImportedAt, p.Status))
+        .Select(p => new { p.id, p.PostingData.Company, p.PostingData.Title, p.PostingData.Link, p.ImportedAt, p.Status })
         .OrderByDescending(p => p.ImportedAt)
         .ThenBy(p => p.id)
         .Take(MaxPostingsToReturn);
 
-    return await query.ToFeedIterator().ToListAsync();
+    return (await query.ToFeedIterator().ToListAsync()).Select(p => new PostingSummary(p.id, p.Link, p.Company, p.Title, p.ImportedAt, p.Status)).ToList();
   }
 
   public async Task<bool> SetResumeDataAsync(ResumeData resumeData)

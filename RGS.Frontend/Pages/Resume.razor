@@ -2,7 +2,7 @@
 @using RGS.Backend.Shared.ViewModels
 @layout ResumeLayout
 
-@if (isLoading)
+@if (resumeData is null)
 {
   <p>Loading resume...</p>
 }
@@ -26,13 +26,11 @@ else
   public string PageTitle => $"abradley-resume-{resumeData.PostingId}";
 
   private ResumeData resumeData = null!;
-  private bool isLoading = true;
 
   protected override async Task OnInitializedAsync()
   {
     // Load posting details using PostingId
     resumeData = await PostingsService.GetResumeDataAsync(PostingId);
-    isLoading = false;
   }
 
   private RenderFragment ExperienceSection(ResumeData resumeData) => @<section class="experience">

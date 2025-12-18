@@ -28,11 +28,18 @@ internal class Effects(IResumeDataService resumeDataService)
   [EffectMethod(typeof(FetchResumeDataAction))]
   public async Task FetchResumeData(IDispatcher dispatcher)
   {
-    var resumeData = await _resumeDataService.GetSourceResumeDataAsync();
-
-    if (resumeData is not null)
+    try
     {
-      dispatcher.Dispatch(new FetchResumeDataResultAction(resumeData));
+      var resumeData = await _resumeDataService.GetSourceResumeDataAsync();
+
+      if (resumeData is not null)
+      {
+        dispatcher.Dispatch(new FetchResumeDataResultAction(resumeData));
+      }
+    }
+    catch (Exception ex)
+    {
+      Console.WriteLine(ex.Message);
     }
   }
 

@@ -16,8 +16,6 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, IUse
     private readonly ILogger<ListCompletedPostings> _logger = logger;
     private readonly IUserDataRepository _userDataRepository = userDataRepository;
 
-    private const int MaxPostingsToReturn = 10;
-
     [Function("ListCompletedPostings")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
@@ -54,6 +52,8 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, IUse
             searchText = searchTextValues.First();
         }
 
-        return new JsonResult(await _userDataRepository.GetPostingListAsync(lastImportedAt, lastId, status, searchText));
+        var postings = await _userDataRepository.GetPostingListAsync(lastImportedAt, lastId, status, searchText);
+
+        return new JsonResult(postings);
     }
 }

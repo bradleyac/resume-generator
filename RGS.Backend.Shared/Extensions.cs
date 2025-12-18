@@ -19,6 +19,18 @@ public static class Extensions
     return results;
   }
 
+  public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this FeedIterator<T> @this)
+  {
+    while (@this.HasMoreResults)
+    {
+      var next = await @this.ReadNextAsync();
+      foreach (var item in next)
+      {
+        yield return item;
+      }
+    }
+  }
+
   /// <summary>
   /// Like Aggregate, but emits the accumulator at each step.
   /// </summary>

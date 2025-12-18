@@ -72,5 +72,6 @@ internal class DevelopmentUserService : IUserService
 
   public Task<User?> GetUserByApiKeyAsync(string apiKey) => Task.FromResult<User?>(new User("13b1c25378654837956349833d60216e", "13b1c25378654837956349833d60216e", apiKey, "andrew.charles.bradley@gmail.com", DefaultSourceResumeDataId));
 
-  public Task<User?> GetUserByIdAsync(string userId) => Task.FromResult<User?>(new User(userId, userId, "13b1c25378654837956349833d60216e", "andrew.charles.bradley@gmail.com", DefaultSourceResumeDataId));
+  // This could just be using the real thing instead of stubbed out like this, if GetCurrentUserId were somewhere else. GetCurrentUserId is the only reason this class exists.
+  public Task<User?> GetUserByIdAsync(string userId) => Task.FromResult<User?>(new User(userId, userId, "13b1c25378654837956349833d60216e", "andrew.charles.bradley@gmail.com", "0ab91230-14bd-4958-9afa-98c98bf44b78"));
 }

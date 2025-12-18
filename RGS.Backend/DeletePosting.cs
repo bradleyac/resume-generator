@@ -18,19 +18,16 @@ internal class DeletePosting(ILogger<DeletePosting> logger, IUserDataRepository 
     [Function("DeletePosting")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "DeletePosting/{postingId}")] HttpRequest req, string postingId)
     {
-        try
-        {
-            // TODO: CSRF protection
-            // Currently using cookie-based authentication built into Azure Functions, and thus vulnerable to CSRF.
-            // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.
-            bool success = await _userDataRepository.DeletePostingAsync(postingId);
+        // TODO: CSRF protection
+        // Currently using cookie-based authentication built into Azure Functions, and thus vulnerable to CSRF.
+        // Fixes include changing to token-based authentication in headers or implementing anti-CSRF tokens.
+        var result = await _userDataRepository.DeletePostingAsync(postingId);
 
-            return success ? new OkResult() : new StatusCodeResult((int)HttpStatusCode.InternalServerError);
-        }
-        catch (Exception e)
+        return result switch
         {
-            _logger.LogError(e, "Failed to delete job posting");
-            throw;
-        }
+            { IsSuccess: true } => new OkResult(),
+            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+        };
     }
 }

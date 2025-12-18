@@ -54,6 +54,11 @@ internal class ListCompletedPostings(ILogger<ListCompletedPostings> logger, IUse
 
         var postings = await _userDataRepository.GetPostingListAsync(lastImportedAt, lastId, status, searchText);
 
-        return new JsonResult(postings);
+        return postings switch
+        {
+            { IsSuccess: true, Value: var postingList } => new JsonResult(postingList),
+            { IsSuccess: false, StatusCode: System.Net.HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+            _ => new StatusCodeResult((int)System.Net.HttpStatusCode.InternalServerError),
+        };
     }
 }

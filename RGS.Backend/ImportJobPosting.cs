@@ -65,14 +65,15 @@ internal class ImportJobPosting(ILogger<ImportJobPosting> logger, ICurrentUserSe
 
             return await userDataRepository.SetPostingAsync(newPosting) switch
             {
-                true => new OkResult(),
-                false => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+                { IsSuccess: true } => new OkResult(),
+                { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+                _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
             };
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Failed to import job posting");
-            throw;
+            return new StatusCodeResult((int)HttpStatusCode.InternalServerError);
         }
     }
 }

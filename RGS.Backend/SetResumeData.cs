@@ -10,6 +10,7 @@ using RGS.Backend.Shared;
 using RGS.Backend.Services;
 using RGS.Backend.Shared.ViewModels;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace RGS.Backend;
 
@@ -21,25 +22,19 @@ internal class SetResumeData(ILogger<SetResumeData> logger, IUserDataRepository 
     [Function("SetResumeData")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
-        try
+        var payload = await req.ReadFromJsonAsync<ResumeData>();
+        if (payload is null || !Validator.TryValidateObject(payload, new ValidationContext(payload), []))
         {
-            var payload = await req.ReadFromJsonAsync<ResumeData>() ?? throw new ArgumentException("Invalid payload");
-
-            // TODO: Standardize this.
-            if (!Validator.TryValidateObject(payload, new ValidationContext(payload), []))
-            {
-                return new BadRequestResult();
-            }
-
-            bool result = await _userDataRepository.SetResumeDataAsync(payload);
-
-            // TODO: This (and other IUserDataRepositoryOperations) might have been an error, not a not found. Boolean is not a good type for this result. Use Result pattern.
-            return result ? new OkResult() : new NotFoundResult();
+            return new BadRequestResult();
         }
-        catch (Exception e)
+
+        var result = await _userDataRepository.SetResumeDataAsync(payload);
+
+        return result switch
         {
-            _logger.LogError(e, "Failed to set resume data");
-            throw;
-        }
+            { IsSuccess: true } => new OkResult(),
+            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+        };
     }
 }

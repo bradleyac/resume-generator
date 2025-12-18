@@ -20,7 +20,13 @@ internal class RegenerateCoverLetter(ILogger<RegenerateCoverLetter> logger, Post
         var payload = await req.ReadFromJsonAsync<RegenerateCoverLetterModel>() ?? throw new ArgumentException("Invalid payload");
 
         _logger.LogInformation("Re-generating cover letter.");
-        await _postingProcessor.RegenerateCoverLetterAsync(payload);
-        return new OkResult();
+        var result = await _postingProcessor.RegenerateCoverLetterAsync(payload);
+
+        return result switch
+        {
+            { IsSuccess: true } => new OkResult(),
+            { IsSuccess: false, StatusCode: System.Net.HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+            _ => new StatusCodeResult((int)System.Net.HttpStatusCode.InternalServerError),
+        };
     }
 }

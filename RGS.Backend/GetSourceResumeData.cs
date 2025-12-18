@@ -9,6 +9,7 @@ using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
 using RGS.Backend.Services;
 using System.Runtime.Intrinsics.Arm;
+using System.Net;
 
 namespace RGS.Backend;
 
@@ -20,19 +21,11 @@ internal class GetSourceResumeData(ILogger<GetSourceResumeData> logger, IUserDat
     [Function("GetSourceResumeData")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
     {
-        try
+        return await _userDataRepository.GetSourceResumeDataAsync() switch
         {
-            return await _userDataRepository.GetSourceResumeDataAsync() switch
-            {
-                null => new NotFoundResult(),
-                SourceResumeData resumeData => new JsonResult(resumeData),
-            };
-
-        }
-        catch (Exception e)
-        {
-            _logger.LogError(e, "Failed to load source resume data");
-            throw;
-        }
+            { IsSuccess: true, Value: SourceResumeData resumeData } => new JsonResult(resumeData),
+            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+        };
     }
 }

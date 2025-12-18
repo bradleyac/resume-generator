@@ -12,6 +12,7 @@ using RGS.Backend.Shared.ViewModels;
 using System.ComponentModel.DataAnnotations;
 using Grpc.Core;
 using System.Net;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace RGS.Backend;
 
@@ -23,23 +24,19 @@ internal class SetSourceResumeData(ILogger<SetSourceResumeData> logger, IUserDat
     [Function("SetSourceResumeData")]
     public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "post")] HttpRequest req)
     {
-        try
+        var payload = await req.ReadFromJsonAsync<SourceResumeData>();
+        if (payload is null || !Validator.TryValidateObject(payload, new ValidationContext(payload), []))
         {
-            var payload = await req.ReadFromJsonAsync<SourceResumeData>() ?? throw new ArgumentException("Invalid payload");
-
-            if (!Validator.TryValidateObject(payload, new ValidationContext(payload), []))
-            {
-                return new BadRequestResult();
-            }
-
-            bool result = await _userDataRepository.SetSourceResumeDataAsync(payload);
-
-            return result ? new OkResult() : new NotFoundResult();
+            return new BadRequestResult();
         }
-        catch (Exception e)
+
+        var result = await _userDataRepository.SetSourceResumeDataAsync(payload);
+
+        return result switch
         {
-            _logger.LogError(e, "Failed to set source resume data");
-            throw;
-        }
+            { IsSuccess: true } => new OkResult(),
+            { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+            _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+        };
     }
 }

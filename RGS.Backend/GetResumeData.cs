@@ -8,6 +8,7 @@ using Microsoft.Identity.Client;
 using RGS.Backend.Shared.Models;
 using RGS.Backend.Shared;
 using RGS.Backend.Services;
+using System.Net;
 
 namespace RGS.Backend;
 
@@ -19,21 +20,16 @@ internal class GetResumeData(ILogger<GetResumeData> logger, IUserDataRepository 
   [Function("GetResumeData")]
   public async Task<IActionResult> Run([HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequest req)
   {
-    try
-    {
-      var postingId = req.Query["postingId"].FirstOrDefault() ?? throw new ArgumentException("postingId missing");
-      var resumeData = await _userDataRepository.GetResumeDataAsync(postingId);
+    var postingId = req.Query["postingId"].FirstOrDefault();
+    if (postingId is null) return new BadRequestResult();
 
-      return resumeData switch
-      {
-        null => new NotFoundResult(),
-        _ => new JsonResult(resumeData),
-      };
-    }
-    catch (Exception e)
+    var resumeData = await _userDataRepository.GetResumeDataAsync(postingId);
+
+    return resumeData switch
     {
-      _logger.LogError(e, "Failed to load resume data");
-      throw;
-    }
+      { IsSuccess: true, Value: var data } => new JsonResult(data),
+      { IsSuccess: false, StatusCode: HttpStatusCode statusCode } => new StatusCodeResult((int)statusCode),
+      _ => new StatusCodeResult((int)HttpStatusCode.InternalServerError),
+    };
   }
 }

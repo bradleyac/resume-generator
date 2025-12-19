@@ -40,7 +40,7 @@
     Unit tests
     Start doing TDD?
 * Additional statuses after applied for jobs I've heard back about
-    Add place for notes
+    ~~Add place for notes~~
 * Generate practice interview questions based on job description
 
 # TODOs

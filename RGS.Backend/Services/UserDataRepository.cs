@@ -11,13 +11,19 @@ namespace RGS.Backend.Services;
 internal interface IUserDataRepositoryFactory
 {
   IUserDataRepository CreateUserDataRepository(string userId);
+  IUserDataRepository CreateUserDataRepository();
 }
 
-internal class UserDataRepositoryFactory(CosmosClient cosmosClient, IUserService userService, ILogger<UserDataRepository> logger) : IUserDataRepositoryFactory
+internal class UserDataRepositoryFactory(CosmosClient cosmosClient, IUserService userService, ICurrentUserService currentUserService, ILogger<UserDataRepository> logger) : IUserDataRepositoryFactory
 {
   public IUserDataRepository CreateUserDataRepository(string userId)
   {
     return new UserDataRepository(cosmosClient, userService, userId, logger);
+  }
+
+  public IUserDataRepository CreateUserDataRepository()
+  {
+    return new UserDataRepository(cosmosClient, currentUserService, userService, logger);
   }
 }
 

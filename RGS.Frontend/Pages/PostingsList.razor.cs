@@ -15,6 +15,7 @@ namespace RGS.Frontend.Pages
     private Func<Task>? LoadMorePostings { get; set; } = null;
     private Subject<string> SearchTermSubject { get; set; } = new();
     private IDisposable? _searchTermSubscription;
+    private bool _loading;
 
     [Parameter]
     [SupplyParameterFromQuery]
@@ -35,6 +36,7 @@ namespace RGS.Frontend.Pages
           await LoadPostingsByStatus(searchTerm);
           StateHasChanged();
         });
+
       await LoadPostingsByStatus();
     }
 
@@ -52,9 +54,18 @@ namespace RGS.Frontend.Pages
 
       LoadMorePostings = async () =>
       {
-        if (await enumerator.MoveNextAsync())
+        if (_loading) return;
+        try
         {
-          Postings.AddRange(enumerator.Current);
+          _loading = true;
+          if (await enumerator.MoveNextAsync())
+          {
+            Postings.AddRange(enumerator.Current);
+          }
+        }
+        finally
+        {
+          _loading = false;
         }
       };
 
@@ -65,6 +76,12 @@ namespace RGS.Frontend.Pages
     {
       await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Applied));
       Postings = Postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Applied } : p).ToList();
+    }
+
+    private async Task OnPostingReplied(string postingId)
+    {
+      await PostingsService.SetPostingStatusAsync(new(postingId, PostingStatus.Replied));
+      Postings = Postings?.Select(p => p.id == postingId ? p with { Status = PostingStatus.Replied } : p).ToList();
     }
 
     private async Task OnPostingArchived(string postingId)

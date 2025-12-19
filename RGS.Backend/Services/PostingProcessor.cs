@@ -13,7 +13,7 @@ using RGS.Backend.Shared.Models;
 
 namespace RGS.Backend.Services;
 
-internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient, IUserDataRepository userDataRepository)
+internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient, IUserDataRepositoryFactory userDataRepositoryFactory)
 {
   private const int LineLength = 85;
   private const int MaxLines = 25;
@@ -21,7 +21,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
   private readonly ILogger<PostingProcessor> _logger = logger;
   private readonly CosmosClient _cosmosClient = cosmosClient;
   private readonly AzureOpenAIClient _aiClient = aiClient;
-  private readonly IUserDataRepository _userDataRepository = userDataRepository;
+  private readonly IUserDataRepositoryFactory _userDataRepositoryFactory = userDataRepositoryFactory;
 
   public async Task CatchUp()
   {
@@ -46,8 +46,9 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
 
   public async Task ProcessPendingPosting(JobPosting posting)
   {
+    var userDataRepository = _userDataRepositoryFactory.CreateUserDataRepository(posting.UserId);
     var userDataContainer = _cosmosClient.GetContainer("Resumes", "UserData");
-    var resumeData = await GenerateResumeDataAsync(posting);
+    var resumeData = await GenerateResumeDataAsync(posting, userDataRepository);
     var coverLetter = await GenerateCoverLetterAsync(posting);
     await userDataContainer.UpsertItemAsync(resumeData);
     await userDataContainer.UpsertItemAsync(coverLetter);
@@ -56,9 +57,10 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
 
   public async Task<Result> RegenerateCoverLetterAsync(RegenerateCoverLetterModel model)
   {
+    var userDataRepository = _userDataRepositoryFactory.CreateUserDataRepository();
     try
     {
-      var postingResult = await _userDataRepository.GetPostingAsync(model.PostingId);
+      var postingResult = await userDataRepository.GetPostingAsync(model.PostingId);
 
       if (!postingResult.IsSuccess)
       {
@@ -74,7 +76,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
         return Result.Failure(coverLetterResult.ErrorMessage!, postingResult.StatusCode!.Value);
       }
 
-      return await _userDataRepository.SetCoverLetterAsync(coverLetterResult.Value!);
+      return await userDataRepository.SetCoverLetterAsync(coverLetterResult.Value!);
     }
     catch (Exception ex)
     {
@@ -82,11 +84,11 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
     }
   }
 
-  private async Task<Result<ResumeData>> GenerateResumeDataAsync(JobPosting posting)
+  private async Task<Result<ResumeData>> GenerateResumeDataAsync(JobPosting posting, IUserDataRepository userDataRepository)
   {
     try
     {
-      var sourceResumeDataResult = await _userDataRepository.GetSourceResumeDataAsync();
+      var sourceResumeDataResult = await userDataRepository.GetSourceResumeDataAsync();
 
       if (!sourceResumeDataResult.IsSuccess)
       {

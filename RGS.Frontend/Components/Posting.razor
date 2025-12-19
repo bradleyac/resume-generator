@@ -16,11 +16,16 @@
       {
         <button class="btn btn-success" @onclick="async () => await OnApplied.InvokeAsync(PostingSummary.id)">Mark Applied</button>
       }
+      @if (PostingSummary.Status == PostingStatus.Applied)
+      {
+        <button class="btn btn-primary" @onclick="async () => await OnReplied.InvokeAsync(PostingSummary.id)">Mark Replied</button>
+      }
       @if (PostingSummary.Status != PostingStatus.Archived)
       {
         <button class="btn btn-danger" @onclick="async () => await OnArchived.InvokeAsync(PostingSummary.id)">Archive Posting</button>
       }
-      else {
+      else
+      {
         <button class="btn btn-danger" @onclick="async () => await OnDeletePosting.InvokeAsync(PostingSummary.id)">Delete Posting</button>
       }
     </div>
@@ -32,6 +37,7 @@
 
   [Inject] private NavigationManager NavigationManager { get; set; } = null!;
   [Parameter] public EventCallback<string> OnApplied { get; set; }
+  [Parameter] public EventCallback<string> OnReplied { get; set; }
   [Parameter] public EventCallback<string> OnArchived { get; set; }
   [Parameter] public EventCallback<string> OnResubmit { get; set; }
   [Parameter] public EventCallback<string> OnDeletePosting { get; set; }
@@ -40,8 +46,9 @@
   {
     PostingStatus.Pending => "border-2 border-light",
     PostingStatus.Ready => "border-2 border-warning",
-    PostingStatus.Applied => "border-2 border-success",
+    PostingStatus.Applied => "border-2 border-success-subtle",
     PostingStatus.Archived => "border-2 border-secondary",
+    PostingStatus.Replied => "border-2 border-success",
     _ => "",
   };
 
@@ -49,8 +56,9 @@
   {
     PostingStatus.Pending => "bg-light",
     PostingStatus.Ready => "bg-warning",
-    PostingStatus.Applied => "bg-success",
+    PostingStatus.Applied => "bg-success-subtle",
     PostingStatus.Archived => "bg-secondary",
+    PostingStatus.Replied => "bg-success",
     _ => "",
   };
 

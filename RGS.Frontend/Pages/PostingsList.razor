@@ -48,7 +48,7 @@
         @foreach (var posting in postingDay)
         {
           <li>
-            <Posting @key=@posting.id OnApplied="OnPostingApplied" OnArchived="OnPostingArchived" OnResubmit="OnResubmitPosting" OnDeletePosting="OnDeletePosting" PostingSummary=@posting />
+            <Posting @key=@posting.id OnApplied="OnPostingApplied" OnReplied="OnPostingReplied" OnArchived="OnPostingArchived" OnResubmit="OnResubmitPosting" OnDeletePosting="OnDeletePosting" PostingSummary=@posting />
           </li>
         }
       </ul>

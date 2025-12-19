@@ -3,8 +3,9 @@
 @using Microsoft.Azure.Cosmos.Linq
 @using R3
 @using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Store
 @using RGS.Frontend.Store.ViewPostingFeature
-@inherits FluxorComponent;
+@inherits FluxorComponent
 
 <EditForm EditContext="@EditContext" FormName="EditNotes">
   <DataAnnotationsValidator />
@@ -15,14 +16,13 @@
   </div>
 </EditForm>
 
-
 @code {
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
-  [Inject] private IState<ViewPostingState> ViewPostingState { get; set; } = null!;
+  [Inject] private IState<ViewPostingState> State { get; set; } = null!;
 
   private EditContext EditContext { get; set; } = null!;
   private NotesModel Model { get; set; } = null!;
-  private CompositeDisposable? _subscription = null!;
+  private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
   protected override void OnInitialized()
@@ -31,9 +31,17 @@
 
     Model = new()
     {
-      Text = ViewPostingState.Value.Posting?.Notes?.Text ?? "",
+      Text = State.Value.Posting?.Notes?.Text ?? "",
     };
-    _subscription = new CompositeDisposable();
+
+    SubscribeToAction((SaveNotesResultAction action) =>
+    {
+      if (action.Success)
+      {
+        EditContext.MarkAsUnmodified();
+      }
+    });
+
     EditContext = new EditContext(Model);
     Observable.FromEventHandler<FieldChangedEventArgs>(
     a => EditContext.OnFieldChanged += a,
@@ -42,15 +50,30 @@
     .WhereNotNull()
     .Where(ec => ec.Validate())
     .Select(ec => (NotesModel)ec.Model)
-    .Debounce(TimeSpan.FromMilliseconds(500))
     .Subscribe(model =>
     {
-      EditContext.MarkAsUnmodified();
-      Dispatcher.Dispatch(new EditNotesAction(ViewPostingState.Value.Posting!.Notes is null
-  ? new Notes(ViewPostingState.Value.Posting!.id, ViewPostingState.Value.Posting.UserId, model.Text ?? "")
-  : ViewPostingState.Value.Posting.Notes with { Text = model.Text ?? "" }));
+      Dispatcher.Dispatch(new EditNotesAction(State.Value.Posting!.Notes is null
+  ? new Notes(State.Value.Posting!.id, State.Value.Posting.UserId, model.Text ?? "")
+  : State.Value.Posting.Notes with { Text = model.Text ?? "" }));
     })
-    .AddTo(_subscription); ;
+    .AddTo(_subscription);
+
+    var edits = Observable.FromEventHandler(
+    a => State.StateChanged += a,
+    a => State.StateChanged -= a)
+    .Select(e => e.sender as IState<ViewPostingState>);
+
+    var retries = Observable.Interval(TimeSpan.FromMilliseconds(5000))
+    .Select<R3.Unit, IState<ViewPostingState>?>(_ => State);
+
+    // Submit edits and retries as necessary.
+    // TODO: Give up on retries eventually?
+    Observable.Merge(edits, retries)
+    .WhereNotNull()
+    .Where(state => state.Value is not null && state.Value.SaveState.SaveStatus is SaveStatus.Dirty or SaveStatus.Faulted)
+    .Debounce(TimeSpan.FromMilliseconds(500))
+    .Subscribe(state => Dispatcher.Dispatch(new SaveNotesAction(State.Value.Posting!.Notes!)))
+    .AddTo(_subscription);
   }
 
   protected override async ValueTask DisposeAsyncCore(bool disposing)

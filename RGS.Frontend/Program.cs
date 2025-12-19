@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using R3;
 using RGS.Backend.Shared.ViewModels;
 using RGS.Frontend;
+using RGS.Frontend.Store;
 using RGS.Frontend.Store.EditSourceResumeDataFeature;
 using RGS.Frontend.Store.ViewPostingFeature;
 

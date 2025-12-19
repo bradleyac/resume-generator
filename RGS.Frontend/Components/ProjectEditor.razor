@@ -1,8 +1,9 @@
-﻿@implements IDisposable
-@using Fluxor
+﻿@using Fluxor
+@using Fluxor.Blazor.Web.Components
 @using R3
 @using RGS.Backend.Shared.ViewModels
 @using RGS.Frontend.Store.EditSourceResumeDataFeature
+@inherits FluxorComponent
 
 <EditForm EditContext="@EditContext" FormName="EditProject">
   <DataAnnotationsValidator />
@@ -36,7 +37,7 @@
   public ProjectModel Model { get; set; } = null!;
   private string NewTechnology { get; set; } = "";
   private string newEntryId = Guid.NewGuid().ToString();
-  private CompositeDisposable? _subscription;
+  private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
   private async Task AddTech()
@@ -62,7 +63,14 @@
       Technologies = [.. Project.Technologies]
     };
 
-    _subscription = new CompositeDisposable();
+    SubscribeToAction((UpdateResumeDataResultAction action) =>
+    {
+      if (action.Success)
+      {
+        EditContext.MarkAsUnmodified();
+      }
+    });
+
     EditContext = new EditContext(Model);
     EditContext.Validate();
     Observable.FromEventHandler<FieldChangedEventArgs>(
@@ -74,7 +82,6 @@
     .Select(ec => (ProjectModel)ec.Model)
     .Subscribe(model =>
     {
-      EditContext.MarkAsUnmodified();
       Dispatcher.Dispatch(new UpdateProjectAction(ProjectIndex, new Project(model.Name!, model.Description!, [.. model.Technologies], model.When!)));
     })
     .AddTo(_subscription);
@@ -86,11 +93,13 @@
     EditContext.Validate();
   }
 
-  public void Dispose()
+  protected override async ValueTask DisposeAsyncCore(bool disposing)
   {
+    await base.DisposeAsyncCore(disposing);
+
     if (!_disposedValue)
     {
-      _subscription?.Dispose();
+      _subscription.Dispose();
     }
 
     _disposedValue = true;

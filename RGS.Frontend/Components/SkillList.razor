@@ -1,12 +1,12 @@
 ﻿@using BlazorBootstrap
 @using Fluxor
+@using Fluxor.Blazor.Web.Components
 @using R3
 @using RGS.Backend.Shared.ViewModels
 @using System.Configuration
 @using RGS.Frontend.ViewModels
 @using RGS.Frontend.Store.EditSourceResumeDataFeature
-
-@implements IDisposable
+@inherits FluxorComponent
 
 <EditForm EditContext="@EditContext" FormName="EditSkillCategory">
   <DataAnnotationsValidator />
@@ -38,7 +38,7 @@
   private SkillCategoryModel Model { get; set; } = null!;
   private string NewSkill { get; set; } = "";
   private string newSkillId = Guid.NewGuid().ToString();
-  private CompositeDisposable? _subscription;
+  private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
   private async Task AddSkill()
@@ -61,7 +61,15 @@
       Items = [.. Category.Items],
       Label = Category.Label
     };
-    _subscription = new CompositeDisposable();
+
+    SubscribeToAction((UpdateResumeDataResultAction action) =>
+    {
+      if (action.Success)
+      {
+        EditContext.MarkAsUnmodified();
+      }
+    });
+
     EditContext = new EditContext(Model);
     Observable.FromEventHandler<FieldChangedEventArgs>(
     a => EditContext.OnFieldChanged += a,
@@ -72,7 +80,6 @@
     .Select(ec => (SkillCategoryModel)ec.Model)
     .Subscribe(model =>
     {
-      EditContext.MarkAsUnmodified();
       Dispatcher.Dispatch(new UpdateSkillCategoryAction(SkillCategoryIndex, new SkillCategory(model.Label!, model.Items.ToArray())));
     })
     .AddTo(_subscription);
@@ -83,11 +90,13 @@
     Model.Items = [.. Category.Items];
   }
 
-  public void Dispose()
+  protected override async ValueTask DisposeAsyncCore(bool disposing)
   {
+    await base.DisposeAsyncCore(disposing);
+
     if (!_disposedValue)
     {
-      _subscription?.Dispose();
+      _subscription.Dispose();
     }
 
     _disposedValue = true;

@@ -2,9 +2,10 @@
 @using Fluxor.Blazor.Web.Components
 @using R3
 @using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Store
 @using RGS.Frontend.Store.EditSourceResumeDataFeature
 
-@inherits FluxorComponent;
+@inherits FluxorComponent
 
 <EditForm EditContext="@EditContext" FormName="EditBiography">
   <DataAnnotationsValidator />
@@ -28,7 +29,7 @@
 
   private EditContext EditContext { get; set; } = null!;
   private BioModel Model { get; set; } = null!;
-  private CompositeDisposable? _subscription = null!;
+  private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
   protected override void OnInitialized()
@@ -45,6 +46,15 @@
       StreetAddress = Bio.StreetAddress,
       Zip = Bio.Zip
     };
+
+    SubscribeToAction((UpdateResumeDataResultAction action) =>
+    {
+      if (action.Success)
+      {
+        EditContext.MarkAsUnmodified();
+      }
+    });
+
     _subscription = new CompositeDisposable();
     EditContext = new EditContext(Model);
     Observable.FromEventHandler<FieldChangedEventArgs>(
@@ -56,7 +66,6 @@
     .Select(ec => (BioModel)ec.Model)
     .Subscribe(model =>
     {
-      EditContext.MarkAsUnmodified();
       Dispatcher.Dispatch(new UpdateBioAction(new Bio(model.Name!, model.Title!, model.About!, model.StreetAddress!, model.City!, model.State!, model.Zip!)));
     })
     .AddTo(_subscription); ;
@@ -68,7 +77,7 @@
 
     if (!_disposedValue)
     {
-      _subscription?.Dispose();
+      _subscription.Dispose();
     }
 
     _disposedValue = true;

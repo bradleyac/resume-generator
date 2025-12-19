@@ -14,6 +14,9 @@
 else
 {
   <div class="@ContainerClass card m-3 p-3">
+    <div class="save-state-indicator mb-3">
+      <ViewPostingSaveStateIndicator />
+    </div>
     <label>Posting Id: </label>
     <LoadingText TextObject=@State.Value.Posting.id />
     <div class="d-flex gap-2" role="group" aria-label="Actions">

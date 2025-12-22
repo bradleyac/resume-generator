@@ -12,7 +12,7 @@ internal class PendingPostingsTrigger
     private readonly ILogger<PendingPostingsTrigger> _logger;
     private readonly PostingProcessor _postingProcessor;
 
-    public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient, PostingProcessor postingProcessor)
+    public PendingPostingsTrigger(ILogger<PendingPostingsTrigger> logger, PostingProcessor postingProcessor)
     {
         _logger = logger;
         _postingProcessor = postingProcessor;

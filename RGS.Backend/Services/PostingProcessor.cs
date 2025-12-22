@@ -47,7 +47,6 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
   public async Task<Result> ProcessPendingPosting(JobPosting posting)
   {
     var userDataRepository = _userDataRepositoryFactory.CreateUserDataRepository(posting.UserId);
-    var userDataContainer = _cosmosClient.GetContainer("Resumes", "UserData");
     var resumeData = await GenerateResumeDataAsync(posting, userDataRepository);
 
     if (!resumeData.IsSuccess)
@@ -62,7 +61,7 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
       return Result.Failure(coverLetter.ErrorMessage!, coverLetter.StatusCode!.Value);
     }
 
-    await userDataRepository.SetPostingAsync(posting with
+    return await userDataRepository.SetPostingAsync(posting with
     {
       Status = PostingStatus.Ready,
       CoverLetter = coverLetter.Value,

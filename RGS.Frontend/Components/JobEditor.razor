@@ -34,7 +34,7 @@
 @code {
   private EditContext EditContext { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
-  [Parameter] public required Job Job { get; set; }
+  [Inject] private IStateSelection<EditSourceResumeDataState, Job?> JobSelector { get; set; } = null!;
   [Parameter] public required int JobIndex { get; set; }
   public JobModel Model { get; set; } = null!;
   private string NewBullet { get; set; } = "";
@@ -57,15 +57,29 @@
   {
     base.OnInitialized();
 
+    JobSelector.Select(state => state.ResumeData?.Jobs[JobIndex]);
+
     Model = new()
     {
-      Company = Job.Company,
-      Title = Job.Title,
-      Location = Job.Location,
-      Start = Job.Start,
-      End = Job.End,
-      Bullets = [.. Job.Bullets],
+      Id = JobSelector.Value?.id!,
+      Company = JobSelector.Value?.Company,
+      Title = JobSelector.Value?.Title,
+      Location = JobSelector.Value?.Location,
+      Start = JobSelector.Value?.Start,
+      End = JobSelector.Value?.End,
+      Bullets = [.. JobSelector.Value?.Bullets ?? []],
     };
+
+    JobSelector.ValueChanges().Subscribe(job =>
+    {
+      Model?.Company = job?.Company;
+      Model?.Title = job?.Title;
+      Model?.Location = job?.Location;
+      Model?.Start = job?.Start;
+      Model?.End = job?.End;
+      Model?.Bullets = [.. job?.Bullets ?? []];
+      StateHasChanged();
+    });
 
     SubscribeToAction((UpdateResumeDataResultAction action) =>
     {
@@ -86,15 +100,9 @@
     .Select(ec => (JobModel)ec.Model)
     .Subscribe(model =>
     {
-      Dispatcher.Dispatch(new UpdateJobAction(JobIndex, new Job(model.Title!, model.Company!, model.Location!, model.Start!, model.End!, [.. model.Bullets])));
+      Dispatcher.Dispatch(new UpdateJobAction(JobIndex, new Job(model.Id, model.Title!, model.Company!, model.Location!, model.Start!, model.End!, [.. model.Bullets])));
     })
     .AddTo(_subscription);
-  }
-
-  protected override void OnParametersSet()
-  {
-    Model.Bullets = Job.Bullets.ToList();
-    EditContext.Validate();
   }
 
   protected override async ValueTask DisposeAsyncCore(bool disposing)

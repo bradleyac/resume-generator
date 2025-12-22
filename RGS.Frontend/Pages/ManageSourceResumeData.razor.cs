@@ -9,7 +9,7 @@ using RGS.Frontend.Store.EditSourceResumeDataFeature;
 
 namespace RGS.Frontend.Pages;
 
-public partial class ManageSourceResumeData : FluxorComponent, IDisposable
+public partial class ManageSourceResumeData : FluxorComponent
 {
   private CompositeDisposable _subscription = new();
   private bool _disposedValue;
@@ -51,23 +51,15 @@ public partial class ManageSourceResumeData : FluxorComponent, IDisposable
     }
   }
 
-  protected virtual void Dispose(bool disposing)
+  protected override async ValueTask DisposeAsyncCore(bool disposing)
   {
+    await base.DisposeAsyncCore(disposing);
+
     if (!_disposedValue)
     {
-      if (disposing)
-      {
-        _subscription?.Dispose();
-      }
-
-      _disposedValue = true;
+      _subscription.Dispose();
     }
-  }
 
-  public void Dispose()
-  {
-    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-    Dispose(disposing: true);
-    GC.SuppressFinalize(this);
+    _disposedValue = true;
   }
 }

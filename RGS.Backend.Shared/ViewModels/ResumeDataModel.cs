@@ -7,6 +7,7 @@ namespace RGS.Backend.Shared.ViewModels;
 
 public class JobModel
 {
+  public required string Id { get; set; }
   [Required]
   public string? Title { get; set; }
   [Required]
@@ -23,6 +24,7 @@ public class JobModel
 
 public class ProjectModel
 {
+  public required string Id { get; set; }
   [Required]
   public string? Name { get; set; }
   [Required]
@@ -35,6 +37,7 @@ public class ProjectModel
 
 public class EducationModel
 {
+  public required string Id { get; set; }
   [Required]
   public string? Degree { get; set; }
   [Required]
@@ -57,6 +60,7 @@ public class ContactModel
 
 public class SkillCategoryModel
 {
+  public required string Id { get; set; }
   [Required]
   public string? Label { get; set; }
   [Required]
@@ -65,6 +69,7 @@ public class SkillCategoryModel
 
 public class BookModel
 {
+  public required string Id { get; set; }
   [Required]
   public string? Title { get; set; }
   [Required]

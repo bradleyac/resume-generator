@@ -4,7 +4,6 @@
 @using R3
 @using RGS.Backend.Shared.ViewModels
 @using System.Configuration
-@using RGS.Frontend.ViewModels
 @using RGS.Frontend.Store.EditSourceResumeDataFeature
 @inherits FluxorComponent
 
@@ -33,7 +32,7 @@
 @code {
   private EditContext EditContext { get; set; } = null!;
   [Parameter] public required int SkillCategoryIndex { get; set; }
-  [Parameter] public required SkillCategory Category { get; set; }
+  [Inject] private IStateSelection<EditSourceResumeDataState, SkillCategory?> SkillCategorySelector { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
   private SkillCategoryModel Model { get; set; } = null!;
   private string NewSkill { get; set; } = "";
@@ -56,11 +55,21 @@
   {
     base.OnInitialized();
 
+    SkillCategorySelector.Select(state => state.ResumeData?.Skills[SkillCategoryIndex]);
+
     Model = new()
     {
-      Items = [.. Category.Items],
-      Label = Category.Label
+      Id = SkillCategorySelector.Value!.id!,
+      Items = [.. SkillCategorySelector.Value?.Items ?? []],
+      Label = SkillCategorySelector.Value?.Label
     };
+
+    SkillCategorySelector.ValueChanges().Subscribe(skillCategory =>
+    {
+      Model?.Label = skillCategory?.Label;
+      Model?.Items = [.. skillCategory?.Items ?? []];
+      StateHasChanged();
+    });
 
     SubscribeToAction((UpdateResumeDataResultAction action) =>
     {
@@ -80,14 +89,9 @@
     .Select(ec => (SkillCategoryModel)ec.Model)
     .Subscribe(model =>
     {
-      Dispatcher.Dispatch(new UpdateSkillCategoryAction(SkillCategoryIndex, new SkillCategory(model.Label!, model.Items.ToArray())));
+      Dispatcher.Dispatch(new UpdateSkillCategoryAction(SkillCategoryIndex, new SkillCategory(model.Id, model.Label!, model.Items.ToArray())));
     })
     .AddTo(_subscription);
-  }
-
-  protected override void OnParametersSet()
-  {
-    Model.Items = [.. Category.Items];
   }
 
   protected override async ValueTask DisposeAsyncCore(bool disposing)

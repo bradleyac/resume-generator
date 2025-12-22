@@ -20,6 +20,7 @@
     ~~books~~
     ~~projects~~
     ~~skills~~
+    contact
   Polish more
     ~~Field widths need another look~~
     ~~Resume bullets are a little different than skills or technologies because they are sentences. Are badges right for them?~~
@@ -39,9 +40,10 @@
     Integration tests for change feed processing
     Unit tests
     Start doing TDD?
-* Additional statuses after applied for jobs I've heard back about
+* ~~Additional statuses after applied for jobs I've heard back about~~
     ~~Add place for notes~~
 * Generate practice interview questions based on job description
+* Better loading experiences with placeholders or spinners or something.
 
 # TODOs
 s
@@ -62,4 +64,4 @@ s
       AND/OR handle the x-api-key header in middleware? Then we can explicitly reject requests without an authenticated user or api key before it gets to controller.
         Do we need to differentiate between endpoints when allowing x-api-key instead of easy auth? Should all endpoints be accessible to a user via api key or only the expected ones?
           Principle of least privilege -> Only allow api-key auth for the import endpoint. Then a leaked api-key is not just as privileged as an authenticated user session.
-* Take another look at how BioEditor, etc., work with EditForm. It automatically sets it unmodified when any change happens, but it would be better if it waited to do that until it was saved.
+* ~~Take another look at how BioEditor, etc., work with EditForm. It automatically sets it unmodified when any change happens, but it would be better if it waited to do that until it was saved.~~

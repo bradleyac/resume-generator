@@ -2,14 +2,14 @@
 @using RGS.Frontend.Store.EditSourceResumeDataFeature
 
 <div class="my-4 d-flex flex-column gap-4">
-  @foreach (var (education, index) in Educations.WithIndex())
+  @foreach (var (education, index) in (State.Value.ResumeData?.Education.WithIndex() ?? []))
   {
     <div class="d-flex flex-column border p-3 position-relative">
       <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="@(() => Dispatcher.Dispatch(new RemoveEducationAction(index)))">
         <Icon Name="IconName.XLg" />
       </Badge>
 
-      <EducationEditor @key="index" Education="education" EducationIndex="index" />
+      <EducationEditor @key="education.id" EducationIndex="index" />
     </div>
   }
   <div class="d-flex gap-2 place-items-center">
@@ -18,6 +18,6 @@
 </div>
 
 @code {
-  [Parameter] public required Education[] Educations { get; set; } = [];
+  [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
 }

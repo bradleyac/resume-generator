@@ -23,8 +23,7 @@
 
 
 @code {
-  [Parameter] public required Bio Bio { get; set; }
-
+  [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
 
   private EditContext EditContext { get; set; } = null!;
@@ -38,13 +37,13 @@
 
     Model = new()
     {
-      Name = Bio.Name,
-      Title = Bio.Title,
-      About = Bio.About,
-      City = Bio.City,
-      State = Bio.State,
-      StreetAddress = Bio.StreetAddress,
-      Zip = Bio.Zip
+      Name = State.Value.ResumeData?.Bio.Name,
+      Title = State.Value.ResumeData?.Bio.Title,
+      About = State.Value.ResumeData?.Bio.About,
+      City = State.Value.ResumeData?.Bio.City,
+      State = State.Value.ResumeData?.Bio.State,
+      StreetAddress = State.Value.ResumeData?.Bio.StreetAddress,
+      Zip = State.Value.ResumeData?.Bio.Zip
     };
 
     SubscribeToAction((UpdateResumeDataResultAction action) =>

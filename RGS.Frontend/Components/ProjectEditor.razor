@@ -32,7 +32,7 @@
 @code {
   private EditContext EditContext { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
-  [Parameter] public required Project Project { get; set; }
+  [Inject] private IStateSelection<EditSourceResumeDataState, Project?> ProjectSelector { get; set; } = null!;
   [Parameter] public required int ProjectIndex { get; set; }
   public ProjectModel Model { get; set; } = null!;
   private string NewTechnology { get; set; } = "";
@@ -55,13 +55,25 @@
   {
     base.OnInitialized();
 
+    ProjectSelector.Select(state => state.ResumeData?.Projects[ProjectIndex]);
+
     Model = new()
     {
-      Name = Project.Name,
-      Description = Project.Description,
-      When = Project.When,
-      Technologies = [.. Project.Technologies]
+      Id = ProjectSelector.Value!.id!,
+      Name = ProjectSelector.Value?.Name,
+      Description = ProjectSelector.Value?.Description,
+      When = ProjectSelector.Value?.When,
+      Technologies = [.. ProjectSelector.Value?.Technologies ?? []]
     };
+
+    ProjectSelector.ValueChanges().Subscribe(project =>
+    {
+      Model?.Name = project?.Name;
+      Model?.Description = project?.Description;
+      Model?.When = project?.When;
+      Model?.Technologies = [.. project?.Technologies ?? []];
+      StateHasChanged();
+    });
 
     SubscribeToAction((UpdateResumeDataResultAction action) =>
     {
@@ -82,15 +94,9 @@
     .Select(ec => (ProjectModel)ec.Model)
     .Subscribe(model =>
     {
-      Dispatcher.Dispatch(new UpdateProjectAction(ProjectIndex, new Project(model.Name!, model.Description!, [.. model.Technologies], model.When!)));
+      Dispatcher.Dispatch(new UpdateProjectAction(ProjectIndex, new Project(model.Id, model.Name!, model.Description!, [.. model.Technologies], model.When!)));
     })
     .AddTo(_subscription);
-  }
-
-  protected override void OnParametersSet()
-  {
-    Model.Technologies = Project.Technologies.ToList();
-    EditContext.Validate();
   }
 
   protected override async ValueTask DisposeAsyncCore(bool disposing)

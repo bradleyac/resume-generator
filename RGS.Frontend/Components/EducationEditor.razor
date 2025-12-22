@@ -19,7 +19,7 @@
 @code {
   private EditContext EditContext { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
-  [Parameter] public required Education Education { get; set; }
+  [Inject] private IStateSelection<EditSourceResumeDataState, Education?> EducationSelector { get; set; } = null!;
   [Parameter] public required int EducationIndex { get; set; }
   public EducationModel Model { get; set; } = null!;
   private CompositeDisposable _subscription = new();
@@ -29,13 +29,25 @@
   {
     base.OnInitialized();
 
+    EducationSelector.Select(state => state.ResumeData?.Education.ElementAtOrDefault(EducationIndex));
+
     Model = new()
     {
-      Degree = Education.Degree,
-      School = Education.School,
-      Location = Education.Location,
-      Graduation = Education.Graduation,
+      Id = EducationSelector.Value?.id!,
+      Degree = EducationSelector.Value?.Degree,
+      School = EducationSelector.Value?.School,
+      Location = EducationSelector.Value?.Location,
+      Graduation = EducationSelector.Value?.Graduation,
     };
+
+    EducationSelector.ValueChanges().Subscribe(education =>
+    {
+      Model?.Degree = education?.Degree;
+      Model?.School = education?.School;
+      Model?.Location = education?.Location;
+      Model?.Graduation = education?.Graduation;
+      StateHasChanged();
+    }).AddTo(_subscription);
 
     SubscribeToAction((UpdateResumeDataResultAction action) =>
     {
@@ -56,7 +68,7 @@
     .Select(ec => (EducationModel)ec.Model)
     .Subscribe(model =>
     {
-      Dispatcher.Dispatch(new UpdateEducationAction(EducationIndex, new Education(model.Degree!, model.School!, model.Location!, model.Graduation!)));
+      Dispatcher.Dispatch(new UpdateEducationAction(EducationIndex, new Education(model.Id, model.Degree!, model.School!, model.Location!, model.Graduation!)));
     })
     .AddTo(_subscription);
   }

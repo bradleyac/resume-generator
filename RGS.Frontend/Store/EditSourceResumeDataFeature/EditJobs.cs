@@ -37,7 +37,7 @@ internal static class JobReducers
       SaveState = SaveState.Dirty,
       ResumeData = state.ResumeData with
       {
-        Jobs = [.. state.ResumeData.Jobs, new("", "", "", "", "", [])],
+        Jobs = [.. state.ResumeData.Jobs, new(Guid.NewGuid().ToString(), "", "", "", "", "", [])],
       }
     };
   }

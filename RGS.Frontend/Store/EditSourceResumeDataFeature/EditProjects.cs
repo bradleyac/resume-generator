@@ -37,7 +37,7 @@ internal static class ProjectReducers
       SaveState = SaveState.Dirty,
       ResumeData = state.ResumeData with
       {
-        Projects = [.. state.ResumeData.Projects, new("", "", [], "")]
+        Projects = [.. state.ResumeData.Projects, new(Guid.NewGuid().ToString(), "", "", [], "")]
       }
     };
   }

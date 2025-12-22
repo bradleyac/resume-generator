@@ -35,7 +35,7 @@ internal static class EducationReducers
       SaveState = SaveState.Dirty,
       ResumeData = state.ResumeData with
       {
-        Education = [.. state.ResumeData.Education, new("", "", "", "")],
+        Education = [.. state.ResumeData.Education, new(Guid.NewGuid().ToString(), "", "", "", "")],
       }
     };
   }

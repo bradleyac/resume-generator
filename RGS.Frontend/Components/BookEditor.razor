@@ -18,7 +18,7 @@
 @code {
   private EditContext EditContext { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
-  [Parameter] public required Book Book { get; set; }
+  [Inject] private IStateSelection<EditSourceResumeDataState, Book?> BookSelector { get; set; } = null!;
   [Parameter] public required int BookIndex { get; set; }
   public BookModel Model { get; set; } = null!;
   private CompositeDisposable _subscription = new();
@@ -26,14 +26,23 @@
 
   protected override void OnInitialized()
   {
-    // TODO: Sub to state instead of taking a prop. Maybe take prop for ID? But then we need IDs.
     base.OnInitialized();
+
+    BookSelector.Select(state => state.ResumeData?.Bookshelf.ElementAtOrDefault(BookIndex));
 
     Model = new()
     {
-      Author = Book.Author,
-      Title = Book.Title,
+      Id = BookSelector.Value?.id!,
+      Author = BookSelector.Value?.Author,
+      Title = BookSelector.Value?.Title,
     };
+
+    BookSelector.ValueChanges().Subscribe(book =>
+    {
+      Model?.Author = book?.Author;
+      Model?.Title = book?.Title;
+      StateHasChanged();
+    }).AddTo(_subscription);
 
     SubscribeToAction((UpdateResumeDataResultAction action) =>
     {
@@ -54,7 +63,7 @@
     .Select(ec => (BookModel)ec.Model)
     .Subscribe(model =>
     {
-      Dispatcher.Dispatch(new UpdateBookAction(BookIndex, new Book(model.Title!, model.Author!)));
+      Dispatcher.Dispatch(new UpdateBookAction(BookIndex, new Book(model.Id, model.Title!, model.Author!)));
     })
     .AddTo(_subscription);
   }

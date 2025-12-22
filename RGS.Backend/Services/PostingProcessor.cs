@@ -44,15 +44,30 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
     _logger.LogInformation($"Catch up complete! Processed {processedCount} postings.");
   }
 
-  public async Task ProcessPendingPosting(JobPosting posting)
+  public async Task<Result> ProcessPendingPosting(JobPosting posting)
   {
     var userDataRepository = _userDataRepositoryFactory.CreateUserDataRepository(posting.UserId);
     var userDataContainer = _cosmosClient.GetContainer("Resumes", "UserData");
     var resumeData = await GenerateResumeDataAsync(posting, userDataRepository);
+
+    if (!resumeData.IsSuccess)
+    {
+      return Result.Failure(resumeData.ErrorMessage!, resumeData.StatusCode!.Value);
+    }
+
     var coverLetter = await GenerateCoverLetterAsync(posting);
-    await userDataContainer.UpsertItemAsync(resumeData);
-    await userDataContainer.UpsertItemAsync(coverLetter);
-    await userDataContainer.UpsertItemAsync(posting with { Status = PostingStatus.Ready });
+
+    if (!coverLetter.IsSuccess)
+    {
+      return Result.Failure(coverLetter.ErrorMessage!, coverLetter.StatusCode!.Value);
+    }
+
+    await userDataRepository.SetPostingAsync(posting with
+    {
+      Status = PostingStatus.Ready,
+      CoverLetter = coverLetter.Value,
+      ResumeData = resumeData.Value,
+    });
   }
 
   public async Task<Result> RegenerateCoverLetterAsync(RegenerateCoverLetterModel model)

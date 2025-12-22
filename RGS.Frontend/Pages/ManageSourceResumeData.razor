@@ -25,7 +25,7 @@ else
         <AccordionItem Title="Bio">
           <Content>
             <div class="d-flex flex-column gap-4">
-              <BioEditor Bio="State.Value.ResumeData.Bio" />
+              <BioEditor />
             </div>
           </Content>
         </AccordionItem>
@@ -38,7 +38,7 @@ else
                   <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => Dispatcher.Dispatch(new RemoveSkillCategoryAction(catIndex))">
                     <Icon Name="IconName.XLg" />
                   </Badge>
-                  <SkillList @key="catIndex" Category="category" SkillCategoryIndex="catIndex" />
+                  <SkillCategoryEditor @key="category.id" SkillCategoryIndex="catIndex" />
                 </div>
               }
               <div class="d-flex gap-2 place-items-center">
@@ -52,28 +52,28 @@ else
         <AccordionItem Title="Projects">
           <Content>
             <div class="d-flex flex-column gap-4">
-              <ProjectList Projects="State.Value.ResumeData.Projects" />
+              <ProjectList />
             </div>
           </Content>
         </AccordionItem>
         <AccordionItem Title="Jobs">
           <Content>
             <div class="d-flex flex-column gap-4">
-              <JobList Jobs="State.Value.ResumeData.Jobs" />
+              <JobList />
             </div>
           </Content>
         </AccordionItem>
         <AccordionItem Title="Education">
           <Content>
             <div class="d-flex flex-column gap-4">
-              <EducationList Educations="State.Value.ResumeData.Education" />
+              <EducationList />
             </div>
           </Content>
         </AccordionItem>
         <AccordionItem Title="Books">
           <Content>
             <div class="d-flex flex-column gap-4">
-              <BookList Books="State.Value.ResumeData.Bookshelf" />
+              <BookList />
             </div>
           </Content>
         </AccordionItem>

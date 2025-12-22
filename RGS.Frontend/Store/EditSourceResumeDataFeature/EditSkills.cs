@@ -82,7 +82,7 @@ public static class SkillReducers
       SaveState = SaveState.Dirty,
       ResumeData = state.ResumeData with
       {
-        Skills = [.. state.ResumeData.Skills, new SkillCategory(action.Label, [])]
+        Skills = [.. state.ResumeData.Skills, new SkillCategory(Guid.NewGuid().ToString(), action.Label, [])]
       }
     };
   }

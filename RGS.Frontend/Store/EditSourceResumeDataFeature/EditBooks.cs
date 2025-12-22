@@ -26,7 +26,7 @@ internal static class BooksReducers
   }
 
   [ReducerMethod]
-  public static EditSourceResumeDataState AddEducation(EditSourceResumeDataState state, AddBookAction action)
+  public static EditSourceResumeDataState AddBook(EditSourceResumeDataState state, AddBookAction action)
   {
     if (state.ResumeData is null) return state;
 
@@ -35,13 +35,13 @@ internal static class BooksReducers
       SaveState = SaveState.Dirty,
       ResumeData = state.ResumeData with
       {
-        Bookshelf = [.. state.ResumeData.Bookshelf, new("", "")],
+        Bookshelf = [.. state.ResumeData.Bookshelf, new(Guid.NewGuid().ToString(), "", "")],
       }
     };
   }
 
   [ReducerMethod]
-  public static EditSourceResumeDataState UpdateEducation(EditSourceResumeDataState state, UpdateBookAction action)
+  public static EditSourceResumeDataState UpdateBook(EditSourceResumeDataState state, UpdateBookAction action)
   {
     if (state.ResumeData is null) return state;
 

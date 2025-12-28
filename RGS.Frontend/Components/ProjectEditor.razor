@@ -15,9 +15,9 @@
     <div class="d-flex flex-wrap gap-3 ms-3">
       @foreach (var (item, index) in @Model.Technologies.WithIndex())
       {
-        <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="@(() => RemoveTechAt(index))">
-            <Icon Name="IconName.XLg" />
-          </Badge>
+        <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">
+          @item
+          <CloseButtonBadge OnClick="() => RemoveTechAt(index)" />
         </Badge>
       }
     </div>
@@ -40,13 +40,13 @@
   private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
-  private async Task AddTech()
+  private void AddTech()
   {
     Dispatcher.Dispatch(new AddTechAction { Tech = NewTechnology, ProjectIndex = ProjectIndex });
     NewTechnology = "";
   }
 
-  private async Task RemoveTechAt(int index)
+  private void RemoveTechAt(int index)
   {
     Dispatcher.Dispatch(new RemoveTechAction { TechIndex = index, ProjectIndex = ProjectIndex });
   }

@@ -1,0 +1,76 @@
+﻿@using Fluxor
+@using Fluxor.Blazor.Web.Components
+@using R3
+@using RGS.Backend.Shared.ViewModels
+@using RGS.Frontend.Store
+@using RGS.Frontend.Store.EditSourceResumeDataFeature
+
+@inherits FluxorComponent
+
+<EditForm EditContext="@EditContext" FormName="EditContact">
+  <DataAnnotationsValidator />
+  <ValidationSummary />
+  <div class="d-flex flex-column gap-4">
+    <FormField @bind-Value="@(Model.Email)" class="col-6" />
+    <FormField @bind-Value="@(Model.Phone)" class="col-6" />
+    <FormField @bind-Value="@(Model.Github)" class="col-6" />
+  </div>
+</EditForm>
+
+
+@code {
+  [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+
+  private EditContext EditContext { get; set; } = null!;
+  private ContactModel Model { get; set; } = null!;
+  private CompositeDisposable _subscription = new();
+  private bool _disposedValue;
+
+  protected override void OnInitialized()
+  {
+    base.OnInitialized();
+
+    Model = new()
+    {
+      Email = State.Value.ResumeData?.Contact.Email,
+      Github = State.Value.ResumeData?.Contact.Github,
+      Phone = State.Value.ResumeData?.Contact.Phone,
+    };
+
+    SubscribeToAction((UpdateResumeDataResultAction action) =>
+    {
+      if (action.Success)
+      {
+        EditContext.MarkAsUnmodified();
+      }
+    });
+
+    _subscription = new CompositeDisposable();
+    EditContext = new EditContext(Model);
+    Observable.FromEventHandler<FieldChangedEventArgs>(
+    a => EditContext.OnFieldChanged += a,
+    a => EditContext.OnFieldChanged -= a
+    ).Select(args => args.sender as EditContext)
+    .WhereNotNull()
+    .Where(ec => ec.Validate())
+    .Select(ec => (ContactModel)ec.Model)
+    .Subscribe(model =>
+    {
+      Dispatcher.Dispatch(new UpdateContactAction(new Contact(model.Email!, model.Phone!, model.Github!)));
+    })
+    .AddTo(_subscription); ;
+  }
+
+  protected override async ValueTask DisposeAsyncCore(bool disposing)
+  {
+    await base.DisposeAsyncCore(disposing);
+
+    if (!_disposedValue)
+    {
+      _subscription.Dispose();
+    }
+
+    _disposedValue = true;
+  }
+}

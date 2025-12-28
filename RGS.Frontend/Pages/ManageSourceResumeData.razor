@@ -22,62 +22,31 @@ else
     </div>
     <div class="d-flex flex-column mt-4 gap-4 pe-4">
       <Accordion AlwaysOpen="true">
-        <AccordionItem Title="Bio">
-          <Content>
-            <div class="d-flex flex-column gap-4">
-              <BioEditor />
-            </div>
-          </Content>
-        </AccordionItem>
-        <AccordionItem Title="Skills">
-          <Content>
-            <div class="d-flex flex-column gap-4 my-3">
-              @foreach (var (category, catIndex) in State.Value.ResumeData.Skills.WithIndex())
-              {
-                <div class="d-flex flex-column border p-3 position-relative">
-                  <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => Dispatcher.Dispatch(new RemoveSkillCategoryAction(catIndex))">
-                    <Icon Name="IconName.XLg" />
-                  </Badge>
-                  <SkillCategoryEditor @key="category.id" SkillCategoryIndex="catIndex" />
-                </div>
-              }
-              <div class="d-flex gap-2 place-items-center">
-                <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
-                <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => Dispatcher.Dispatch(new AddSkillCategoryAction(@NewCategory!)))">Add Skill Category</Button>
-              </div>
-
-            </div>
-          </Content>
-        </AccordionItem>
-        <AccordionItem Title="Projects">
-          <Content>
-            <div class="d-flex flex-column gap-4">
-              <ProjectList />
-            </div>
-          </Content>
-        </AccordionItem>
-        <AccordionItem Title="Jobs">
-          <Content>
-            <div class="d-flex flex-column gap-4">
-              <JobList />
-            </div>
-          </Content>
-        </AccordionItem>
-        <AccordionItem Title="Education">
-          <Content>
-            <div class="d-flex flex-column gap-4">
-              <EducationList />
-            </div>
-          </Content>
-        </AccordionItem>
-        <AccordionItem Title="Books">
-          <Content>
-            <div class="d-flex flex-column gap-4">
-              <BookList />
-            </div>
-          </Content>
-        </AccordionItem>
+        @foreach (var sect in Enum.GetValues<Section>())
+        {
+          @RenderAccordionSection(sect)
+        }
       </Accordion>
     </div>
   </div>
+}
+
+@code {
+  private RenderFragment? RenderSection(Section sect) => sect switch
+  {
+    Section.Bio => @<BioEditor />,
+Section.Contact => @<ContactEditor />,
+Section.Skills => @<SkillCategoryList />,
+Section.Projects => @<ProjectList />,
+Section.Jobs => @<JobList />,
+Section.Education => @<EducationList />,
+Section.Books => @<BookList />,
+_ => null
+  };
+
+  private RenderFragment RenderAccordionSection(Section sect) => @<AccordionItem Title="@sect.ToString()">
+      <Content>
+        @RenderSection(sect);
+      </Content>
+  </AccordionItem>;
 }

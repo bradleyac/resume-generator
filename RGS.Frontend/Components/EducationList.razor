@@ -5,10 +5,7 @@
   @foreach (var (education, index) in (State.Value.ResumeData?.Education.WithIndex() ?? []))
   {
     <div class="d-flex flex-column border p-3 position-relative">
-      <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="@(() => Dispatcher.Dispatch(new RemoveEducationAction(index)))">
-        <Icon Name="IconName.XLg" />
-      </Badge>
-
+      <CloseButtonBadge OnClick="() => Dispatcher.Dispatch(new RemoveEducationAction(index))" />
       <EducationEditor @key="education.id" EducationIndex="index" />
     </div>
   }

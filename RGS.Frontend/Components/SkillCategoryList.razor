@@ -1,0 +1,22 @@
+﻿@using Fluxor
+@using RGS.Frontend.Store.EditSourceResumeDataFeature
+
+<div class="my-4 d-flex flex-column gap-4">
+  @foreach (var (category, catIndex) in State.Value.ResumeData?.Skills.WithIndex() ?? [])
+  {
+    <div class="d-flex flex-column border p-3 position-relative">
+      <CloseButtonBadge OnClick="() => Dispatcher.Dispatch(new RemoveSkillCategoryAction(catIndex))" />
+      <SkillCategoryEditor @key="category.id" SkillCategoryIndex="catIndex" />
+    </div>
+  }
+  <div class="d-flex gap-2 place-items-center">
+    <input type="text" class="col-3" @bind-value="@NewCategory" @bind-value:event="oninput" />
+    <Button Type="ButtonType.Button" Color="ButtonColor.Primary" disabled="@(NewCategory is null or "")" @onclick="@(() => { Dispatcher.Dispatch(new AddSkillCategoryAction(@NewCategory!)); NewCategory = ""; })">Add Skill Category</Button>
+  </div>
+</div>
+
+@code {
+  [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
+  [Inject] private IDispatcher Dispatcher { get; set; } = null!;
+  private string? NewCategory { get; set; }
+}

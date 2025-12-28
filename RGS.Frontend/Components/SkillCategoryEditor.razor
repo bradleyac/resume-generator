@@ -15,9 +15,9 @@
     <div class="d-flex flex-wrap gap-3 ms-3">
       @foreach (var (item, index) in @Model.Items.WithIndex())
       {
-        <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">@item<Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="() => RemoveSkillAt(index)">
-            <Icon Name="IconName.XLg" />
-          </Badge>
+        <Badge @key="@index" Color="BadgeColor.Success" Position="Position.Relative">
+          @item
+          <CloseButtonBadge OnClick="() => RemoveSkillAt(index)" />
         </Badge>
       }
     </div>
@@ -40,13 +40,13 @@
   private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
-  private async Task AddSkill()
+  private void AddSkill()
   {
     Dispatcher.Dispatch(new AddSkillAction { Skill = NewSkill, SkillCategoryIndex = SkillCategoryIndex });
     NewSkill = "";
   }
 
-  private async Task RemoveSkillAt(int index)
+  private void RemoveSkillAt(int index)
   {
     Dispatcher.Dispatch(new RemoveSkillAction { SkillIndex = index, SkillCategoryIndex = SkillCategoryIndex });
   }
@@ -55,7 +55,7 @@
   {
     base.OnInitialized();
 
-    SkillCategorySelector.Select(state => state.ResumeData?.Skills[SkillCategoryIndex]);
+    SkillCategorySelector.Select(state => SkillCategoryIndex < state.ResumeData?.Skills.Length ? state.ResumeData?.Skills[SkillCategoryIndex] : null);
 
     Model = new()
     {

@@ -8,11 +8,7 @@
   @foreach (var (book, index) in (State.Value.ResumeData?.Bookshelf.WithIndex() ?? []))
   {
     <div class="d-flex flex-column border p-3 position-relative">
-      <Badge style="aspect-ratio: 1 / 1; display: flex; place-items: center" IndicatorType="BadgeIndicatorType.RoundedCircle" Color="BadgeColor.Danger" Position="Position.Absolute" Placement="BadgePlacement.TopLeft" @onclick="@(() => Dispatcher.Dispatch(new RemoveBookAction(index)))">
-        <Icon Name="IconName.XLg" />
-      </Badge>
-
-      @* // TODO: Figure out a better @key. Index sucks (= broken) and so does book.  *@
+      <CloseButtonBadge OnClick="() => Dispatcher.Dispatch(new RemoveBookAction(index))" />
       <BookEditor @key="book.id" BookIndex="index" />
     </div>
   }

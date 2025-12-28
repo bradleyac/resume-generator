@@ -1,5 +1,5 @@
 ﻿<section class="m-3">
-  <EditForm Model="@model" @key="@model" OnValidSubmit="HandleValidSubmit">
+  <EditForm Model="@model" @key="@model" OnValidSubmit="HandleValidSubmit" FormName="RegenerateCoverLetter">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <div class="mb-3">
@@ -30,9 +30,9 @@
     await OnCancel.InvokeAsync();
   }
 
-    protected override Task OnInitializedAsync() 
-    {
-      model = new RegenerateCoverLetterModel{ PostingId = PostingId };
-      return Task.CompletedTask;
-    }
+  protected override Task OnInitializedAsync()
+  {
+    model = new RegenerateCoverLetterModel { PostingId = PostingId };
+    return Task.CompletedTask;
+  }
 }

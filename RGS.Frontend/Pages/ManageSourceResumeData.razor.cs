@@ -11,14 +11,13 @@ namespace RGS.Frontend.Pages;
 
 public partial class ManageSourceResumeData : FluxorComponent
 {
+  private enum Section { Bio, Contact, Skills, Projects, Jobs, Education, Books };
   private CompositeDisposable _subscription = new();
   private bool _disposedValue;
 
   [Inject] private IState<EditSourceResumeDataState> State { get; set; } = null!;
   [Inject] private ILogger<ManageSourceResumeData> Logger { get; set; } = null!;
   [Inject] private IDispatcher Dispatcher { get; set; } = null!;
-
-  private string NewCategory { get; set; } = "";
 
   protected override async Task OnInitializedAsync()
   {

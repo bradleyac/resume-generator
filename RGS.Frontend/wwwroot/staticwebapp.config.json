@@ -5,12 +5,6 @@
       "allowedRoles": [
         "anonymous"
       ]
-    },
-    {
-      "route": "/*",
-      "allowedRoles": [
-        "contributor"
-      ]
     }
   ],
   "responseOverrides": {

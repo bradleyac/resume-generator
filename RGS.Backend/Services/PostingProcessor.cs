@@ -16,7 +16,7 @@ namespace RGS.Backend.Services;
 internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient cosmosClient, AzureOpenAIClient aiClient, IUserDataRepositoryFactory userDataRepositoryFactory)
 {
   private const int LineLength = 85;
-  private const int MaxLines = 25;
+  private const int MaxLines = 23;
 
   private readonly ILogger<PostingProcessor> _logger = logger;
   private readonly CosmosClient _cosmosClient = cosmosClient;

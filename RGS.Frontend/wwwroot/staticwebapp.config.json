@@ -1,6 +1,12 @@
 {
   "routes": [
     {
+      "route": "/.auth/*",
+      "allowedRoles": [
+        "anonymous"
+      ]
+    },
+    {
       "route": "/api/ImportJobPosting",
       "allowedRoles": [
         "anonymous"

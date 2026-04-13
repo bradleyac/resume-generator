@@ -36,7 +36,8 @@ internal class PostingProcessor(ILogger<PostingProcessor> logger, CosmosClient c
       foreach (var posting in await pendingPostings.ReadNextAsync())
       {
         _logger.LogInformation($"Processing posting {posting.id}");
-        await ProcessPendingPosting(posting);
+        var result = await ProcessPendingPosting(posting);
+        _logger.LogInformation(result.IsSuccess ? $"Successfully processed posting {posting.id}" : $"Failed to process posting {posting.id}: {result.ErrorMessage}");
         ++processedCount;
       }
     }

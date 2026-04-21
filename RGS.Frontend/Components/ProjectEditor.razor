@@ -55,7 +55,7 @@
   {
     base.OnInitialized();
 
-    ProjectSelector.Select(state => state.ResumeData?.Projects[ProjectIndex]);
+    ProjectSelector.Select(state => state.ResumeData?.Projects.Length > ProjectIndex ? state.ResumeData?.Projects[ProjectIndex] : null);
 
     Model = new()
     {

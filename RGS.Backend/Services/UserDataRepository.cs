@@ -155,7 +155,7 @@ internal partial class UserDataRepository : IUserDataRepository
 
       if (response.StatusCode != HttpStatusCode.OK)
       {
-        Logger.LogInformation(posting.ToString());
+        Logger.LogError($"Failed to set posting: {posting.ToString()}");
       }
 
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set job posting", response.StatusCode.FromCosmosDBStatusCode());

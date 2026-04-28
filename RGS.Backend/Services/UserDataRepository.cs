@@ -153,6 +153,11 @@ internal partial class UserDataRepository : IUserDataRepository
       var container = CosmosClient.GetContainer("Resumes", "UserData");
       var response = await container.UpsertItemAsync<UserDataRecord>(posting);
 
+      if (response.StatusCode != HttpStatusCode.OK)
+      {
+        Logger.LogInformation(posting.ToString());
+      }
+
       return response.StatusCode == HttpStatusCode.OK ? Result.Success() : Result.Failure("Failed to set job posting", response.StatusCode.FromCosmosDBStatusCode());
     }
     catch (Exception ex)
